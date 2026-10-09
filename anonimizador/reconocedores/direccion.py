@@ -1,4 +1,7 @@
+import re
+
 from presidio_analyzer import Pattern, PatternRecognizer
+from spacy.lang.es.stop_words import STOP_WORDS
 
 # --------------------------------------------------------------------------- #
 # Bloques de construcción
@@ -152,6 +155,18 @@ class ReconocedorDireccion(PatternRecognizer):
 
     CONTEXTO = ["dirección", "direccion", "residencia", "domicilio", "reside",
                 "barrio", "localidad", "vive"]
+
+    def analyze(self, text, entities, nlp_artifacts=None):
+        """Sin palabras funcionales al final del nombre del barrio/finca: en texto
+        sin puntuación "barrio san carlos se encuentra…" capturaba "se"."""
+        resultados = super().analyze(text, entities, nlp_artifacts)
+        for r in resultados:
+            while True:
+                m = re.search(r"\s+([^\W\d_]+)$", text[r.start:r.end])
+                if not m or m.group(1).lower() not in STOP_WORDS:
+                    break
+                r.end = r.start + m.start()
+        return resultados
 
     def __init__(self):
         super().__init__(

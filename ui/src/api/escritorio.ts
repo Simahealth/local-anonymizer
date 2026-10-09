@@ -163,6 +163,18 @@ export interface ApiEscritorio {
     activo: boolean | null,
     categoria: string | null,
   ): Promise<DocumentoRevision>;
+  /** Muestra (activo=false) u oculta el tramo y todos los del documento con el mismo texto. */
+  alternar_valor(
+    carpeta: string,
+    codigo: string,
+    tramoId: number,
+    activo: boolean,
+  ): Promise<{ ids: number[]; documento: DocumentoRevision }>;
+  /** Estado explícito de varios tramos (deshacer). */
+  fijar_tramos(carpeta: string, codigo: string, ids: number[], activo: boolean): Promise<DocumentoRevision>;
+  cambiar_categoria(carpeta: string, codigo: string, ids: number[], categoria: string): Promise<DocumentoRevision>;
+  mostrar_en_lote(carpeta: string, valor: string): Promise<{ documentos: number; tramos: number }>;
+  ocultar_en_lote(carpeta: string, valor: string, categoria: string): Promise<{ documentos: number; tramos: number }>;
   marcar_revisado(carpeta: string, codigo: string, revisado: boolean): Promise<Contadores>;
   exportar_relacion(carpeta: string): Promise<string>;
 

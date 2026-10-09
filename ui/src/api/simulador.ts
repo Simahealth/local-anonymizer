@@ -344,6 +344,55 @@ export function crearSimulador(): ApiEscritorio {
       if (t && categoria !== null) t.categoria = categoria;
       return revision(doc(carpeta, cod));
     },
+    async alternar_valor(carpeta, cod, tramoId, activoNuevo) {
+      const d = doc(carpeta, cod);
+      const base = d.tramos.find((t) => t.id === tramoId);
+      if (!base) return { ids: [], documento: revision(d) };
+      const clave = (t: TramoRevision) => d.texto.slice(t.inicio, t.fin).toLowerCase().split(/\s+/).join(" ");
+      const ids: number[] = [];
+      for (const t of d.tramos) {
+        if (t.activo !== activoNuevo && clave(t) === clave(base)) {
+          t.activo = activoNuevo;
+          ids.push(t.id);
+        }
+      }
+      return { ids, documento: revision(d) };
+    },
+    async fijar_tramos(carpeta, cod, ids, activoNuevo) {
+      const d = doc(carpeta, cod);
+      for (const t of d.tramos) if (ids.includes(t.id)) t.activo = activoNuevo;
+      return revision(d);
+    },
+    async cambiar_categoria(carpeta, cod, ids, categoria) {
+      const d = doc(carpeta, cod);
+      for (const t of d.tramos) if (ids.includes(t.id)) t.categoria = categoria;
+      return revision(d);
+    },
+    async mostrar_en_lote(carpeta, valor) {
+      const v = valor.toLowerCase();
+      let documentos = 0;
+      let tramos = 0;
+      for (const d of lote(carpeta).docs) {
+        const cambiados = d.tramos.filter((t) => t.activo && d.texto.slice(t.inicio, t.fin).toLowerCase() === v);
+        cambiados.forEach((t) => (t.activo = false));
+        if (cambiados.length) documentos++;
+        tramos += cambiados.length;
+      }
+      return { documentos, tramos };
+    },
+    async ocultar_en_lote(carpeta, valor, categoria) {
+      let documentos = 0;
+      let tramos = 0;
+      for (const d of lote(carpeta).docs) {
+        const i = d.texto.toLowerCase().indexOf(valor.toLowerCase());
+        if (d.estado !== "completado" || i < 0) continue;
+        const antes = d.tramos.length;
+        await this.ocultar(carpeta, d.codigo, i, i + valor.length, categoria, true);
+        documentos++;
+        tramos += Math.max(1, d.tramos.length - antes);
+      }
+      return { documentos, tramos };
+    },
     async marcar_revisado(carpeta, cod, revisado) {
       doc(carpeta, cod).revisado = revisado;
       return contar(lote(carpeta).docs);

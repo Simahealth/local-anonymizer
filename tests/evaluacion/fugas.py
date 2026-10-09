@@ -6,7 +6,7 @@ que de verdad importa para la privacidad: se corre el pipeline completo
 salida. Un valor "fuga" si alguno de sus fragmentos identificadores sobrevive:
 
   * nombres:            cualquier palabra de ≥3 letras (sin conectores "de", "la"…)
-  * direcciones:        el valor completo o un número de 2+ dígitos (la placa)
+  * direcciones:        el valor completo o su placa (los dos últimos números)
   * resto (documentos,
     teléfonos, emails,
     números de registro): el valor completo, o su secuencia de dígitos
@@ -40,8 +40,11 @@ def fragmentos(categoria: str, valor: str) -> list[str]:
     if categoria == "nombres":
         return [p for p in re.findall(r"[^\W\d_]{3,}", valor) if p.lower() not in CONECTORES]
     if categoria == "direcciones":
-        # Números de 2+ dígitos: uno suelto ("piso 4") aparece por azar en el texto.
-        return [valor] + re.findall(r"\d{2,}", valor)
+        # El valor completo o la placa ("12 - 30", "82 15"): un número suelto de
+        # la dirección aparece por azar en historias largas (dosis, signos vitales).
+        numeros = list(re.finditer(r"\d+", valor))
+        placa = [valor[numeros[-2].start():numeros[-1].end()]] if len(numeros) >= 2 else []
+        return [valor] + placa
     digitos = re.sub(r"\D", "", valor)
     return [valor] + ([digitos] if len(digitos) >= 5 else [])
 

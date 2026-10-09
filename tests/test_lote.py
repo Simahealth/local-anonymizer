@@ -174,3 +174,31 @@ def test_fragmentar_corta_en_saltos_de_linea():
     assert all(len(p) <= 1000 for _, p in partes)
     assert all(p.endswith("\n") for _, p in partes[:-1])
     assert all(texto[o:o + len(p)] == p for o, p in partes)
+
+
+def test_alternar_valor_y_deshacer(tmp_path, anonimizador):
+    pdf = crear_pdf(tmp_path / "hc.pdf",
+                    "Paciente Laura Martinez Ospina con canula nasal. Control de canula. Laura Martinez Ospina estable.")
+    lote = Lote.crear([pdf], tmp_path / "salida")
+    lote.procesar(anonimizador)
+    codigo = lote.almacen.listar(0, 1)[1][0]["codigo"]
+    doc = lote.documento_revision(codigo)
+    nombre = next(t for t in doc["tramos"] if doc["texto"][t["inicio"]:t["fin"]].startswith("Laura"))
+    ids = lote.alternar_valor(codigo, nombre["id"], activo=False)
+    assert len(ids) == 2  # las dos apariciones del mismo nombre
+    assert texto_pdf(lote.carpeta_pdfs / f"{codigo}.pdf").count("Laura Martinez Ospina") == 2
+    lote.fijar_tramos(codigo, ids, True)  # deshacer
+    assert "Laura" not in texto_pdf(lote.carpeta_pdfs / f"{codigo}.pdf")
+
+
+def test_mostrar_y_ocultar_en_todo_el_lote(tmp_path, anonimizador):
+    pdfs = [crear_pdf(tmp_path / f"{n}.pdf", f"Paciente Laura Martinez Ospina en cama {n}. Turno de la jefe Rosalba.")
+            for n in range(3)]
+    lote = Lote.crear(pdfs, tmp_path / "salida")
+    lote.procesar(anonimizador)
+    r = lote.ocultar_en_lote("jefe Rosalba", "nombres")
+    assert r["documentos"] == 3
+    r = lote.mostrar_en_lote("jefe rosalba")
+    assert r["documentos"] == 3 and r["tramos"] == 3
+    for _, (d,) in [lote.almacen.listar(i, 1) for i in range(3)]:
+        assert "Rosalba" in texto_pdf(lote.carpeta_pdfs / f"{d['codigo']}.pdf")

@@ -337,6 +337,59 @@ class Lote:
         self.almacen.actualizar_tramo(doc["id"], tramo_id, activo, categoria)
         self.regenerar_pdf(codigo)
 
+    def alternar_valor(self, codigo: str, tramo_id: int, activo: bool) -> list[int]:
+        """Muestra (activo=False) u oculta el tramo y TODOS los del documento con
+        el mismo texto: si "canula" no es un dato personal, no lo es en ninguna
+        de sus 12 apariciones. Retorna los ids cambiados (para deshacer)."""
+        doc = self._doc(codigo)
+        texto = self.almacen.texto(doc["id"])
+        tramos = self.almacen.tramos(doc["id"])
+        base = next((t for t in tramos if t.id == tramo_id), None)
+        if base is None:
+            return []
+        clave = _clave(texto[base.inicio:base.fin])
+        ids = [t.id for t in tramos if t.activo != activo and _clave(texto[t.inicio:t.fin]) == clave]
+        self.almacen.fijar_activos(doc["id"], ids, activo)
+        self.regenerar_pdf(codigo)
+        return ids
+
+    def cambiar_categoria(self, codigo: str, ids: list[int], categoria: str) -> None:
+        if categoria not in ETIQUETAS_PII:
+            raise ValueError(f"Categoría desconocida: {categoria}")
+        doc = self._doc(codigo)
+        for i in ids:
+            self.almacen.actualizar_tramo(doc["id"], i, categoria=categoria)
+        self.regenerar_pdf(codigo)
+
+    def fijar_tramos(self, codigo: str, ids: list[int], activo: bool) -> None:
+        """Estado explícito de un conjunto de tramos (deshacer)."""
+        self.almacen.fijar_activos(self._doc(codigo)["id"], ids, activo)
+        self.regenerar_pdf(codigo)
+
+    def mostrar_en_lote(self, valor: str) -> dict:
+        """Muestra `valor` en todos los documentos del lote (falso positivo
+        repetido, p. ej. un término clínico que el detector tomó por nombre)."""
+        cambios: dict[int, list[int]] = {}
+        for tramo_id, doc_id in self.almacen.tramos_con_texto(" ".join(valor.split()), activo=True):
+            cambios.setdefault(doc_id, []).append(tramo_id)
+        for doc_id, ids in cambios.items():
+            self.almacen.fijar_activos(doc_id, ids, False)
+            self.regenerar_pdf(self.almacen.documento_por_id(doc_id)["codigo"])
+        return {"documentos": len(cambios), "tramos": sum(len(v) for v in cambios.values())}
+
+    def ocultar_en_lote(self, valor: str, categoria: str) -> dict:
+        """Oculta `valor` (palabra completa) en todos los documentos del lote
+        donde aparezca: un nombre que el detector no vio en ninguno."""
+        valor = " ".join(valor.split())
+        patron = re.compile(_patron_literal(valor), re.IGNORECASE)
+        documentos = tramos = 0
+        for doc in self.almacen.documentos_que_contienen(valor):
+            m = patron.search(self.almacen.texto(doc["id"]))
+            if m:
+                tramos += self.ocultar(doc["codigo"], m.start(), m.end(), categoria, todas=True)
+                documentos += 1
+        return {"documentos": documentos, "tramos": tramos}
+
     def marcar_revisado(self, codigo: str, revisado: bool) -> None:
         self.almacen.marcar_revisado(self._doc(codigo)["id"], revisado)
 
@@ -357,6 +410,10 @@ class Lote:
             "texto": texto,
             "tramos": [_tramo_js(t, a_js) for t in self.almacen.tramos(doc["id"])],
         }
+
+
+def _clave(fragmento: str) -> str:
+    return " ".join(fragmento.lower().split())
 
 
 def _tramo_js(t: TramoGuardado, a_js: Callable[[int], int]) -> dict:

@@ -93,3 +93,31 @@ describe("rangoDeSeleccion", () => {
     expect(rangoDeSeleccion(r, cont)).toEqual({ inicio: 0, fin: 30 });
   });
 });
+
+describe("sugerirCategoria", async () => {
+  const { sugerirCategoria } = await import("./segmentos");
+  it("adivina la categoría por la forma", () => {
+    expect(sugerirCategoria("rosalba mena")).toBe("nombres");
+    expect(sugerirCategoria("1077432198")).toBe("documentos");
+    expect(sugerirCategoria("52.345.678")).toBe("documentos");
+    expect(sugerirCategoria("315 234 5678")).toBe("telefonos");
+    expect(sugerirCategoria("6017654321")).toBe("telefonos");
+    expect(sugerirCategoria("laura gmail com")).toBe("emails");
+    expect(sugerirCategoria("calle 45 sur # 12 - 30")).toBe("direcciones");
+  });
+});
+
+describe("agrupar", async () => {
+  const { agrupar } = await import("./segmentos");
+  it("un grupo por valor, los más repetidos primero", () => {
+    const texto = "canula y Canula y laura y canula";
+    const t = (id: number, i: number, f: number, activo = true): TramoRevision => ({
+      id, inicio: i, fin: f, categoria: "ubicaciones", origen: "auto", activo,
+    });
+    const grupos = agrupar({
+      codigo: "HC-X", nombreOriginal: "", rutaOriginal: "", estado: "completado", error: "", revisado: false,
+      texto, tramos: [t(1, 0, 6), t(2, 9, 15, false), t(3, 18, 23), t(4, 26, 32)],
+    });
+    expect(grupos.map((g) => [g.clave, g.tramos.length, g.activos])).toEqual([["canula", 3, 2], ["laura", 1, 1]]);
+  });
+});

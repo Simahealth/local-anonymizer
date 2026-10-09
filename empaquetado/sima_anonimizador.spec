@@ -17,7 +17,7 @@ from PyInstaller.utils.hooks import collect_all
 
 RAIZ = Path(SPECPATH).parent
 NOMBRE = "SIMA Anonimizador"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 datas = [
     (str(RAIZ / "ui" / "dist"), "ui/dist"),

@@ -17,7 +17,13 @@ def test_no_reemplaza_dentro_de_otra_palabra():
 
 
 def test_numero_no_se_reemplaza_dentro_de_otro():
-    assert r.reemplazar("Edad 21, año 2021", vacio(edades={"21"})) == "Edad [EDAD], año 2021"
+    assert r.reemplazar("Edad 21 años, año 2021", vacio(edades={"21 años"})) == "Edad [EDAD], año 2021"
+
+
+def test_numero_corto_suelto_no_se_propaga():
+    # Un "3" solo no se busca en todo el texto: destruiría dosis y días.
+    texto = "3 ml cada 3 horas"
+    assert r.reemplazar(texto, vacio(edades={"3"})) == texto
 
 
 def test_ignora_mayusculas():

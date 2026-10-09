@@ -1,4 +1,7 @@
 import re
+from pathlib import Path
+
+from spacy.lang.es.stop_words import STOP_WORDS
 
 from presidio_analyzer import AnalyzerEngine
 from presidio_analyzer.nlp_engine import NlpEngineProvider
@@ -10,7 +13,8 @@ from .reconocedores.edad import ReconocedorEdad
 from .reconocedores.eps import ReconocedorEPS
 from .reconocedores.fecha import ReconocedorFecha
 from .reconocedores.nombre import ReconocedorNombreMayusculas
-from .reconocedores.nombre_gazetteer import ReconocedorNombreGazetteer
+from .reconocedores.email_espaciado import ReconocedorEmailEspaciado
+from .reconocedores.nombre_gazetteer import ReconocedorNombreGazetteer, _normalizar, cargar_nombres
 from .reconocedores.registro_medico import ReconocedorRegistroMedico
 from .reconocedores.telefono import ReconocedorTelefonoColombia
 
@@ -47,6 +51,7 @@ MAPA_ENTIDADES: dict[str, str] = {
     "REGISTRO_CO":   "numeros_registro",
     "NOMBRE_MAYUS":  "nombres",
     "NOMBRE_GAZETTEER": "nombres",
+    "EMAIL_ESPACIADO": "emails",
 }
 
 # Palabras que spaCy clasifica erróneamente como entidades en texto clínico.
@@ -78,6 +83,13 @@ FALSOS_POSITIVOS_NER: dict[str, set[str]] = {
 
 # Entidades de spaCy (NER estadístico), a diferencia de los reconocedores por patrón.
 _ENTIDADES_NER = {"PERSON", "LOCATION"}
+
+_GAZETTEER = cargar_nombres()
+_LUGARES = {
+    _normalizar(linea.strip())
+    for linea in (Path(__file__).parent / "datos" / "lugares_co.txt").read_text(encoding="utf-8").splitlines()
+    if linea.strip() and not linea.startswith("#")
+}
 
 # Longitud mínima de caracteres para aceptar un match de LOCATION.
 MIN_LONGITUD_UBICACION = 4
@@ -125,6 +137,7 @@ class DetectorPII:
         analizador.registry.add_recognizer(ReconocedorRegistroMedico())
         analizador.registry.add_recognizer(ReconocedorNombreMayusculas())
         analizador.registry.add_recognizer(ReconocedorNombreGazetteer())
+        analizador.registry.add_recognizer(ReconocedorEmailEspaciado())
         return analizador
 
     def _detectar_con_presidio(self, texto: str) -> dict[str, set[str]]:
@@ -145,9 +158,40 @@ class DetectorPII:
                 continue
             if valor.lower() in FALSOS_POSITIVOS_NER.get(categoria, set()):
                 continue
+            if r.entity_type in _ENTIDADES_NER and not self._ner_plausible(r.entity_type, valor):
+                continue
             pii[categoria].add(valor)
         pii["nombres"] = expandir_nombres(texto, pii["nombres"])
         return self._descartar_subsumidos(texto, pii)
+
+    def _ner_plausible(self, entidad: str, valor: str) -> bool:
+        """Filtra el NER estadístico de spaCy donde es poco fiable.
+
+        En exports todo en minúscula y sin tildes, spaCy etiqueta como lugar o
+        persona casi cualquier término clínico ("canula", "inhaloterapia",
+        "luxacion", "adiciona(n"): en un lote real de 100 historias, más del 90 %
+        de sus LOCATION y la mitad de sus PERSON eran de este tipo. Ahí solo se
+        acepta lo que tenga respaldo: un lugar colombiano conocido, o al menos
+        una palabra que sea un nombre/apellido del gazetteer. Con mayúsculas se
+        confía en spaCy, salvo un PERSON hecho solo de palabras comunes del idioma
+        ("Evolucion Consulta Externa").
+        """
+        tokens = [_normalizar(t) for t in re.findall(r"[^\W\d_]+", valor)]
+        if not tokens:
+            return False
+        en_gazetteer = any(t in _GAZETTEER and t not in STOP_WORDS for t in tokens)
+        if entidad == "LOCATION":
+            if valor.islower():
+                return " ".join(tokens) in _LUGARES or tokens[-1] in _LUGARES
+            return True
+        if valor.islower():
+            return en_gazetteer
+        comunes = all(self._palabra_comun(t) for t in tokens)
+        return en_gazetteer or not comunes
+
+    def _palabra_comun(self, token: str) -> bool:
+        lexema = self._analizador.nlp_engine.nlp["es"].vocab[token]
+        return token in STOP_WORDS or lexema.has_vector
 
     def _descartar_subsumidos(self, texto: str, pii: dict[str, set[str]]) -> dict[str, set[str]]:
         """Descarta valores que son un fragmento de otro valor más largo, EN

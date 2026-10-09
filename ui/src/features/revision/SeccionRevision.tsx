@@ -25,6 +25,7 @@ import { getIconGlyph } from "../../styles/ds/foundations/icons/icons";
 import { plural } from "../anonimizar/formato";
 import { ListaDocumentos, POR_PAGINA } from "./ListaDocumentos";
 import { PanelTramos } from "./PanelTramos";
+import type { GrupoTramos } from "./segmentos";
 import { VisorDocumento, type ModoVisor } from "./VisorDocumento";
 import "../../styles/revision.css";
 
@@ -203,13 +204,74 @@ export function SeccionRevision({ carpeta, onCarpeta }: SeccionRevisionProps) {
     }
   }
 
-  const ocultar = (inicio: number, fin: number, categoria: string, todas: boolean) =>
-    editar(async () => (await obtenerApi()).ocultar(carpeta!, codigo!, inicio, fin, categoria, todas));
+  const textoDe = (t: TramoRevision) => doc!.texto.slice(t.inicio, t.fin).replace(/\s+/g, " ").trim();
+  const veces = (n: number) => (n === 1 ? "1 vez" : `${n} veces`);
 
-  const actualizarTramo = (t: TramoRevision, cambios: { activo?: boolean; categoria?: string }) =>
-    editar(async () =>
-      (await obtenerApi()).actualizar_tramo(carpeta!, codigo!, t.id, cambios.activo ?? null, cambios.categoria ?? null),
-    );
+  /** Tocar: muestra u oculta el valor en todas sus apariciones del documento,
+   * con "Deshacer" en el aviso. */
+  async function alternar(t: TramoRevision) {
+    const valor = textoDe(t);
+    const mostrar = t.activo;
+    let ids: number[] = [];
+    await editar(async () => {
+      const r = await (await obtenerApi()).alternar_valor(carpeta!, codigo!, t.id, !mostrar);
+      ids = r.ids;
+      return r.documento;
+    });
+    toast.show({
+      tone: "neutral",
+      message: `${mostrar ? "Visible" : "Oculto"}: “${valor}”`,
+      description: `${veces(ids.length)} en este documento`,
+      action: {
+        label: "Deshacer",
+        onClick: () => void editar(async () => (await obtenerApi()).fijar_tramos(carpeta!, codigo!, ids, mostrar)),
+      },
+    });
+  }
+
+  async function ocultar(inicio: number, fin: number, categoria: string, alcance: "documento" | "lote") {
+    const valor = doc!.texto.slice(inicio, fin).replace(/\s+/g, " ").trim();
+    if (alcance === "documento") {
+      await editar(async () => (await obtenerApi()).ocultar(carpeta!, codigo!, inicio, fin, categoria, true));
+      return;
+    }
+    await enLote(async (api) => api.ocultar_en_lote(carpeta!, valor, categoria), `Oculto en el lote: “${valor}”`);
+  }
+
+  /** Operación sobre todo el lote: recarga el documento abierto y los contadores. */
+  async function enLote(
+    accion: (api: Awaited<ReturnType<typeof obtenerApi>>) => Promise<{ documentos: number; tramos: number }>,
+    mensaje: string,
+  ) {
+    setOcupado(true);
+    try {
+      const api = await obtenerApi();
+      const r = await accion(api);
+      setDoc(await api.documento(carpeta!, codigo!));
+      void cargarLista(offset, filtro, busqueda);
+      void recargarInfo();
+      toast.show({
+        tone: "success",
+        message: mensaje,
+        description: `${veces(r.tramos)} en ${r.documentos === 1 ? "1 documento" : `${r.documentos} documentos`}`,
+      });
+    } catch (e) {
+      toast.show({ tone: "error", message: "No se pudo aplicar en el lote", description: String(e) });
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  function loteGrupo(g: GrupoTramos) {
+    if (g.activos > 0) {
+      void enLote(async (api) => api.mostrar_en_lote(carpeta!, g.texto), `Visible en el lote: “${g.texto}”`);
+    } else {
+      void enLote(async (api) => api.ocultar_en_lote(carpeta!, g.texto, g.categoria), `Oculto en el lote: “${g.texto}”`);
+    }
+  }
+
+  const categoriaGrupo = (g: GrupoTramos, categoria: string) =>
+    editar(async () => (await obtenerApi()).cambiar_categoria(carpeta!, codigo!, g.tramos.map((t) => t.id), categoria));
 
   async function irA(delta: 1 | -1) {
     const docs = pagina.documentos;
@@ -370,13 +432,15 @@ export function SeccionRevision({ carpeta, onCarpeta }: SeccionRevisionProps) {
                     onModo={setModo}
                     ocupado={ocupado}
                     enfoque={enfoque}
-                    onOcultar={ocultar}
-                    onActualizarTramo={actualizarTramo}
+                    onAlternar={(t) => void alternar(t)}
+                    onOcultar={(i, f, c, a) => void ocultar(i, f, c, a)}
                   />
                   <PanelTramos
                     doc={doc}
                     onEnfocar={(t) => setEnfoque((e) => ({ id: t.id, n: (e?.n ?? 0) + 1 }))}
-                    onAlternar={(t) => actualizarTramo(t, { activo: !t.activo })}
+                    onAlternar={(t) => void alternar(t)}
+                    onCategoria={(g, c) => void categoriaGrupo(g, c)}
+                    onLote={loteGrupo}
                   />
                 </div>
               ) : (

@@ -283,6 +283,35 @@ class Almacen:
             (doc_id, doc_id),
         )
 
+    def fijar_activos(self, doc_id: int, ids: list[int], activo: bool) -> None:
+        with self._escribiendo() as c:
+            c.executemany("UPDATE tramos SET activo = ? WHERE id = ? AND documento_id = ?",
+                          [(int(activo), i, doc_id) for i in ids])
+            self._actualizar_total(c, doc_id)
+
+    def tramos_con_texto(self, valor: str, activo: bool) -> list[tuple[int, int]]:
+        """(tramo_id, documento_id) de todos los tramos del lote cuyo texto es
+        `valor` (sin distinguir mayúsculas), con el estado `activo` dado."""
+        with self._conexion() as c:
+            return [(f[0], f[1]) for f in c.execute(
+                "SELECT t.id, t.documento_id FROM tramos t JOIN textos x ON x.documento_id = t.documento_id "
+                "WHERE t.activo = ? AND lower(substr(x.texto, t.inicio + 1, t.fin - t.inicio)) = lower(?)",
+                (int(activo), valor),
+            )]
+
+    def documentos_que_contienen(self, valor: str) -> list[sqlite3.Row]:
+        """Documentos completados cuyo texto contiene `valor` (sin distinguir mayúsculas)."""
+        with self._conexion() as c:
+            return c.execute(
+                "SELECT d.* FROM documentos d JOIN textos x ON x.documento_id = d.id "
+                "WHERE d.estado = 'completado' AND instr(lower(x.texto), lower(?)) > 0 ORDER BY d.id",
+                (valor,),
+            ).fetchall()
+
+    def documento_por_id(self, doc_id: int) -> sqlite3.Row | None:
+        with self._conexion() as c:
+            return c.execute("SELECT * FROM documentos WHERE id = ?", (doc_id,)).fetchone()
+
     def marcar_revisado(self, doc_id: int, revisado: bool) -> None:
         with self._escribiendo() as c:
             c.execute("UPDATE documentos SET revisado = ? WHERE id = ?", (int(revisado), doc_id))

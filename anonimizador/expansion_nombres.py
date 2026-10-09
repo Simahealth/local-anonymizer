@@ -129,12 +129,56 @@ def _por_ancla(texto: str) -> set[str]:
     return hallados
 
 
+# --- Texto en minúsculas (exports sin mayúsculas) ---------------------------
+# Sin la inicial mayúscula como pista, una vecina cuenta como parte del nombre si
+# es un nombre/apellido del gazetteer; y una sola palabra desconocida al final,
+# si justo después viene un límite inequívoco de nombre ("… chindoy cc 107…",
+# "… uriana celular 31…", "… guegia, de 19 anos").
+_PALABRA_MIN = r"[a-zñáéíóúü]+"
+_SIG_MIN = re.compile(rf"[ \t]+((?:(?:de|del|la|las|los)[ \t]+){{0,2}})({_PALABRA_MIN})")
+_ANT_MIN = re.compile(rf"({_PALABRA_MIN})[ \t]+$")
+_LIMITE_NOMBRE = re.compile(
+    r"[ \t]*(?:[,.;:()]|\n|$|(?:cc|c\.c|ti|t\.i|rc|cedula|documento|identificad[oa]|celular|cel|tel|"
+    r"telefono|registro|quien|de \d+ anos|\(?(?:madre|padre|abuela|abuelo|tia|tio|hermana|hermano|acudiente)\)?)\b)"
+)
+
+
+def _es_nombre_min(palabra: str) -> bool:
+    n = _normalizar(palabra)
+    return n in _GAZETTEER and _puede_ser_nombre(palabra)
+
+
+def _crecer_minusculas(texto: str, ini: int, fin: int) -> tuple[int, int]:
+    n_tokens = len(texto[ini:fin].split())
+    desconocida_usada = False
+    while n_tokens < MAX_TOKENS + 1:
+        m = _SIG_MIN.match(texto, fin)
+        if not m:
+            break
+        palabra = m.group(2)
+        if _es_nombre_min(palabra):
+            fin, n_tokens = m.end(), n_tokens + 1
+            continue
+        if (not desconocida_usada and not m.group(1) and _puede_ser_nombre(palabra) and len(palabra) >= 3
+                and _LIMITE_NOMBRE.match(texto, m.end())):
+            fin, n_tokens, desconocida_usada = m.end(), n_tokens + 1, True
+            continue
+        break
+    while n_tokens < MAX_TOKENS + 1:
+        m = _ANT_MIN.search(texto[max(0, ini - 40):ini])
+        if not m or not _es_nombre_min(m.group(1)):
+            break
+        ini, n_tokens = ini - len(m.group(0)), n_tokens + 1
+    return ini, fin
+
+
 def expandir_nombres(texto: str, nombres: set[str]) -> set[str]:
     """Devuelve `nombres` más sus versiones completas encontradas en `texto`."""
     resultado = set(nombres)
     for valor in nombres:
+        crecer = _crecer_minusculas if valor.islower() else _crecer
         for m in re.finditer(re.escape(valor), texto):
-            ini, fin = _crecer(texto, m.start(), m.end())
+            ini, fin = crecer(texto, m.start(), m.end())
             if (ini, fin) != (m.start(), m.end()):
                 resultado.add(texto[ini:fin])
     resultado |= _por_ancla(texto)

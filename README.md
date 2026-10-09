@@ -46,8 +46,13 @@ revisados / sin revisar / errores) | visor por páginas | datos ocultados.
 - **Modo Resultado:** como queda el PDF (`[NOMBRE]`, `[DOCUMENTO]`…).
 - **Seleccionar texto → Ocultar** como una categoría, en ese punto o en todas
   sus apariciones del documento.
-- **Clic en algo ocultado →** texto original, cambiar categoría o "Mostrar (no
-  es dato personal)"; lo revertido queda subrayado y se puede volver a ocultar.
+- **Tocar algo resaltado lo muestra** (no era dato personal) junto con todas
+  sus apariciones iguales en el documento, con "Deshacer"; tocarlo otra vez lo
+  oculta. **Seleccionar texto** (arrastrar o doble clic) abre una barra con
+  "Ocultar": la categoría viene sugerida y Enter confirma.
+- **Panel agrupado por valor** ("canula" ×12 es una fila), los más repetidos
+  primero: ojo para todo el documento, categoría editable y **"Lote"** para
+  mostrar u ocultar ese valor en todos los documentos del lote.
 - Cada cambio se guarda al instante y regenera el PDF del documento. "Revisado y
   siguiente" lleva el control de avance; la tabla de relación incluye la columna
   *Revisado* al actualizarla.
@@ -127,7 +132,17 @@ sale de los PDF reales, con todo lo que introduce la extracción.
 | `datos_sintetico_co` (50 HC) | 350 | 100 % |
 | `datos_sintetico_ame` (30 HC, texto) | 84 | 100 % |
 | `datos_sintetico_ame` (30 HC, **desde PDF**) | 84 | 100 % |
-| `datos_meddocan` (España, fuera de alcance) | 161 | ~58 % |
+| HC reales "otras enfermedades" (100, PII ficticia, **desde PDF**)¹ | 4 377 | 97,5 % |
+| `datos_meddocan` (España, fuera de alcance) | 161 | ~62 % |
+
+¹ Dataset local, no versionado (deriva de historias reales); ver
+`tests/evaluacion/generar_dataset_otras_enfermedades.py`. Export todo en
+minúsculas y sin tildes: con él se ajustó el detector para ese formato (NER de
+spaCy filtrado en minúsculas, gazetteer ampliado, correos "usuario gmail com",
+registros sin falsos positivos de años/fechas, edades "anos"). Pasó de 78,8 % a
+97,5 % de redacción efectiva y de 27 451 a 15 863 tramos ocultados (menos
+sobre-redacción). Ojo: parte de los nombres del gazetteer coinciden con los
+ficticios del dataset; conviene validar con otro conjunto.
 
 Los conjuntos colombianos quedan cubiertos por `tests/test_fugas.py`: si un
 cambio en el motor reintroduce una fuga, falla `pytest`. MEDDOCAN usa formatos

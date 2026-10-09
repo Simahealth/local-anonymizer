@@ -46,22 +46,31 @@ describe("App", () => {
     fireEvent.mouseUp(pagina1);
     const barra = await screen.findByRole("dialog", { name: "Ocultar selección" });
     expect(within(barra).getByText("“Rosalba”")).toBeInTheDocument();
-    await user.click(within(barra).getByRole("button", { name: "Ocultar" }));
+    expect(within(barra).getByRole("combobox", { name: "Ocultar como" })).toHaveValue("nombres");
+    await user.click(within(barra).getByRole("button", { name: /^Ocultar$/ }));
     // Aparece en las dos páginas → dos tramos (marcas) en el visor, y en el panel.
     const marcasRosalba = () =>
       [...document.querySelectorAll(".rev-pagina mark")].filter((m) => m.textContent === "Rosalba");
     await waitFor(() => expect(marcasRosalba()).toHaveLength(2));
-    expect(within(screen.getByRole("complementary", { name: /Datos ocultados/ })).getAllByText("Rosalba")).toHaveLength(2);
+    // La categoría sugerida para un nombre es "Nombres".
 
-    // Revertir un tramo: el nombre del paciente queda visible.
-    await user.click(within(screen.getByRole("article", { name: "Página 1 de 2" })).getByText("Laura Martínez Ospina"));
-    const popover = await screen.findByRole("dialog", { name: "Dato ocultado" });
-    await user.click(within(popover).getByRole("button", { name: /Mostrar/ }));
+    // Tocar un dato oculto lo muestra al instante (y todas sus apariciones),
+    // con "Deshacer" en el aviso.
+    const pagina = () => screen.getByRole("article", { name: "Página 1 de 2" });
+    await user.click(within(pagina()).getByText("Laura Martínez Ospina"));
+    await waitFor(() => expect(within(pagina()).getByText("Laura Martínez Ospina")).toHaveClass("rev-tramo--revertido"));
+    await user.click(await screen.findByRole("button", { name: "Deshacer" }));
     await waitFor(() =>
-      expect(
-        within(screen.getByRole("article", { name: "Página 1 de 2" })).getByText("Laura Martínez Ospina"),
-      ).toHaveClass("rev-tramo--revertido"),
+      expect(within(pagina()).getByText("Laura Martínez Ospina")).not.toHaveClass("rev-tramo--revertido"),
     );
+
+    // Panel agrupado por valor: "Rosalba" (2 apariciones) es una sola fila ×2;
+    // "Lote" lo muestra en todos los documentos del lote.
+    const panel = screen.getByRole("complementary", { name: /Datos ocultados/ });
+    expect(within(panel).getByText("×2")).toBeInTheDocument();
+    await user.click(within(panel).getByTitle("Mostrar “Rosalba” en todo el lote"));
+    expect(await screen.findByText("Visible en el lote: “Rosalba”")).toBeInTheDocument();
+    await waitFor(() => expect(marcasRosalba().every((m) => m.classList.contains("rev-tramo--revertido"))).toBe(true));
 
     // Modo Resultado: etiquetas como en el PDF anonimizado.
     await user.click(screen.getByRole("button", { name: "Resultado" }));

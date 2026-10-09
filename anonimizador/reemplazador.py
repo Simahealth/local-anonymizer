@@ -114,6 +114,11 @@ class Reemplazador:
             for valor in valores:
                 if not valor.strip():
                     continue
+                if re.fullmatch(r"\d{1,3}", valor.strip()):
+                    # Un número corto suelto ("3", "15") aparece por todo el texto
+                    # (dosis, días, signos): reemplazarlo en todas partes destruye
+                    # el documento. Los reconocedores deben dar contexto ("3 anos").
+                    continue
                 patrones = [_patron_literal(valor)]
                 if categoria == "documentos":
                     # Con su prefijo: "CC: 12345678" → "[DOCUMENTO]", no "CC: [DOCUMENTO]".

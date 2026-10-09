@@ -9,7 +9,7 @@
  * segmento normal es exactamente `data-ini + offset` en el texto original
  * (mismas unidades UTF-16 que usa el backend al mandar los tramos).
  */
-import type { TramoRevision } from "../../api/escritorio";
+import type { DocumentoRevision, TramoRevision } from "../../api/escritorio";
 
 export const SALTO_PAGINA = "\f";
 
@@ -97,4 +97,44 @@ export function rangoDeSeleccion(rango: Range, contenedor: HTMLElement): { inici
   const fin = offsetDe(rango.endContainer, rango.endOffset, "fin");
   if (inicio === null || fin === null || fin <= inicio) return null;
   return { inicio, fin };
+}
+
+/** Categoría más probable para un fragmento seleccionado. */
+export function sugerirCategoria(fragmento: string): string {
+  const t = fragmento.trim();
+  if (/@|\s(gmail|hotmail|yahoo|outlook)\s+(com|es)\b/i.test(t)) return "emails";
+  if (/\b(calle|cl|carrera|cra|kr|diag|transversal|tv|av|avenida|manzana|mz|barrio|vereda)\b/i.test(t)) {
+    return "direcciones";
+  }
+  const digitos = t.replace(/\D/g, "");
+  if (digitos.length >= 7 && digitos.length === t.replace(/[\s.\-()]/g, "").length) {
+    return /^(3\d{9}|60\d{8})$/.test(digitos) ? "telefonos" : "documentos";
+  }
+  return "nombres";
+}
+
+/** Lo ocultado en un documento, agrupado por valor (sin distinguir mayúsculas). */
+export interface GrupoTramos {
+  clave: string;
+  texto: string;
+  categoria: string;
+  tramos: TramoRevision[];
+  activos: number;
+  manual: boolean;
+}
+
+export function agrupar(doc: DocumentoRevision): GrupoTramos[] {
+  const grupos = new Map<string, GrupoTramos>();
+  for (const t of doc.tramos) {
+    const texto = doc.texto.slice(t.inicio, t.fin).replace(/\s+/g, " ").trim();
+    const clave = texto.toLowerCase();
+    const g = grupos.get(clave) ?? { clave, texto, categoria: t.categoria, tramos: [], activos: 0, manual: false };
+    g.tramos.push(t);
+    if (t.activo) g.activos++;
+    if (t.origen === "manual") g.manual = true;
+    grupos.set(clave, g);
+  }
+  return [...grupos.values()].sort(
+    (a, b) => b.tramos.length - a.tramos.length || a.tramos[0]!.inicio - b.tramos[0]!.inicio,
+  );
 }

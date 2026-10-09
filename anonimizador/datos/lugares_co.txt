@@ -1,0 +1,224 @@
+# Departamentos y municipios de Colombia (minúsculas, sin tildes).
+# Lo usa el detector para aceptar una UBICACION de spaCy en texto en minúscula
+# (exports sin mayúsculas), donde spaCy etiqueta como lugar casi cualquier palabra.
+amazonas
+antioquia
+arauca
+atlantico
+bolivar
+boyaca
+caldas
+caqueta
+casanare
+cauca
+cesar
+choco
+cordoba
+cundinamarca
+guainia
+guaviare
+huila
+la guajira
+guajira
+magdalena
+meta
+narino
+norte de santander
+putumayo
+quindio
+risaralda
+san andres
+santander
+sucre
+tolima
+valle del cauca
+valle
+vaupes
+vichada
+bogota
+medellin
+cali
+barranquilla
+cartagena
+cucuta
+soacha
+soledad
+bucaramanga
+bello
+villavicencio
+ibague
+santa marta
+valledupar
+monteria
+pereira
+manizales
+pasto
+neiva
+palmira
+popayan
+buenaventura
+floridablanca
+armenia
+sincelejo
+itagui
+tumaco
+envigado
+dosquebradas
+tulua
+barrancabermeja
+riohacha
+uribia
+maicao
+piedecuesta
+tunja
+girardot
+facatativa
+fusagasuga
+zipaquira
+chia
+mosquera
+madrid
+funza
+cajica
+sogamoso
+duitama
+chiquinquira
+yopal
+aguazul
+villanueva
+tauramena
+paz de ariporo
+florencia
+san vicente del caguan
+mocoa
+puerto asis
+orito
+sibundoy
+leticia
+puerto narino
+quibdo
+istmina
+tado
+condoto
+bahia solano
+nuqui
+apartado
+turbo
+carepa
+chigorodo
+necocli
+caucasia
+rionegro
+marinilla
+la ceja
+sabaneta
+caldas
+girardota
+copacabana
+santa rosa de osos
+yarumal
+ipiales
+tuquerres
+la union
+samaniego
+santander de quilichao
+puerto tejada
+piendamo
+silvia
+toribio
+inza
+paez
+el bordo
+patia
+jamundi
+candelaria
+yumbo
+cartago
+buga
+sevilla
+roldanillo
+zarzal
+el cerrito
+florida
+pradera
+dagua
+espinal
+melgar
+honda
+mariquita
+chaparral
+libano
+pitalito
+garzon
+la plata
+campoalegre
+gigante
+lorica
+cerete
+sahagun
+montelibano
+planeta rica
+tierralta
+corozal
+san marcos
+magangue
+el carmen de bolivar
+turbaco
+arjona
+mompox
+cienaga
+fundacion
+el banco
+aguachica
+agustin codazzi
+la jagua de ibirico
+ocana
+pamplona
+villa del rosario
+los patios
+tibu
+san gil
+socorro
+barbosa
+malaga
+puerto boyaca
+saravena
+tame
+arauquita
+san jose del guaviare
+puerto carreno
+inirida
+mitu
+granada
+puerto lopez
+puerto gaitan
+acacias
+la dorada
+chinchina
+villamaria
+la virginia
+santa rosa de cabal
+calarca
+montenegro
+quimbaya
+la tebaida
+gacheta
+guasca
+ubate
+la mesa
+anapoima
+tocaima
+villeta
+sasaima
+guaduas
+pacho
+choconta
+suesca
+tenjo
+tabio
+sopo
+la calera
+cota
+sibate
+silvania
+viota

@@ -61,9 +61,12 @@ class ReconocedorRegistroMedico(PatternRecognizer):
         # Número suelto (sin marca): formularios donde el registro aparece solo.
         # Score bajo y validado por ancla en analyze(); si solapa con un teléfono
         # o cédula (mayor score), gana esa etiqueta.
+        # Sin prefijo: 5+ dígitos que no sean parte de una fecha ni de otro número
+        # ("2015-03-09", "12/05/2016", "1.023"). Con 4 dígitos atrapaba los años
+        # de cada nota en exports donde "registro" aparece en todas las firmas.
         Pattern(
             name="registro_suelto",
-            regex=r"\b" + _NUMERO + r"\b",
+            regex=r"(?<![\d/.:-])\d{5,12}(?![\d/.:-])",
             score=0.45,
         ),
     ]
@@ -97,8 +100,9 @@ class ReconocedorRegistroMedico(PatternRecognizer):
             # una marca de registro/historia clínica en el entorno.
             sin_prefijo = not re.search(r"[A-Za-z]", span)
             if sin_prefijo:
-                entorno = text[max(0, ini - _VENTANA_REG):ini] + text[fin:fin + _VENTANA_REG]
-                if not _ANCLA_REG.search(entorno):
+                # El ancla debe ir ANTES del número ("registro 1234567"): un
+                # "registro" de la nota siguiente no convierte a un número en registro.
+                if not _ANCLA_REG.search(text[max(0, ini - _VENTANA_REG):ini]):
                     continue
             ajustados.append(RecognizerResult(
                 entity_type=r.entity_type,

@@ -30,7 +30,7 @@ from anonimizador.lote import Anonimizador, EventoDocumento, Lote, desde_utf16
 from anonimizador.memoria import GestorMemoria
 
 NOMBRE_APP = "SIMA Anonimizador"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 LIMITE_PAGINA = 200
 
 
@@ -330,6 +330,28 @@ class ApiEscritorio:
         lote = self._lote_en(carpeta)
         lote.actualizar_tramo(codigo, tramo_id, activo, categoria)
         return lote.documento_revision(codigo)
+
+    def alternar_valor(self, carpeta: str, codigo: str, tramo_id: int, activo: bool) -> dict:
+        """Muestra/oculta un tramo y todos los del documento con el mismo texto."""
+        lote = self._lote_en(carpeta)
+        ids = lote.alternar_valor(codigo, tramo_id, activo)
+        return {"ids": ids, "documento": lote.documento_revision(codigo)}
+
+    def fijar_tramos(self, carpeta: str, codigo: str, ids: list[int], activo: bool) -> dict:
+        lote = self._lote_en(carpeta)
+        lote.fijar_tramos(codigo, ids, activo)
+        return lote.documento_revision(codigo)
+
+    def cambiar_categoria(self, carpeta: str, codigo: str, ids: list[int], categoria: str) -> dict:
+        lote = self._lote_en(carpeta)
+        lote.cambiar_categoria(codigo, ids, categoria)
+        return lote.documento_revision(codigo)
+
+    def mostrar_en_lote(self, carpeta: str, valor: str) -> dict:
+        return self._lote_en(carpeta).mostrar_en_lote(valor)
+
+    def ocultar_en_lote(self, carpeta: str, valor: str, categoria: str) -> dict:
+        return self._lote_en(carpeta).ocultar_en_lote(valor, categoria)
 
     def marcar_revisado(self, carpeta: str, codigo: str, revisado: bool) -> dict:
         lote = self._lote_en(carpeta)

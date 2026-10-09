@@ -18,17 +18,17 @@ class ReconocedorEdad(PatternRecognizer):
     PATRONES = [
         Pattern(
             name="edad_con_de",
-            regex=r"\bde\s+\d{1,3}\s+años?\b",
+            regex=r"\bde\s+\d{1,3}\s+a(?:ñ|n)os?\b",
             score=0.85,
         ),
         Pattern(
             name="edad_de_edad",
-            regex=r"\b\d{1,3}\s+años?\s+de\s+edad\b",
+            regex=r"\b\d{1,3}\s+a(?:ñ|n)os?\s+de\s+edad\b",
             score=0.9,
         ),
         Pattern(
             name="edad_etiqueta",
-            regex=r"\b[Ee]dad\s*:?\s*\d{1,3}(?:\s+años?)?\b",
+            regex=r"\b[Ee]dad\s*:?\s*\d{1,3}(?:\s+a(?:ñ|n)os?)?\b",
             score=0.9,
         ),
     ]
@@ -48,8 +48,10 @@ class ReconocedorEdad(PatternRecognizer):
         ajustados = []
         for r in resultados:
             span = text[r.start:r.end]
-            # Recortar a la edad en sí ("34 años"), descartando "de" / "Edad:".
-            m = re.search(r"\d{1,3}\s+años?", span) or re.search(r"\d{1,3}", span)
+            # Recortar a la edad en sí ("34 años"), descartando "de". Sin la
+            # palabra "años" ("Edad: 3") se conserva la etiqueta: con el valor
+            # "3" solo, el reemplazo ocultaba cada "3" del documento (dosis, días).
+            m = re.search(r"\d{1,3}\s+a(?:ñ|n)os?", span) or re.search(r"\S.*\d", span)
             if m:
                 ajustados.append(RecognizerResult(
                     entity_type=r.entity_type,

@@ -546,3 +546,13 @@
   gap: var(--space-6);
   flex-shrink: 0;
 }
+
+/* DS gap: la acción del Toast es un Button "ghost" (texto oscuro) sobre el fondo
+   oscuro del toast. Se fuerza el color inverso aquí, sin tocar el átomo. */
+.toast__actions .btn {
+  color: var(--text-inverse);
+  border: 1px solid rgba(248, 249, 252, 0.4);
+}
+.toast__actions .btn:hover {
+  background: rgba(248, 249, 252, 0.12);
+}

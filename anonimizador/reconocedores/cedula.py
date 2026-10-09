@@ -133,6 +133,11 @@ class ReconocedorCedula(PatternRecognizer):
             # exigir un ancla de documento/nombre en el entorno y descartar si lo
             # precede una etiqueta de identificador interno (Id. Consulta, etc.).
             sin_prefijo = not re.search(r"[A-Za-z]", span)
+            digitos = re.sub(r"\D", "", text[ini:fin])
+            # 10 dígitos que empiezan por 60 son un fijo (601…, 604…), no una
+            # cédula: sin prefijo de documento, se lo deja al reconocedor de teléfonos.
+            if sin_prefijo and len(digitos) == 10 and digitos.startswith("60"):
+                continue
             if sin_prefijo:
                 antes = text[max(0, ini - _VENTANA_NO_DOC):ini]
                 if _LABEL_NO_DOC.search(antes):
