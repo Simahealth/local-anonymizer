@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_040",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Patricia Moreno Ospina\nC.C. 91.156.554\nFecha de nacimiento: Julio 1 de 1956\nProcedencia: Bogotá, Tolima\nDirección: Av 27 Sur No. 67-16 apto 186, barrio Manga\nTeléfono: 3228339571   Correo: patricia29@yahoo.es\nEPS: Salud Total\nFecha de ingreso: Junio 17 de 1980\n\nMOTIVO DE CONSULTA\nPaciente Edad: 33 años que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Bogotá y consulta de forma espontánea. Se localiza al acompañante en el número 3228339571.\n\nVALORACIÓN\nAtendido por el Dr. Ana Muñoz López (HC-185569). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo patricia29@yahoo.es o remitir a la dirección Av 27 Sur No. 67-16 apto 186.",
+  "ground_truth": {
+    "nombres": [
+      "Patricia Moreno Ospina",
+      "Ana Muñoz López"
+    ],
+    "documentos": [
+      "91.156.554"
+    ],
+    "edades": [
+      "33 años"
+    ],
+    "ubicaciones": [
+      "Bogotá",
+      "Tolima"
+    ],
+    "direcciones": [
+      "Av 27 Sur No. 67-16 apto 186"
+    ],
+    "telefonos": [
+      "3228339571"
+    ],
+    "emails": [
+      "patricia29@yahoo.es"
+    ],
+    "seguros": [
+      "Salud Total"
+    ],
+    "fechas_nacimiento": [
+      "Julio 1 de 1956"
+    ],
+    "fechas": [
+      "Junio 17 de 1980"
+    ],
+    "numeros_registro": [
+      "HC-185569"
+    ]
+  }
+}

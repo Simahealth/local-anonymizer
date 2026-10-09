@@ -1,0 +1,43 @@
+/**
+ * CategoryNav — SimaHealth Design System · Layer 3 — Molecule
+ * ─────────────────────────────────────────────────────────────────
+ * Reported gap (2026-08-21 CasePage parity migration): the historical
+ * vanilla Documentos chapter navigates 9 categories via plain buttons
+ * (`case-page.html`'s category nav, `case-page.js` CATEGORIES list).
+ * `selection-group.css` (the existing pill-select molecule) explicitly
+ * documents itself as the WRONG fit here ("options exceed 8 -> use
+ * Dropdown instead"); no Dropdown/Tab/Nav component existed either.
+ * Authorized as the minimal new DS molecule needed, not a page-local
+ * improvisation -- a plain vertical list of buttons, single active
+ * state, no icons, no pill background (matches the historical anatomy:
+ * `case-page.js`'s `renderNav()` renders plain `<button>`s with only an
+ * `.is-active` class).
+ *
+ * USE when: a fixed, single-select list of category filters (not a
+ * fixed set of ≤8 SelectionGroup pills, not a Dropdown, not page-to-page
+ * navigation -- see selection-group.css's own guidance for those cases).
+ */
+.category-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.category-nav__item {
+  all: unset;
+  cursor: pointer;
+  padding: var(--space-4) 0;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  border-radius: var(--radius-200);
+}
+.category-nav__item:hover {
+  color: var(--text-secondary);
+}
+.category-nav__item:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+}
+.category-nav__item.is-active {
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+}

@@ -1,0 +1,39 @@
+{
+  "nombre": "meddocan_S0004-06142006000600012-1",
+  "descripcion": "MEDDOCAN dev · S0004-06142006000600012-1 (corpus español, conjunto neutral)",
+  "texto": "Datos del paciente.\nNombre:  Mariano.\nApellidos: Ramos Baez.\nNHC: 2594890.\nNASS: 47 39047534 02.\nDomicilio: Av. Pedro Rubio, 36.\nLocalidad/ Provincia: Madrid.\nCP: 28319.\nDatos asistenciales.\nFecha de nacimiento: 13/09/1955.\nPaís: España.\nEdad: 62 años Sexo: H.\nFecha de Ingreso: 23/07/2017.\nMédico:  NºCol: 28 28.\nInforme clínico del paciente: Paciente de 62 años de edad,consulta por presentar dolor en hemiescroto derecho de tres meses de evolución, al examen físico se constata varicocele derecho grado IV, palpándose además voluminosa masa a nivel del área renal derecha. Se realiza ecografía abdominal que informa masa heterogénea de 10 cm. aproximadamente en riñón derecho, riñón izquierdo sin hallazgos patológicos. Se complementa con tomografía axial computada de abdomen y pelvis con contraste endovenoso donde se evidencia una formación renal derecha heterogénea de 110 x 120 mm de diámetro, no se observan adenomegalias retroperitoneales. Difícil evaluación del pedículo renal derecho.\nSe solicita resonancia magnética que confirma la formación heterogénea renal derecha en polo superior de 12 cm. de diámetro mayor, sin compromiso de vena renal ni de la vena cava inferior.\nSe realiza una nefrectomía radical derecha. Buena evolución, se externa al quinto día postoperatorio.\nLa anatomía patológica revela: Tumor maligno indiferenciado de estirpe a diferenciar por inmunohistoquímica (IHQ).. Tamaño tumoral 13 cm. Invasión local: el tumor se extiende a través de la cápsula renal, provocando infiltración focal de la grasa perisuprarenal. Hilio renal libre de lesión. Embolias vasculares presentes, márgenes quirúrgicos libres de lesión tumoral. Riñón no neoplásico: pielonefritis crónica. Arterio y arteriolonefroesclerosis y quiste de retención de 4 cm. de diámetro mayor. Glándula suprarrenal libre de lesión. IHQ:WT1 +++,CD 117 +++,CD56 +++,P53 -.\nDiagnóstico: Nefroblastoma (Tumor de Wilms), estadío II de la clasificación de la NWTS.\nLa TC al mes postoperatorio evidencia recidiva tumoral a nivel del lecho de la nefrectomía.\nInicia esquema de quimioterapia con vincristina, dactinomicina y doxorubicina. Presenta durante el curso de la quimioterapia un cuadro de neumonía con deterioro del estado general, sepsis y meses de la nefrectomía.\nRemitido por: Dr: Rodrigo Martínez Mansur. Email: drrmmmansur@yahoo.com\n",
+  "ground_truth": {
+    "emails": [
+      "drrmmmansur@yahoo.com"
+    ],
+    "nombres": [
+      "Rodrigo Martínez Mansur",
+      "Ramos Baez",
+      "Mariano"
+    ],
+    "edades": [
+      "62 años"
+    ],
+    "numeros_registro": [
+      "28 28"
+    ],
+    "fechas": [
+      "23/07/2017",
+      "13/09/1955"
+    ],
+    "ubicaciones": [
+      "España",
+      "28319",
+      "Madrid"
+    ],
+    "direcciones": [
+      "Av. Pedro Rubio, 36"
+    ],
+    "seguros": [
+      "47 39047534 02"
+    ],
+    "documentos": [
+      "2594890"
+    ]
+  }
+}

@@ -1,0 +1,215 @@
+/* ==========================================================================
+   Atom family: Field / Input / Textarea / FieldMessage
+   Layer: 2 — Atoms
+   Owner: Design System
+   Estado: active
+
+   Primer átomo de formulario real del DS (antes: cada pantalla tenía su
+   propio <input>/<textarea> nativo con clases locales -- `.aow-search__
+   input`, `.note-composer__textarea`, `.composer-panel-title/-body`,
+   `.ccf-*`, `.mnc-*` -- ver docs/design-system/index.html → Atoms →
+   "Input / Textarea" para el registro de esos consumidores ad-hoc).
+
+   Todos los valores vienen de tokens.css ya existentes: --space-*,
+   --text-*, --border-*, --surface-*, --radius-200, --state-focus-ring,
+   --transition-fast/base. Ningún token nuevo.
+
+   Ver `src/components/Field/*.tsx` para los componentes React y el
+   contrato de accesibilidad completo (htmlFor, aria-describedby,
+   aria-invalid, required real).
+   ========================================================================== */
+
+/* ── Field (wrapper) ────────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 4px);
+}
+
+.field--disabled {
+  opacity: 0.72;
+}
+
+.field__label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4, 4px);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-sm, 14px);
+  font-weight: var(--weight-medium, 500);
+  color: var(--text-primary, #0d0f10);
+}
+
+.field__required {
+  color: var(--text-error, #c00f0c);
+}
+
+.field__optional {
+  font-size: var(--text-xs, 12px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--text-tertiary, #6b7280);
+}
+
+/* Field agrega su propio gap (--space-4) al de arriba/abajo -- el
+   control mismo no necesita margin propio. */
+.field > .field-input,
+.field > .field-textarea {
+  width: 100%;
+}
+
+/* ── FieldMessage (hint / error / success) ──────────────────────────── */
+
+.field-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4, 4px);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-xs, 12px);
+  line-height: 1.4;
+}
+
+.field-message--hint {
+  color: var(--text-tertiary, #6b7280);
+}
+
+.field-message--error {
+  color: var(--text-error, #c00f0c);
+}
+
+/* `success` solo si el consumidor lo pide explícitamente -- token real
+   ya existente (--text-success), sin uso real todavía en ningún
+   formulario del producto (ver Field.spec / catálogo, sección Gaps). */
+.field-message--success {
+  color: var(--text-success, #008043);
+}
+
+.field-message__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+/* Modal/Form visual QA task: Google Fonts' own `.material-symbols-
+   outlined` rule (loaded via foundations/icons/icons.css's `@import`)
+   ships its own `font-size: 24px` -- same specificity as this wrapper's
+   descendant selector would need, so without an explicit override here
+   the icon glyph never actually inherits this wrapper's 14px, it renders
+   at Google's 24px default instead (visually a "gigante"/dominant red
+   circle next to a 12px error line, the reported bug). `inherit` ties
+   it to whatever this wrapper is sized to instead of a second hardcoded
+   number. */
+.field-message__icon .material-symbols-outlined {
+  font-size: inherit;
+}
+
+/* ── Control base compartido (Input + Textarea) ─────────────────────── */
+
+.field-control {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-8, 8px) var(--space-12, 12px);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-sm, 14px);
+  line-height: 1.4;
+  color: var(--text-primary, #0d0f10);
+  background: var(--surface-primary, #ffffff);
+  border: 1px solid var(--border-default, #d9dce1);
+  border-radius: var(--radius-200, 4px);
+  transition: border-color var(--transition-fast, 80ms ease), background var(--transition-fast, 80ms ease);
+}
+
+.field-control::placeholder {
+  color: var(--text-tertiary, #6b7280);
+}
+
+.field-control:hover:not(:disabled):not(:read-only) {
+  border-color: var(--border-strong, #7a7f87);
+}
+
+.field-control:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: 1px;
+  border-color: var(--border-brand, #d732ab);
+}
+
+.field-control:disabled {
+  background: var(--surface-tertiary, #f1f3f7);
+  border-color: var(--border-subtle, #e9ebef);
+  color: var(--text-disabled, #b9bdc4);
+  cursor: not-allowed;
+}
+
+/* readOnly NO es disabled: sigue seleccionable/enfocable, solo no
+   editable -- superficie levemente distinta (secondary, no tertiary) y
+   cursor default, nunca not-allowed. `:not(:disabled)` es necesario acá,
+   no cosmético: por spec CSS, un elemento `disabled` TAMBIÉN matchea
+   `:read-only` (no es editable) -- sin este guard, esta regla (declarada
+   después) le gana el `background` a `.field-control:disabled` de
+   arriba para un `<input disabled>` cualquiera, mezclando los dos
+   estados visuales. Bug real encontrado y corregido en esta QA (ver
+   docs/design-system/index.html). */
+.field-control:read-only:not(:disabled) {
+  background: var(--surface-secondary, #f8f9fc);
+  cursor: default;
+}
+
+/* Invalid: borde + texto (nunca solo color de fondo) -- el ícono/texto
+   del error real vive en FieldMessage, esto solo marca el control. */
+.field-control--invalid {
+  border-color: var(--border-error, #ec221f);
+  color: var(--text-error, #c00f0c);
+}
+.field-control--invalid::placeholder {
+  color: var(--text-tertiary, #6b7280);
+}
+.field-control--invalid:focus-visible {
+  border-color: var(--border-error, #ec221f);
+  outline-color: var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+}
+
+/* ── Input ───────────────────────────────────────────────────────────
+   Altura mínima consistente (36px, mismo alto que Button md/DropdownMenu
+   default) para que un Input al lado de un Button/trigger se vea
+   alineado sin ajustes ad-hoc por pantalla. */
+.field-input {
+  height: 36px;
+}
+
+/* Modal/Form visual QA task, item 5 (`<Input type="date">`, e.g.
+   TreatmentPlanModal's "Fecha de inicio"): no DS-approved date-picker
+   component exists yet (deuda -- see this task's report) -- this stays
+   the native browser control, not a new calendar built for this task.
+   The one safe, non-invasive tweak available without replacing it:
+   the native calendar-icon affordance (`::-webkit-calendar-picker-
+   indicator`, Chromium/WebKit only -- Firefox has no equivalent
+   pseudo-element to target and renders its own, unstyled) muted to the
+   same tertiary tone/opacity every other inline icon in this DS uses at
+   rest, plus a pointer cursor, so it doesn't read as a heavier, full-
+   opacity affordance than the rest of the control. Layout/size
+   untouched. */
+.field-input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.55;
+  cursor: pointer;
+}
+.field-input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 0.85;
+}
+
+/* ── Textarea ────────────────────────────────────────────────────────
+   Mismo lenguaje visual que Input (misma clase base .field-control) +
+   min-height propio en vez de height fija. resize: "vertical" (default,
+   como .note-composer__textarea ya tenía) o "none" -- nunca horizontal. */
+.field-textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+.field-textarea--resize-none {
+  resize: none;
+}

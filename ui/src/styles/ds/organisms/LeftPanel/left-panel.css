@@ -1,0 +1,1261 @@
+/* ============================================================
+   LeftPanel — SimahealthDS Organism
+   Versión: 3.0 | Fecha: 2026-07-17
+   Sprint: consolidación LeftPanel (ADR-008, supersede ADR-007)
+
+   LeftPanel es el organismo oficial del Design System que implementa
+   la región del panel izquierdo del Actor Operational Workspace.
+   Este archivo consolida en una única fuente lo que antes eran dos
+   CSS separados — Sidebar (shell) y Tool Panel (contenido de Tools) —
+   sin cambio de reglas, spacing, layout, tipografía ni especificidad:
+   es la concatenación literal de ambos, reorganizada únicamente por
+   comentarios de agrupación.
+
+   Extraído originalmente desde Hospital como source of truth
+   (ADR-003 · Enmienda 2026-07-13) para la parte de shell; la parte de
+   Tools se descubrió a partir de 6 implementaciones reales de
+   Hospital/Farma (ADR-007, ver bloque "TOOLS" más abajo). Hospital y
+   Farma quedaron fuera de alcance de la consolidación de LeftPanel —
+   no se migran, no se adaptan — y ya no comparten estos archivos: el
+   nombre de clase legacy documentado abajo ya no tiene ese consumidor
+   externo, pero renombrarlo queda fuera de este commit (ver
+   left-panel.js).
+
+   Implementación oficial del organismo:
+     - CSS  → este archivo (estructura visual + estados)
+     - JS   → left-panel.js (SimaAOWV2.LeftPanel.mount() +
+              SimaAOWV2.LeftPanel.mountTools())
+     Los actores consumen esta implementación por configuración; no
+     reconstruyen el shell.
+
+   Contrato semántico: LeftPanel renderiza el shell (Header/Navigation/
+   contenedor de Tools) y el contenido de Tools (Search/Sort/Filter
+   Groups) como un único organismo.
+     - Nodo raíz: .aow-sidebar[data-sidebar]
+     - Layout host: .aow-body (define --sb-w / --sb-w-min) + .aow-canvas
+     - Header:      brand + actor-switcher (.sidebar-section--actor +
+                     .sidebar-actor-select)
+     - Navigation:   selector de Intents (.sidebar-section--readings + nav
+                     vacío; el nombre de clase es legacy, ver nota abajo)
+     - Tools:        contenedor (.tool-panel) + contenido (Search/Sort/
+                     Filter Groups, ver bloque "TOOLS" más abajo)
+     - Estado colapsado: .aow-sidebar--collapsed (rail de iconos).
+
+   Actor-switcher como slot del organismo:
+     .sidebar-actor-select se define aquí (antes inline en cada actor).
+     El color de foco es configurable por instancia vía
+     --sidebar-actor-focus (fallback --border-brand). El organismo NO
+     conoce actores.
+
+   Consume (no duplica):
+     - .sidebar-toggle → atoms/button/icon-button.css (alias .icon-btn)
+     - Pills de filtro → molecules/selection-group/
+
+   Nota de nomenclatura (deuda heredada, sin resolver en este commit):
+   las clases de Navigation y Tools (.sidebar-reading-item,
+   .sidebar-section--readings, data-readings-nav, .tool-panel,
+   .sidebar-z3-*) mantienen su nombre legacy. Renombrarlas es un
+   trabajo separado (~15+ selectores entre CSS/JS/HTML) con riesgo de
+   regresión visual si se omite alguno; queda documentado como
+   oportunidad de un commit posterior, no necesario para consolidar el
+   organismo.
+
+   Exclusión: .z3-group-header pertenece al Board (actor), no a LeftPanel.
+   El nombre de la clase es legado de Board y no se renombra en este sprint.
+   ============================================================ */
+
+/*
+ * Sidebar — Operational Control Panel (v2 — visual maturity)
+ *
+ * Dark graphite panel: #141920 — not pure black.
+ * Clinical dark blue-gray: sofisticado y operacional, no gamer/devtool.
+ *
+ * 3-level cognitive hierarchy:
+ *   Level 1 — Active reading mode: dominant, full brightness, icon + weight
+ *   Level 2 — Available readings:  quiet, scannable, secondary weight
+ *   Level 3 — Tools + pulse:       utility compact, very low visual weight
+ *
+ * Noise reduction principles:
+ *   - Minimal separators (1 structural, 1 pulse boundary)
+ *   - Section labels: tiny muted markers, not uppercase shouts
+ *   - No pill backgrounds for active state — icon color + weight only
+ *   - No left accent bars (no_left_accent_borders) — spacing as structure, not borders
+ *
+ * Color: magenta used ONLY for the active icon (Navigation) and Tools/Pulse dots.
+ * Everything else is a shade of the graphite surface.
+ */
+
+/* ==========================================================================
+   LAYOUT CONTAINERS (introduced by the sidebar system)
+   ========================================================================== */
+
+.aow-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  position: relative; /* containing block for floating sidebar */
+  /* design/react-visual-align: 290px -> 240px (-50px exacto), a pedido
+     explícito. Única variable que gobierna el ancho expandido (width +
+     min-width del sidebar, y el margin-left de .aow-canvas vía
+     inheritance) -- se modifica sola, sin hardcodear el nuevo ancho en
+     ningún otro selector. --sb-w-min (colapsado) no cambia. */
+  --sb-w: 240px;
+  --sb-w-min: 52px;
+}
+
+.aow-canvas {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-left: calc(var(--sb-w) + 24px); /* 8px left gap + 16px channel */
+  transition: margin-left var(--transition-base);
+}
+
+/* Collapsed: canvas follows sidebar width transition */
+.aow-sidebar--collapsed ~ .aow-canvas {
+  margin-left: calc(var(--sb-w-min) + 24px);
+}
+
+/* ==========================================================================
+   SIDEBAR SHELL
+   ========================================================================== */
+
+.aow-sidebar {
+  /*
+   * Local palette — sidebar is infrastructure, canvas is figure (VH2).
+   * Sidebar sits on the same plane as the Workspace canvas (.workspace,
+   * base.css) — so the app reads as one continuous surface. Hierarchy
+   * comes from the right border/radius/gap (kept), not from a
+   * differentiated background block.
+   * design/react-visual-align: --sb-bg pasó de --surface-canvas a
+   * --surface-primary (mismo token que Card y que html/body/.workspace
+   * ahora) para que ese "un solo plano continuo" siga siendo cierto con
+   * el nuevo fondo base de toda la UI.
+   * Magenta reserved exclusively for the active reading indicator.
+   */
+  --sb-bg: var(
+    --surface-primary
+  ); /* mismo blanco que Card -- continúa el plano único con html/body/.workspace */
+  --sb-text: var(--text-primary); /* #0d0f10 */
+  --sb-subtle: var(--text-secondary); /* #4b5057 */
+  --sb-muted: var(--text-tertiary); /* #7a7f87 */
+  --sb-faint: var(--border-subtle); /* #e9ebef — hover backgrounds, tracks */
+  --sb-divider: var(--border-subtle); /* #e9ebef — structural separators */
+  --sb-active: var(
+    --surface-brand
+  ); /* #d732ab magenta — brand accent, actor-agnostic (DS-EX-04) */
+  --sb-info: var(--sima-blue); /* #5798b3 */
+
+  width: var(--sb-w);
+  min-width: var(--sb-w);
+  flex-shrink: 0;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  bottom: 8px;
+  height: auto;
+  border-radius: var(--radius-400); /* 16px — object framing */
+  display: flex;
+  flex-direction: column;
+  background: var(--sb-bg);
+  border-right: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sidebar); /* casts rightward onto board canvas */
+  overflow: hidden;
+  transition:
+    width var(--transition-base),
+    min-width var(--transition-base);
+  z-index: 10;
+}
+
+.aow-sidebar--collapsed {
+  width: var(--sb-w-min);
+  min-width: var(--sb-w-min);
+}
+
+/* ==========================================================================
+   TOGGLE BUTTON — positional context only (Layer 5 responsibility)
+   Visual definition → atoms/button/icon-button.css (DS-EX-03)
+   ========================================================================== */
+
+.sidebar-toggle {
+  position: absolute;
+  top: 15px;
+  right: 9px;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   SCROLLABLE BODY
+   ========================================================================== */
+
+.sidebar-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: none;
+}
+
+.sidebar-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================================================
+   SIDEBAR BRAND — product identity (VH1-A: moved from global header)
+   System name only. Not a hero. Not a region. No visual weight.
+   design/react-visual-align: collapsed no longer hides the brand
+   entirely -- it shows only the logo's graphic mark (see below).
+   ========================================================================== */
+
+.sidebar-brand {
+  padding: var(--space-16) var(--space-16) var(--space-32);
+  padding-right: var(--space-40); /* avoid toggle button overlap */
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Header → Actor: el Header es dueño de su propio espacio de cierre (32px);
+   se neutraliza el padding-top ambiental de .sidebar-section para que el
+   valor no se acumule con el de abajo. */
+.sidebar-brand + .sidebar-section--actor {
+  padding-top: 0;
+}
+
+.sidebar-brand__logo {
+  height: 40px; /* bumped up from 29px for more visual weight — proportions/position/lockup unchanged (width: auto) */
+  width: auto;
+  display: block;
+}
+
+/* design/react-visual-align: en colapsado se oculta solo la mitad
+   wordmark del logo (texto "SimaHealth") -- el mismo <svg>/asset, sin
+   reemplazo -- dejando visible únicamente su símbolo gráfico. El propio
+   componente (SimaLogo.tsx) angosta el `viewBox` al bbox real del
+   símbolo cuando `collapsed` es true, así el ícono queda centrado en
+   vez de aparecer pegado a la izquierda de una caja aún dimensionada
+   para el ancho completo del wordmark. */
+.aow-sidebar--collapsed .sidebar-brand__wordmark {
+  display: none;
+}
+
+.aow-sidebar--collapsed .sidebar-brand {
+  padding: var(--space-16) 0;
+  display: flex;
+  justify-content: center;
+  /* Containing block for the chevron overlay below (position:absolute
+     resolves against this box instead of .aow-sidebar, so it can cover
+     exactly the logo's own area, no more/no less). */
+  position: relative;
+}
+
+/* design/react-visual-align: antes, colapsado centraba el mismo botón
+   .sidebar-toggle (con el glifo "»") justo encima del logo de forma
+   permanente -- se superponían todo el tiempo. Ahora ese botón (movido
+   dentro de .sidebar-brand, misma navegación/onClick, sin lógica
+   duplicada) queda invisible por defecto (opacity:0) y solo se revela
+   al hacer :hover sobre TODA el área de .sidebar-brand (no solo sobre
+   el propio botón) -- el logo queda "limpio" en reposo y el chevron
+   aparece como overlay superpuesto al pasar el mouse por cualquier
+   punto del área del logo, sin reservar espacio (sigue
+   position:absolute, fuera del flujo) ni desplazar nada. El botón es
+   descendiente de .sidebar-brand, así que hacer hover sobre el botón
+   ya visible sigue contando como hover de .sidebar-brand (sin el
+   parpadeo que tendría si fuera un hermano superpuesto por fuera).
+   Estilo: reutiliza las clases reales `.btn.btn--primary` (atoms/
+   button/button.css) -- colores/borde intactos, solo se sobreescriben
+   los tokens de tamaño del propio átomo (--btn-height/--btn-min-width/
+   etc, el mecanismo de theming que el atom ya documenta) para que quepa
+   como ícono circular en el rail de 52px en vez de su tamaño de CTA de
+   texto (min-width:80px). background/border/color se repiten aquí
+   explícitos vía var(--btn-bg)/var(--btn-border)/var(--btn-text) --
+   mismos valores que ya fija .btn, pero declarados con la especificidad
+   de esta regla para que gane sin ambigüedad sobre .icon-btn/
+   .sidebar-toggle (atoms/button/icon-button.css, que también apunta a
+   este mismo botón y se importa después de button.css). */
+.aow-sidebar--collapsed .sidebar-brand .sidebar-toggle {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 28px;
+  height: 28px;
+  --btn-height: 28px;
+  --btn-min-width: 28px;
+  --btn-px: 0;
+  --btn-py: 0;
+  --btn-gap: 0;
+  --btn-radius: var(--radius-full);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--btn-radius);
+  color: var(--btn-text);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.aow-sidebar--collapsed .sidebar-brand:hover .sidebar-toggle,
+.aow-sidebar--collapsed .sidebar-brand .sidebar-toggle:focus-visible {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   SECTION BASE — minimal, no visible lines between sections
+   Structure comes from spacing, not borders.
+   ========================================================================== */
+
+.sidebar-section {
+  padding: var(--space-14) var(--space-14);
+  flex-shrink: 0;
+}
+
+/*
+ * Section labels — orientation markers, not structural headers.
+ * 12px uppercase: present and scannable, not decorative.
+ */
+.sidebar-section-label {
+  display: block;
+  /* design/react-visual-align: espacio label -> contenido estandarizado
+     a 24px (era 8px) en todo el organismo -- ver mismo criterio en
+     .sidebar-z3-filter-group / .sidebar-z3-sort-section más abajo. */
+  margin-bottom: var(--space-24);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  color: var(--sb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity var(--transition-base);
+}
+
+.aow-sidebar--collapsed .sidebar-section-label {
+  opacity: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+  height: 0;
+}
+
+/* ==========================================================================
+   ACTOR SWITCHER — slot del organismo (O1)
+   Base extraída VERBATIM de la definición aprobada de Hospital.
+   El color de foco es configurable por instancia vía --sidebar-actor-focus
+   (fallback --border-brand). El organismo NO conoce actores: cada consumidor
+   define su propio acento (Hospital: --role-hospital; Farma: --role-farma;
+   Especialista: --border-brand) sobre --sidebar-actor-focus.
+   El contenido (opciones, seleccionado) es configuración del consumidor.
+   ========================================================================== */
+.sidebar-actor-select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 8px;
+  font-size: var(--text-sm, 13px);
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-100);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 120ms ease;
+}
+.sidebar-actor-select:focus {
+  border-color: var(--sidebar-actor-focus, var(--border-brand));
+}
+
+/* Actor → Intents: el grupo Actor es dueño de su propio espacio de cierre
+   (24px) para sentirse como dos grupos independientes; se neutraliza el
+   padding-top ambiental de Readings para que el valor no se acumule. */
+.sidebar-section--actor {
+  padding-bottom: var(--space-24);
+}
+
+.sidebar-section--actor + .sidebar-section--readings {
+  padding-top: 0;
+}
+
+/* Sidebar context section (actor/role/disease display + collapsed overrides) → product.css (DS-EX-01) */
+
+/* Status micro-items */
+.sidebar-status-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-status-item__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--sb-muted);
+}
+
+.sidebar-status-item--critical .sidebar-status-item__dot {
+  background: var(--color-warning-600);
+  width: 5px;
+  height: 5px;
+}
+
+.sidebar-status-item--warning .sidebar-status-item__dot {
+  background: var(--color-warning-600);
+  opacity: 0.55;
+}
+
+.sidebar-status-item--info .sidebar-status-item__dot {
+  background: var(--sb-info);
+  opacity: 0.7;
+}
+
+.sidebar-status-item__text {
+  font-size: var(--text-xs);
+  color: var(--sb-muted);
+  line-height: var(--leading-snug);
+}
+
+.sidebar-status-item--critical .sidebar-status-item__text {
+  color: color-mix(in srgb, var(--color-warning-600) 80%, var(--sb-text));
+}
+
+/* ==========================================================================
+   SECTION 2 — READINGS
+   Operational reading modes. Level 1-2 hierarchy.
+   Active mode: icon color + text weight, NOT a colored background.
+   ========================================================================== */
+
+.sidebar-section--readings {
+  flex: 1 0 auto;
+  min-height: 0;
+  padding-top: var(--space-12);
+}
+
+.sidebar-readings {
+  display: flex;
+  flex-direction: column;
+  /* design/react-visual-align: 2px entre items de navegación (era 16px)
+     -- misma regla, aplica igual en expandido y colapsado. */
+  gap: var(--space-2);
+}
+
+/*
+ * Reading item — base (Level 2: available, not active)
+ * Icons as wayfinding. 14px labels — readable in the sidebar's width (--sb-w).
+ * Color at --sb-subtle (0.72 opacity) for clear legibility.
+ */
+.sidebar-reading-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  padding: var(--space-11) var(--space-10); /* vertical +1px/lado (era space-10) */
+  border-radius: var(--radius-200);
+  background: transparent;
+  border: none;
+  color: var(--sb-subtle);
+  cursor: pointer;
+  text-align: left;
+  min-height: 40px; /* +2px, refleja el padding vertical */
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  font-family: var(--font-sans);
+}
+
+.sidebar-reading-item:hover {
+  color: var(--sb-text);
+  background: var(--sb-faint);
+}
+
+/* Foco — mismo criterio que selection-group.css (molecule): sin anillo
+   en click con mouse, anillo visible en navegación por teclado. Gap
+   de auditoría SP2: el item es un <button> real (Tab-focusable) que no
+   tenía tratamiento de foco propio. */
+.sidebar-reading-item:focus {
+  outline: none;
+}
+
+.sidebar-reading-item:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: -2px;
+}
+
+/*
+ * Active reading item — Level 1: dominant operational mode.
+ * Icon color + text weight carry the active signal. No rail, no
+ * background pill — el ícono ya distingue el estado (no_left_accent_borders).
+ */
+.sidebar-reading-item--active {
+  color: var(--sb-text);
+  background: transparent;
+}
+
+/* ── Icon — replaces the old dot. Wayfinding in both states. ──
+   color: currentColor -- el ícono hereda el mismo color que el texto
+   del item salvo en --active, donde una regla propia lo pone en
+   --sb-active (magenta de marca, DS-EX-04 -- ver definición arriba)
+   a pedido explícito: el Intent activo debe distinguirse por el color
+   de su ícono, no solo por el peso del label. Sin sub-regla de :hover:
+   currentColor ya sigue el `color` que .sidebar-reading-item:hover
+   define. */
+.sidebar-reading-item__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  font-size: 16px;
+  transition: color var(--transition-fast);
+}
+
+.sidebar-reading-item__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Aplica igual en expandido y colapsado -- este selector no depende de
+   .aow-sidebar--collapsed, y la regla de tamaño del ícono colapsado
+   (más abajo) no vuelve a tocar `color`. */
+.sidebar-reading-item--active .sidebar-reading-item__icon {
+  color: var(--sb-active);
+}
+
+/* Content body */
+.sidebar-reading-item__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  overflow: hidden;
+  transition: opacity var(--transition-base);
+}
+
+.sidebar-reading-item__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: font-weight var(--transition-fast);
+}
+
+.sidebar-reading-item--active .sidebar-reading-item__label {
+  font-weight: var(--weight-medium);
+}
+
+.sidebar-reading-item__badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-5);
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--sb-faint);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--sb-subtle);
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.sidebar-reading-item--active .sidebar-reading-item__badge {
+  background: color-mix(in srgb, var(--sb-active) 18%, transparent);
+  color: color-mix(in srgb, var(--sb-active) 90%, var(--sb-text));
+}
+
+/* ==========================================================================
+   COLLAPSED STATE — operational icon rail
+   Icons become the primary wayfinding element.
+   Each icon is a legible signifier. Active state must be unambiguous.
+   ========================================================================== */
+
+.aow-sidebar--collapsed .sidebar-reading-item {
+  justify-content: center;
+  padding: var(--space-10) 0;
+  gap: 0;
+}
+
+/* In collapsed state, icon is larger and more prominent -- color still
+   currentColor (see base rule above), just a bigger box/font-size. */
+.aow-sidebar--collapsed .sidebar-reading-item__icon {
+  width: 20px;
+  height: 20px;
+  font-size: var(--text-lg, 20px);
+}
+
+.aow-sidebar--collapsed .sidebar-reading-item__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.aow-sidebar--collapsed .sidebar-reading-item__content {
+  opacity: 0;
+  width: 0;
+  max-width: 0;
+  overflow: hidden;
+  pointer-events: none;
+  flex: 0;
+}
+
+.aow-sidebar--collapsed .sidebar-section--readings {
+  padding-top: var(--space-8);
+}
+
+/* ==========================================================================
+   SECTION 3 — TOOLS (Level 3: utility, very low weight)
+   No section separator. Part of the body flow.
+   Compact key=value pairs. Barely visible.
+   ========================================================================== */
+
+.sidebar-section--tools {
+  padding-top: var(--space-16);
+  transition:
+    opacity var(--transition-base),
+    max-height var(--transition-base);
+}
+
+.sidebar-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sidebar-tool {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-200);
+}
+
+.sidebar-tool:hover {
+  background: var(--sb-faint);
+}
+
+.sidebar-tool__label {
+  font-size: var(--text-xs);
+  color: var(--sb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-tool__value {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--sb-subtle);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sidebar-tool__value--warning {
+  color: color-mix(in srgb, var(--color-warning-600) 80%, var(--sb-text));
+}
+
+/* ==========================================================================
+   OPERATIONAL CONTROLS
+   Sidebar interactive controls — slider + toggle.
+   Minimal chrome. Value feedback is the signal, not the control decoration.
+   ========================================================================== */
+
+/* Tool row variants */
+.sidebar-tool--control {
+  align-items: center;
+  padding: var(--space-5) var(--space-8);
+}
+
+.sidebar-tool--static {
+  opacity: 0.7;
+}
+
+/* ── Slider control → atoms/inputs/slider/slider.css (DS-EX-03) ── */
+/* ── Toggle control → atoms/inputs/toggle-compact/toggle-compact.css (DS-EX-03) ── */
+
+/* Collapsed: hide controls entirely */
+.aow-sidebar--collapsed .sidebar-section--tools {
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   SECTION 3b — SESSION STATUS (S10-B — active lineage counts)
+   Compact surface answering "what's happening now" at three levels:
+     L1 — Active molecular referrals  (highest signal — blue accent)
+     L2 — Active operational processes (medium signal — muted)
+     L3 — Total session actions       (low signal — very muted)
+   No trust / urgency / confidence / candidate counts here.
+   Separated from Context (ecosystem state) and Pulse (persistent alerts).
+   ========================================================================== */
+
+.sidebar-section--session {
+  padding-top: var(--space-12);
+  transition:
+    opacity var(--transition-base),
+    max-height var(--transition-base);
+}
+
+.sidebar-session-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sidebar-session-empty {
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--sb-muted);
+  line-height: var(--leading-snug);
+  margin: 0;
+  padding: var(--space-4) 0;
+  opacity: 0.7;
+}
+
+/* Individual session status item */
+.sidebar-session-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+}
+
+.sidebar-session-item__count {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 16px;
+  text-align: right;
+}
+
+.sidebar-session-item__label {
+  font-size: 11px;
+  line-height: var(--leading-snug);
+}
+
+/* L1 — Active molecular referrals: highest visual weight, blue accent */
+.sidebar-session-item--l1 .sidebar-session-item__count {
+  color: var(--sb-info);
+}
+.sidebar-session-item--l1 .sidebar-session-item__label {
+  color: var(--sb-subtle);
+  font-weight: var(--weight-medium);
+}
+
+/* L2 — Active operational processes: medium weight */
+.sidebar-session-item--l2 .sidebar-session-item__count {
+  color: var(--sb-text);
+  opacity: 0.75;
+}
+.sidebar-session-item--l2 .sidebar-session-item__label {
+  color: var(--sb-muted);
+}
+
+/* L3 — Session action count: lowest weight, purely informational */
+.sidebar-session-item--l3 .sidebar-session-item__count {
+  color: var(--sb-muted);
+  opacity: 0.7;
+}
+.sidebar-session-item--l3 .sidebar-session-item__label {
+  color: var(--sb-muted);
+  opacity: 0.7;
+}
+
+/* Collapsed state — hide session section (same pattern as tools) */
+.aow-sidebar--collapsed .sidebar-section--session {
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   SECTION 4 — HISTORY (S10-A — operational record)
+   Append-only session record of actions taken. Reads as audit trail, not log.
+   Visual hierarchy (per S10-A.2):
+     type chip     → category (Candidato / Flujo / Sede)
+     outcomeLabel  → primary operational fact
+     downstreamState → consequence in motion
+     timestamp     → HH:MM
+     lineage dot   → consequence still active in system's belief state
+   Separated from: attended state, trust, selected state, board lineage.
+   ========================================================================== */
+
+.sidebar-section--history {
+  padding-top: var(--space-12);
+  transition:
+    opacity var(--transition-base),
+    max-height var(--transition-base);
+}
+
+.sidebar-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.sidebar-history-empty {
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--sb-muted);
+  line-height: var(--leading-snug);
+  margin: 0;
+  padding: var(--space-4) 0;
+  opacity: 0.7;
+}
+
+/* Individual history entry — compact operational row */
+.sidebar-history-entry {
+  padding: var(--space-8) var(--space-8);
+  border-radius: var(--radius-200);
+  border-left: 2px solid var(--sb-faint);
+  background: transparent;
+  transition: background var(--transition-fast);
+}
+
+.sidebar-history-entry:hover {
+  background: var(--sb-faint);
+}
+
+/* Header row: type chip + meta (time + lineage dot) */
+.sidebar-history-entry__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-3);
+}
+
+/* Type chip — categorical label (Candidato / Flujo / Sede) */
+.sidebar-history-entry__type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  color: var(--sb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Meta group: time + lineage dot */
+.sidebar-history-entry__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-shrink: 0;
+}
+
+/* Timestamp */
+.sidebar-history-entry__time {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--sb-muted);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/*
+ * Lineage dot — signals the downstream consequence is still in the
+ * system's belief state for this session.
+ * Intentionally the same blue as --sb-info to match the primitive
+ * lineage-active signal without reusing identical semantics.
+ * S10-A.4: operational record, not alert, not celebration.
+ */
+.sidebar-history-entry__lineage {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--sb-info);
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
+/* Outcome label — the primary operational fact */
+.sidebar-history-entry__outcome {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--sb-subtle);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Downstream state — consequence label, subordinate to outcome */
+.sidebar-history-entry__state {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--sb-muted);
+  line-height: var(--leading-snug);
+  margin-top: var(--space-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Collapsed state — hide history section (same pattern as tools) */
+.aow-sidebar--collapsed .sidebar-section--history {
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   SECTION 5 — PULSE (pinned, persistent operational signal)
+   The one structural border: pulse is always separate from the body.
+   Low visual weight. Dots only signal severity — no heavy color blocks.
+   ========================================================================== */
+
+.sidebar-section--pulse {
+  flex-shrink: 0;
+  border-top: 1px solid var(--sb-divider);
+  padding: var(--space-16) var(--space-14);
+  background: var(--sb-bg);
+  margin-top: auto;
+}
+
+.sidebar-pulse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.sidebar-pulse-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.sidebar-pulse-item__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  margin-top: 5px;
+  background: var(--sb-faint);
+}
+
+.sidebar-pulse-item--critical .sidebar-pulse-item__dot {
+  background: var(--color-warning-600);
+}
+
+.sidebar-pulse-item--warning .sidebar-pulse-item__dot {
+  background: var(--color-warning-600);
+  opacity: 0.6;
+}
+
+.sidebar-pulse-item--info .sidebar-pulse-item__dot {
+  background: var(--sb-info);
+  opacity: 0.7;
+}
+
+.sidebar-pulse-item__text {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--sb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--transition-base);
+}
+
+.sidebar-pulse-item--critical .sidebar-pulse-item__text {
+  color: color-mix(in srgb, var(--color-warning-600) 80%, var(--sb-text));
+  font-weight: var(--weight-medium);
+}
+
+/* Collapsed: dots only */
+.aow-sidebar--collapsed .sidebar-pulse-item__text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aow-sidebar--collapsed .sidebar-section--pulse {
+  padding: var(--space-10) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.aow-sidebar--collapsed .sidebar-pulse-item {
+  justify-content: center;
+}
+
+.aow-sidebar--collapsed .sidebar-section-label {
+  display: none;
+}
+
+/* Actor preview mode (selector wrap, trigger, dropdown, options) → product.css (DS-EX-01) */
+
+/* ==========================================================================
+   RESPONSIVE — hide sidebar below board collapse boundary (1079px)
+   ========================================================================== */
+
+@media (max-width: 1079px) {
+  .aow-sidebar {
+    display: none;
+  }
+
+  .aow-canvas {
+    margin-left: 0;
+  }
+}
+
+/* ============================================================
+   TOOLS — Search / Sort / Filter Groups
+   Antes: SimahealthDS/organisms/ToolPanel/tool-panel.css
+   Versión CSS original: 1.0 | Sprint: DS-05 | Fecha: 2026-07-06
+   Versión 2.0 | Sprint: DS-08 | Fecha: 2026-07-17
+
+   Contenido de la región Tools que mount() ya reservó como contenedor
+   vacío (.tool-panel) más arriba en este archivo. Renderizado por
+   SimaAOWV2.LeftPanel.mountTools() (left-panel.js).
+
+   Descubierto a partir de 6 implementaciones reales:
+     Hospital · Descubrimiento, Monitoreo, Histórico
+     Farma    · Pipeline, Riesgo, Trazabilidad
+
+   Contrato de estructura (ADR-007, ahora parte del contrato de
+   LeftPanel — ver ADR-008, SimahealthDS/docs/ARCHITECTURE_DECISIONS.md):
+     - Nodo raíz: .tool-panel
+     - Región Search (opcional, independiente): .sidebar-z3-search-wrap
+     - Región Sort (opcional, independiente): .sidebar-z3-sort-section
+       — reutiliza hoy la forma visual de Filter Group sin acoplarse a
+       ella (clase de wrapper propia; puede divergir sin refactor).
+     - Región Filter Groups (0..N): .sidebar-z3-filter-group
+
+   Exclusión DS-05C: .z3-group-header pertenece al Board (actor),
+     no a Tools. No se extrae aquí.
+   ============================================================ */
+
+/* ── Container ───────────────────────────────────────────────
+   Nodo raíz canónico. El actor lo monta en el sidebar y
+   controla show/hide (display:none / '').
+   ─────────────────────────────────────────────────────────── */
+.tool-panel {
+  /* Mismo plano que el Sidebar que lo monta y el canvas del Workspace
+     -- sin superficie propia. Antes --surface-canvas; ahora
+     --surface-primary (mismo token que Card), igual que el resto del
+     plano base (ver --sb-bg arriba).
+     design/react-visual-align: el border-top que separaba visualmente
+     esta región de Intents (la línea divisoria del LeftPanel) se quitó
+     a pedido explícito -- la separación ahora la aporta solo el
+     espaciado (margin-top), sin una línea. */
+  background: var(--surface-primary);
+  padding: 14px 14px 16px;
+  margin-top: 10px;
+}
+
+.aow-sidebar--collapsed .tool-panel {
+  display: none;
+}
+
+/* Label estructural ("HERRAMIENTAS"): decisión de diseño vigente lo
+   retiró del contrato visual — left-panel.js (implementación oficial)
+   ya no lo emite. Esta regla queda como referencia histórica del
+   tratamiento visual que tuvo ese label; no tiene consumidor activo
+   desde que Hospital y Farma quedaron fuera de alcance. */
+.tool-panel > .sidebar-section-label {
+  opacity: 0.65;
+  margin-bottom: var(--space-14);
+}
+
+/* ── Search ──────────────────────────────────────────────────
+   Slot opcional. Incluido o no por el actor según el intent.
+   ─────────────────────────────────────────────────────────── */
+.sidebar-z3-search-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.sidebar-z3-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.sidebar-z3-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  height: 34px;
+  padding: 0 12px 0 28px;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 120ms ease;
+}
+
+.sidebar-z3-input:focus {
+  border-color: var(--border-brand);
+}
+
+.sidebar-z3-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ── Filter Section ──────────────────────────────────────────
+   Wrapper de grupos de filtro. Siempre presente.
+   ─────────────────────────────────────────────────────────── */
+.sidebar-z3-filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  margin-bottom: var(--space-2);
+}
+
+.sidebar-z3-section-head {
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+/* ── Filter Group ────────────────────────────────────────────
+   Unidad de filtro: etiqueta + SelectionGroup molecule.
+   ≥1 obligatorio por Tool Panel.
+   ─────────────────────────────────────────────────────────── */
+.sidebar-z3-filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* design/react-visual-align: espacio label -> contenido = 24px (era el
+   `gap: 4px` uniforme de arriba, que también separaba el selection-group
+   del trigger "más" opcional). Se reemplaza por un margin-top dirigido
+   solo al primer contenido tras el label, para no empujar "Ver más" 24px
+   lejos de las pills -- ese espaciado (antes 4px vía el mismo gap) se
+   preserva explícitamente abajo. */
+.sidebar-z3-filter-group > .selection-group {
+  margin-top: var(--space-24);
+}
+.sidebar-z3-filter-group > .sidebar-z3-group-more {
+  margin-top: var(--space-4, 4px);
+}
+
+/* design/react-visual-align: font-weight tokenizado (600 -> el mismo
+   valor real vía var(--weight-semibold), sin cambio visual). font-size
+   se deja en 10px -- no existe un token DS para ese tamaño exacto
+   (--text-xs es 12px, el más chico declarado); forzarlo a 12px
+   cambiaría la jerarquía visual propia de LeftPanel, que esta tarea
+   pide no alterar arbitrariamente. Reportado como brecha de tokens,
+   no resuelto en silencio. */
+.sidebar-z3-filter-label {
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
+}
+
+/* Modificador: etiqueta y pills en la misma fila */
+.sidebar-z3-filter-group--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+.sidebar-z3-filter-group--inline > .sidebar-z3-filter-label {
+  flex-shrink: 0;
+}
+
+/* SP2 — ajuste visual: +2px de ritmo vertical entre líneas de opciones
+   quebradas dentro de un Filter Group (legibilidad). Solo row-gap: el
+   espaciado horizontal entre pills de una misma línea (--space-4,
+   column-gap) no cambia. Alcance acotado a Filter Groups — Sort
+   reutiliza la misma forma visual pero no se toca aquí (no lo pidió
+   este ajuste, y hoy nunca quiebra a una segunda línea). */
+.sidebar-z3-filter-group .selection-group {
+  row-gap: 6px;
+}
+
+/* ── Sort ────────────────────────────────────────────────────
+   Región independiente de Filter Group (ADR-007) — hoy reutiliza la
+   misma forma visual (etiqueta + selection-group) vía una regla propia,
+   no comparte selector con .sidebar-z3-filter-group: puede divergir
+   visualmente en el futuro sin tocar Filter Group. Slot opcional.
+   ─────────────────────────────────────────────────────────── */
+.sidebar-z3-sort-section {
+  display: flex;
+  flex-direction: column;
+  /* design/react-visual-align: espacio label -> contenido = 24px (era
+     4px). Sort nunca tiene un tercer hijo ("más"), así que a diferencia
+     de Filter Group alcanza con un solo `gap` uniforme. */
+  gap: var(--space-24);
+  margin-bottom: var(--space-24);
+}
+
+/* ── Group "more" (revelado progresivo) ─────────────────────
+   Trigger opcional de un Filter Group con más ítems de los que
+   muestra por defecto. Solo estructura/estilo — el organismo no
+   wire-ea el click (ver left-panel.js, "Nota de revelado"); el
+   consumidor decide cuándo mostrarlo y qué anunciar.
+   ─────────────────────────────────────────────────────────── */
+.sidebar-z3-group-more {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0 var(--space-4, 4px);
+  height: 24px;
+  line-height: 1;
+  font: inherit;
+  font-size: var(--text-xs, 11px);
+  font-weight: var(--weight-semibold);
+  color: var(--text-brand);
+  cursor: pointer;
+  align-self: flex-start;
+}
+.sidebar-z3-group-more:hover {
+  text-decoration: underline;
+}
+.sidebar-z3-group-more:focus {
+  outline: none;
+}
+.sidebar-z3-group-more:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-200);
+}
+
+/* El display:inline-flex del chip vence al [hidden] del user-agent:
+   se restablece la ocultación con mayor especificidad. Genérico (no
+   depende de qué representa el ítem oculto) — movido aquí desde
+   especialista.css, que lo tenía scoped bajo `.tool-panel` sin ninguna
+   otra dependencia actor-local. */
+.tool-panel .selection-group__item[hidden] {
+  display: none;
+}

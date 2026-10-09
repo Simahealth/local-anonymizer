@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_027",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Jorge Pérez Gómez\ncédula de ciudadanía No. 91478884\nFecha de nacimiento: 1972-07-24\nProcedencia: Villavicencio, Atlántico\nDirección: Avenida 169 Sur # 18-81, barrio La Floresta\nTeléfono: 310 712 1355   Correo: jorge12@outlook.com\nEPS: Salud Total\nFecha de ingreso: 5 de septiembre de 1996\n\nMOTIVO DE CONSULTA\nPaciente de 29 años que ingresa al servicio refiriendo dolor torácico de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número 310 712 1355.\n\nVALORACIÓN\nAtendido por el Dr. Paula Quintero Vargas (Registro médico 31567). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo jorge12@outlook.com o remitir a la dirección Avenida 169 Sur # 18-81.",
+  "ground_truth": {
+    "nombres": [
+      "Jorge Pérez Gómez",
+      "Paula Quintero Vargas"
+    ],
+    "documentos": [
+      "91478884"
+    ],
+    "edades": [
+      "29 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Atlántico"
+    ],
+    "direcciones": [
+      "Avenida 169 Sur # 18-81"
+    ],
+    "telefonos": [
+      "310 712 1355"
+    ],
+    "emails": [
+      "jorge12@outlook.com"
+    ],
+    "seguros": [
+      "Salud Total"
+    ],
+    "fechas_nacimiento": [
+      "1972-07-24"
+    ],
+    "fechas": [
+      "5 de septiembre de 1996"
+    ],
+    "numeros_registro": [
+      "Registro médico 31567"
+    ]
+  }
+}

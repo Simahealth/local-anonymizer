@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_005",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Carlos Ramírez Rodríguez\nC.C. 4.289.233.844\nFecha de nacimiento: 08/02/1993\nProcedencia: Manizales, Nariño\nDirección: Cra 156B N° 28-70 piso 6, barrio Manga\nTeléfono: 6028350099   Correo: carlos58@gmail.com\nEPS: Compensar\nFecha de ingreso: 1979-09-19\n\nMOTIVO DE CONSULTA\nPaciente de 85 años que ingresa al servicio refiriendo fiebre de tres días de varios días de evolución. Reside en Manizales y consulta de forma espontánea. Se localiza al acompañante en el número 6028350099.\n\nVALORACIÓN\nAtendido por el Dr. Andrés Quintero Rodríguez (HC-107540). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo carlos58@gmail.com o remitir a la dirección Cra 156B N° 28-70 piso 6.",
+  "ground_truth": {
+    "nombres": [
+      "Carlos Ramírez Rodríguez",
+      "Andrés Quintero Rodríguez"
+    ],
+    "documentos": [
+      "4.289.233.844"
+    ],
+    "edades": [
+      "85 años"
+    ],
+    "ubicaciones": [
+      "Manizales",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Cra 156B N° 28-70 piso 6"
+    ],
+    "telefonos": [
+      "6028350099"
+    ],
+    "emails": [
+      "carlos58@gmail.com"
+    ],
+    "seguros": [
+      "Compensar"
+    ],
+    "fechas_nacimiento": [
+      "08/02/1993"
+    ],
+    "fechas": [
+      "1979-09-19"
+    ],
+    "numeros_registro": [
+      "HC-107540"
+    ]
+  }
+}

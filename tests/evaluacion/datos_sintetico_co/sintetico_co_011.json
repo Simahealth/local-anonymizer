@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_011",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Andrés Torres Rojas\nidentificado con C.C. 7.597.996.327\nFecha de nacimiento: 1950-07-23\nProcedencia: Armenia, Santander\nDirección: Cra 68 No. 14-77 piso 7, barrio Cabecera\nTeléfono: 321-746-2506   Correo: andrés25@outlook.com\nEPS: Sura\nFecha de ingreso: 12 de julio de 1958\n\nMOTIVO DE CONSULTA\nPaciente 15 años de edad que ingresa al servicio refiriendo dolor torácico de varios días de evolución. Reside en Armenia y consulta de forma espontánea. Se localiza al acompañante en el número 321-746-2506.\n\nVALORACIÓN\nAtendido por el Dr. Laura Ospina Moreno (HC-753425). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo andrés25@outlook.com o remitir a la dirección Cra 68 No. 14-77 piso 7.",
+  "ground_truth": {
+    "nombres": [
+      "Andrés Torres Rojas",
+      "Laura Ospina Moreno"
+    ],
+    "documentos": [
+      "7.597.996.327"
+    ],
+    "edades": [
+      "15 años"
+    ],
+    "ubicaciones": [
+      "Armenia",
+      "Santander"
+    ],
+    "direcciones": [
+      "Cra 68 No. 14-77 piso 7"
+    ],
+    "telefonos": [
+      "321-746-2506"
+    ],
+    "emails": [
+      "andrés25@outlook.com"
+    ],
+    "seguros": [
+      "Sura"
+    ],
+    "fechas_nacimiento": [
+      "1950-07-23"
+    ],
+    "fechas": [
+      "12 de julio de 1958"
+    ],
+    "numeros_registro": [
+      "HC-753425"
+    ]
+  }
+}

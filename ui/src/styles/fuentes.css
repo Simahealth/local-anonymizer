@@ -1,0 +1,28 @@
+/* Fuentes del Design System empaquetadas en local (fontsource / material-symbols)
+   en lugar de Google Fonts: la app de escritorio debe funcionar sin conexión y
+   no debe hacer peticiones a terceros. Los paquetes de fuentes variables
+   registran la familia como "<Nombre> Variable", así que se antepone a los
+   tokens del DS manteniendo el nombre original como respaldo. */
+@import "@fontsource-variable/dm-sans/opsz.css";
+@import "@fontsource-variable/dm-sans/opsz-italic.css";
+@import "@fontsource/dm-mono/400.css";
+@import "@fontsource/dm-mono/500.css";
+@import "@fontsource-variable/noto-serif/index.css";
+
+:root {
+  --font-sans: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", "Fira Code", monospace;
+  --font-serif: "Noto Serif Variable", "Noto Serif", Georgia, serif;
+}
+
+/* Solo la @font-face de Material Symbols: la clase .material-symbols-outlined
+   la define el DS (foundations/icons/icons.css). El outlined.css del paquete
+   también trae la clase, con un font-size fijo de 24px que pisaría el tamaño
+   heredado que el DS espera. */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url("../../node_modules/material-symbols/material-symbols-outlined.woff2") format("woff2");
+}

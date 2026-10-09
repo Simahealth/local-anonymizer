@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_003",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Juliana Gómez Ramírez\nidentificado con C.C. 387.484.583\nFecha de nacimiento: 1978-06-13\nProcedencia: Armenia, Huila\nDirección: Av 128B # 83-59, barrio Cabecera\nTeléfono: 6075408072   Correo: juliana75@yahoo.es\nEPS: Mutual SER\nFecha de ingreso: 17/08/1961\n\nMOTIVO DE CONSULTA\nPaciente de 28 años que ingresa al servicio refiriendo mareo de varios días de evolución. Reside en Armenia y consulta de forma espontánea. Se localiza al acompañante en el número 6075408072.\n\nVALORACIÓN\nAtendido por el Dr. Juliana Gómez Castro (HC-214975). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo juliana75@yahoo.es o remitir a la dirección Av 128B # 83-59.",
+  "ground_truth": {
+    "nombres": [
+      "Juliana Gómez Ramírez",
+      "Juliana Gómez Castro"
+    ],
+    "documentos": [
+      "387.484.583"
+    ],
+    "edades": [
+      "28 años"
+    ],
+    "ubicaciones": [
+      "Armenia",
+      "Huila"
+    ],
+    "direcciones": [
+      "Av 128B # 83-59"
+    ],
+    "telefonos": [
+      "6075408072"
+    ],
+    "emails": [
+      "juliana75@yahoo.es"
+    ],
+    "seguros": [
+      "Mutual SER"
+    ],
+    "fechas_nacimiento": [
+      "1978-06-13"
+    ],
+    "fechas": [
+      "17/08/1961"
+    ],
+    "numeros_registro": [
+      "HC-214975"
+    ]
+  }
+}

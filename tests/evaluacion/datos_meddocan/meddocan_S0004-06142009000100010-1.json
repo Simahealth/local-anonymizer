@@ -1,0 +1,43 @@
+{
+  "nombre": "meddocan_S0004-06142009000100010-1",
+  "descripcion": "MEDDOCAN dev · S0004-06142009000100010-1 (corpus español, conjunto neutral)",
+  "texto": "Datos del paciente.\nNombre:  Valeria.\nApellidos: Casado Vinuesa.\nNHC: 3096502.\nDomicilio: Paseo de los Heroes y Martires, 23, 4C.\nLocalidad/ Provincia: Zaragoza.\nCP: 50468.\nDatos asistenciales.\nFecha de nacimiento: 15/01/2009.\nPaís: España.\nEdad: 9 años Sexo: M.\nFecha de Ingreso: 15/06/2018.\nServicio: Pediatria.\nMédico: Jorge Subirá Ríos NºCol: 50 50 97563.\nHistoria Actual: Niña de 9 años de edad ingresa en el servicio de pediatría procedente de urgencias por segundo episodio de hematuria macroscópica en 20 días.\nNo presenta antecedentes familiares de interés, antecedentes personales de hemihipertrofia facial por tortícolis congénito, varicela, mononucleosis infecciosa, enúresis nocturna hasta los 7 años, neumonía a los 9 meses y traumatismo en cóccix.\nExploración física: Exploración física: ligera palidez cutánea, peso dentro de percentil 25-50 y talla percentil 50-75. Sin más hallazgos.\nPruebas complementarias: hemograma, bioquímica, coagulación, urocultivo, función renal, enolasa, alfa feto proteína, radiografía de tórax y ECG normales.\nSedimento urinario: hematuria macroscópica.\nEcografía abdominal: masa de 5cm de diámetro en riñón izquierdo, compleja con áreas quísticas/necrosis.\nEvolución y comentarios: El servicio de pediatría realiza interconsulta a nuestro servicio decidiéndose realizar tras hallazgo ecográfico, una TC abdominal con contraste con el hallazgo de masa dependiente del riñón izquierdo, en cara anterior, de contenido quístico con engrosamientos irregulares endoluminales. Presenta un tabique grueso e irregular de densidad similar a la obtenida en las irregularidades internas descritas. No se observan adenomegalias inter-cavoaórticas ni periaórticas.\nLa masa es compatible con tumor de Wilms o adeno-carcinoma.\nSe decide realización de nefrectomía izquierda: la masa mide 4.5 cm. de diámetro.\nLa niña está pendiente de una nueva revision, debera pedir cita al telefono de cita previa del servicio de pediatria 901 598 663.\nDiagnóstico Principal: El diagnóstico anatomopatológico es de nefroma meso-blástico quístico (quiste renal multilocular).\nRemitido por: Dr.Jorge Subirá Ríos. Plaza San Francisco 7, 3D 50006 Zaragoza. (España). kokedoc@hotmail.com\n",
+  "ground_truth": {
+    "edades": [
+      "9 meses",
+      "7 años",
+      "9 años"
+    ],
+    "emails": [
+      "kokedoc@hotmail.com"
+    ],
+    "ubicaciones": [
+      "España",
+      "Zaragoza",
+      "50006",
+      "50468"
+    ],
+    "direcciones": [
+      "Plaza San Francisco 7, 3D",
+      "Paseo de los Heroes y Martires, 23, 4C"
+    ],
+    "nombres": [
+      "Jorge Subirá Ríos",
+      "Casado Vinuesa",
+      "Valeria"
+    ],
+    "telefonos": [
+      "901 598 663"
+    ],
+    "numeros_registro": [
+      "50 50 97563"
+    ],
+    "fechas": [
+      "15/06/2018",
+      "15/01/2009"
+    ],
+    "documentos": [
+      "3096502"
+    ]
+  }
+}

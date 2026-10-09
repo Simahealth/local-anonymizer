@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_019",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Patricia López González\nidentificado con C.C. 7.858.164.010\nFecha de nacimiento: 1993-08-16\nProcedencia: Cartagena, Atlántico\nDirección: Av 4 Sur No. 69-17 apto 147, barrio Chapinero\nTeléfono: 3072721135   Correo: patricia74@outlook.com\nEPS: Coosalud\nFecha de ingreso: 02/05/2011\n\nMOTIVO DE CONSULTA\nPaciente Edad: 25 años que ingresa al servicio refiriendo cefalea persistente de varios días de evolución. Reside en Cartagena y consulta de forma espontánea. Se localiza al acompañante en el número 3072721135.\n\nVALORACIÓN\nAtendido por el Dr. David Quintero Torres (Registro médico 18564). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo patricia74@outlook.com o remitir a la dirección Av 4 Sur No. 69-17 apto 147.",
+  "ground_truth": {
+    "nombres": [
+      "Patricia López González",
+      "David Quintero Torres"
+    ],
+    "documentos": [
+      "7.858.164.010"
+    ],
+    "edades": [
+      "25 años"
+    ],
+    "ubicaciones": [
+      "Cartagena",
+      "Atlántico"
+    ],
+    "direcciones": [
+      "Av 4 Sur No. 69-17 apto 147"
+    ],
+    "telefonos": [
+      "3072721135"
+    ],
+    "emails": [
+      "patricia74@outlook.com"
+    ],
+    "seguros": [
+      "Coosalud"
+    ],
+    "fechas_nacimiento": [
+      "1993-08-16"
+    ],
+    "fechas": [
+      "02/05/2011"
+    ],
+    "numeros_registro": [
+      "Registro médico 18564"
+    ]
+  }
+}

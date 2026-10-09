@@ -1,0 +1,9 @@
+{
+  "nombre": "caso_nombres_ubicaciones",
+  "descripcion": "Nombres compuestos consecutivos y posibles colisiones entre nombres y ubicaciones.",
+  "texto": "Nota de evolución\n\nEl paciente José Manuel Hernández Vargas, natural de Santa Marta y residente en el barrio La Castellana de Bogotá, fue valorado en la ciudad de Cali durante su traslado. Acompañado por su esposa Diana Carolina Mejía. El médico tratante, Dr. Andrés Felipe Santos, solicita interconsulta con la Dra. Paula Restrepo del servicio de cardiología en Barranquilla.\n",
+  "ground_truth": {
+    "nombres": ["José Manuel Hernández Vargas", "Diana Carolina Mejía", "Andrés Felipe Santos", "Paula Restrepo"],
+    "ubicaciones": ["Santa Marta", "Bogotá", "Cali", "Barranquilla"]
+  }
+}

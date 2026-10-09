@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_041",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Valentina García García\ncédula de ciudadanía No. 4569'592.370\nFecha de nacimiento: 21/10/2008\nProcedencia: Manizales, Huila\nDirección: Calle 5A N° 28-20 piso 10, barrio Chapinero\nTeléfono: 3136052478   Correo: valentina7@hotmail.com\nEPS: Famisanar\nFecha de ingreso: 04/08/2018\n\nMOTIVO DE CONSULTA\nPaciente 61 años de edad que ingresa al servicio refiriendo disnea de esfuerzo de varios días de evolución. Reside en Manizales y consulta de forma espontánea. Se localiza al acompañante en el número 3136052478.\n\nVALORACIÓN\nAtendido por el Dr. Carlos Vargas Quintero (HC-762652). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo valentina7@hotmail.com o remitir a la dirección Calle 5A N° 28-20 piso 10.",
+  "ground_truth": {
+    "nombres": [
+      "Valentina García García",
+      "Carlos Vargas Quintero"
+    ],
+    "documentos": [
+      "4569'592.370"
+    ],
+    "edades": [
+      "61 años"
+    ],
+    "ubicaciones": [
+      "Manizales",
+      "Huila"
+    ],
+    "direcciones": [
+      "Calle 5A N° 28-20 piso 10"
+    ],
+    "telefonos": [
+      "3136052478"
+    ],
+    "emails": [
+      "valentina7@hotmail.com"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "21/10/2008"
+    ],
+    "fechas": [
+      "04/08/2018"
+    ],
+    "numeros_registro": [
+      "HC-762652"
+    ]
+  }
+}

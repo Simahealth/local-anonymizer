@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_030",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Valentina González Rodríguez\ndocumento de identidad 4735313433\nFecha de nacimiento: 05/12/2003\nProcedencia: Pasto, Huila\nDirección: Calle 38 # 70-33, barrio El Poblado\nTeléfono: 3136431983   Correo: valentina23@outlook.com\nEPS: Sura\nFecha de ingreso: Febrero 24 de 2010\n\nMOTIVO DE CONSULTA\nPaciente Edad: 19 años que ingresa al servicio refiriendo cefalea persistente de varios días de evolución. Reside en Pasto y consulta de forma espontánea. Se localiza al acompañante en el número 3136431983.\n\nVALORACIÓN\nAtendido por el Dr. Juliana Cárdenas González (RM 77271). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo valentina23@outlook.com o remitir a la dirección Calle 38 # 70-33.",
+  "ground_truth": {
+    "nombres": [
+      "Valentina González Rodríguez",
+      "Juliana Cárdenas González"
+    ],
+    "documentos": [
+      "4735313433"
+    ],
+    "edades": [
+      "19 años"
+    ],
+    "ubicaciones": [
+      "Pasto",
+      "Huila"
+    ],
+    "direcciones": [
+      "Calle 38 # 70-33"
+    ],
+    "telefonos": [
+      "3136431983"
+    ],
+    "emails": [
+      "valentina23@outlook.com"
+    ],
+    "seguros": [
+      "Sura"
+    ],
+    "fechas_nacimiento": [
+      "05/12/2003"
+    ],
+    "fechas": [
+      "Febrero 24 de 2010"
+    ],
+    "numeros_registro": [
+      "RM 77271"
+    ]
+  }
+}

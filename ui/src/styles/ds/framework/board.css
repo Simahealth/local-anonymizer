@@ -1,0 +1,356 @@
+.board {
+  min-height: calc(100vh - 200px);
+  display: grid;
+  grid-template-columns: repeat(var(--aow-grid-columns), minmax(0, 1fr));
+  grid-auto-rows: minmax(var(--aow-grid-row-unit), auto);
+  /* H-SP-01: decouple axes — rows breathe wider than columns.
+     column-gap = L2 (zone gap, 16px). row-gap = L2×1.5 (24px) for vertical rhythm.
+     Standard ratio per IBM Carbon / Material 3 spatial system. */
+  column-gap: var(--aow-grid-gap);
+  row-gap: var(--space-24);
+  /* H-SP-03: editorial pause between intent header and board surface */
+  padding: var(--space-32) var(--aow-grid-margin) var(--space-48, 48px);
+}
+
+/*
+ * Board region base — reduced visual weight.
+ * Shadow removed: depth comes from content, not containers.
+ * Border is very subtle — regions are spatial anchors, not boxes.
+ */
+.board-region {
+  min-width: 0;
+  min-height: 156px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  overflow: hidden;
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-400);
+  background: var(--surface-primary);
+  /* No box-shadow — depth is expressed through content hierarchy, not container shadows */
+}
+
+/*
+ * Primary region — the STAGE.
+ *
+ * This region is not a container — it is the operational foreground.
+ * It should read as the surface where the active situation is happening,
+ * not as one of four equivalent board columns.
+ *
+ * Principles:
+ *   - No container border or box — the primitive IS the surface
+ *   - More breathing room: generous top padding creates stage entrance
+ *   - The A-rep primitive gets a distinct shadow to lift it off the canvas
+ *   - Subtle warm floor: a barely-perceptible tinted background anchors
+ *     the stage without creating a visible box
+ */
+.board-region--primary {
+  grid-column: var(--aow-region-primary-column-start) /
+    var(--aow-region-primary-column-end);
+  min-height: calc(
+    var(--aow-grid-row-unit) * var(--aow-region-primary-min-rows)
+  );
+  /* S11: transparent — primary region is a stage, not a container.
+     Was color-mix(sima-blue 2%, surface-secondary) ≈ #f5f7fb, visually distinct
+     from the workspace floor (#f8f9fc). Transparent merges with the unified floor. */
+  background: transparent;
+  border: 0.5px solid var(--border-default);
+  box-shadow: none;
+  padding: var(--space-16);
+  border-radius: var(--radius-400);
+}
+
+.board-region--primary .board-region__header {
+  border-bottom: none;
+  margin-bottom: var(--space-14);
+  padding-bottom: 0;
+}
+
+/*
+ * Primary region header — more editorial weight.
+ * Region label fades; region h3 has a bit more presence than supporting regions.
+ */
+.board-region--primary .board-region__header p {
+  color: color-mix(in srgb, var(--sima-blue) 55%, var(--text-tertiary));
+  letter-spacing: 0.04em;
+}
+
+.board-region--primary .board-region__header h2 {
+  color: var(--text-primary);
+  font-size: var(--text-base); /* was 13px — now grid-compliant + readable */
+  font-weight: var(--weight-semibold);
+}
+
+/*
+ * Stage elevation — the A-rep primitive is the dominant surface.
+ * Deep shadow with slight blue-tint: depth without drama.
+ * Slightly elevated border creates separation from the canvas.
+ */
+.board-region--primary .primitive-shell[data-representation="A"] {
+  border-color: color-mix(in srgb, var(--sima-blue) 18%, var(--border-default));
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 1px color-mix(in srgb, var(--sima-blue) 8%, transparent);
+}
+
+/*
+ * Left — operational scan surface.
+ * Uniform L3 padding (16px) — zone provides all spatial breathing room.
+ * Header no longer needs explicit horizontal padding override.
+ */
+.board-region--left {
+  grid-column: var(--aow-region-leftOperational-column-start) /
+    var(--aow-region-leftOperational-column-end);
+  min-height: calc(
+    var(--aow-grid-row-unit) * var(--aow-region-leftOperational-min-rows)
+  );
+  padding: var(--space-16);
+  background: var(--surface-primary);
+}
+
+.board-region--left .board-region__content {
+  padding: 0;
+}
+
+/*
+ * Right — ambient reference surface.
+ * Transparent container: C-rep cards float on the workspace background.
+ * No box — this zone is ambient, not operational.
+ */
+.board-region--right {
+  grid-column: var(--aow-region-rightContextual-column-start) /
+    var(--aow-region-rightContextual-column-end);
+  min-height: calc(
+    var(--aow-grid-row-unit) * var(--aow-region-rightContextual-min-rows)
+  );
+  background: transparent;
+  border: 0.5px solid var(--border-default);
+  padding: var(--space-8) var(--space-4);
+}
+
+.board-region--right .board-region__header {
+  border-bottom: none;
+  padding-bottom: var(--space-8);
+  margin-bottom: var(--space-4);
+}
+
+/*
+ * Bottom — synthesized intelligence layer.
+ * Light container, no shadow. Intelligence cards carry their own weight.
+ * Slightly more transparent than left to feel secondary.
+ * Extra padding: bottom region is dense with compressed graphs —
+ * more breathing room between header and content prevents visual collapse.
+ */
+.board-region--bottom {
+  grid-column: var(--aow-region-bottomIntelligence-column-start) /
+    var(--aow-region-bottomIntelligence-column-end);
+  min-height: calc(
+    var(--aow-grid-row-unit) * var(--aow-region-bottomIntelligence-min-rows)
+  );
+  /* S11: was color-mix(surface-primary 85%, transparent) — rendered as semi-transparent
+     white over #ffffff (= white) but breaks when workspace floor is surface-secondary.
+     Now explicit surface-primary: bottom region is an elevated panel, same as left. */
+  background: var(--surface-primary);
+  padding: var(--space-16);
+}
+
+.board-region--bottom .board-region__header {
+  margin-bottom: var(--space-12);
+}
+
+.board-region__header {
+  display: grid;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-2);
+}
+
+/*
+ * Region label — geographic/operational anchor.
+ * 12px: grid-compliant minimum for readable orientation text.
+ */
+.board-region__header p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+}
+
+/*
+ * Region subtitle — intent-driven framing.
+ * 12px: quiet, instrumental, clearly below title level.
+ * Weight: regular (400) — ambient context, not operational instruction.
+ */
+.board-region h2 {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-regular);
+}
+
+.board-region__content {
+  min-height: 72px;
+  flex: 1 1 auto;
+}
+
+/* Legacy dashboard layouts (opportunity-panel, summary-pills, object-list,
+   brief-grid, chart__*, context-stack) were removed in Sprint UX 3.
+   The board now uses the primitive pipeline exclusively (primitive-region--*
+   containers + primitive-shell cards). No chart/object/brief grid needed. */
+
+/* ==========================================================================
+   REGION PRIMITIVE CONTAINERS
+   Within-region layout for the primitive pipeline (board-renderer v2).
+
+   These classes wrap the rendered primitive list inside each board-region__content.
+   They define region-specific grid behavior and override the operational-grid-item
+   span rules (which target workspace-level placement, not within-region placement).
+
+   Naming follows the region IDs in config/regions/board-regions.js.
+   ========================================================================== */
+
+/* Base reset: inside any region grid, primitive shells fill their cell naturally.
+   The operational-grid-item span behavior (grid-column: span N) is a workspace
+   contract — it does not apply within a region's own auto-fill grid. */
+.primitive-region--primary .operational-grid-item,
+.primitive-region--left .operational-grid-item,
+.primitive-region--right .operational-grid-item,
+.primitive-region--bottom .operational-grid-item {
+  grid-column: auto;
+}
+
+/* primary — single column, one dominant card at full fidelity */
+.primitive-region--primary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+  align-content: start;
+}
+
+/* leftOperational — auto-fill scan surface.
+   B-representation candidates flow into a 2-column grid at typical region widths.
+   minmax(240px, 1fr) ensures cards never become too narrow to read. */
+.primitive-region--left {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-12);
+  align-content: start;
+}
+
+/* rightContextual — single column stack for C-representation reference nodes.
+   C cards are compact and should run vertically, not side by side. */
+.primitive-region--right {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-content: start;
+}
+
+/* bottomIntelligence — auto-fill for B-representation intelligence summaries.
+   Charts, cohorts, flows, and summaries sit side by side at wider widths.
+   Larger gap: compressed graph cards need more air than scan list items. */
+.primitive-region--bottom {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-12);
+  align-content: start;
+}
+
+/* ==========================================================================
+   SCAN LIST CONTEXT — B-rep primitives inside leftOperational
+   When B-rep cards appear in the scan surface, they become list items,
+   not individual boxes. Separation via hairline rules, not card borders.
+   This breaks the "grid of equal boxes" dashboard symmetry.
+   ========================================================================== */
+
+.primitive-region--left .primitive-shell {
+  border-radius: 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  box-shadow: none;
+  /* Zone provides L3=16px horizontal. Item provides L5=12px vertical. */
+  padding: var(--space-12) 0;
+}
+
+.primitive-region--left .primitive-shell:last-child {
+  border-bottom: none;
+}
+
+/* Selected item in scan list — left accent overrides the list-item border removal */
+.primitive-region--left .primitive-shell[data-selected="true"] {
+  background: color-mix(in srgb, var(--sima-blue) 3%, transparent);
+  box-shadow: inset 3px 0 0
+    color-mix(in srgb, var(--sima-blue) 45%, transparent);
+}
+
+/* Blocked item in scan list — amber left accent */
+.primitive-region--left .primitive-shell[data-operational-state="blocked"] {
+  border-left: 2px solid
+    color-mix(in srgb, var(--color-warning-600) 55%, transparent);
+  padding-left: calc(var(--space-16) - 2px);
+}
+
+/* ==========================================================================
+   AMBIENT CONTEXT — C-rep primitives inside rightContextual
+   Float on the workspace background: no container backing.
+   Trust dot is the primary signal. Card border stays (dashed = ambient).
+   ========================================================================== */
+
+.primitive-region--right .primitive-shell {
+  background: var(--surface-primary);
+}
+
+/* Board collapse boundary is intentionally aligned with the spatial grid's
+   smallDesktop minWidth (1080px in config/regions/spatial-grid.js).
+   Below 1079px: all regions stack full-width; spatial grid is not active.
+   At 1080px+:   spatial grid governs layout via CSS custom properties. */
+@media (max-width: 1079px) {
+  .board-region--primary,
+  .board-region--left,
+  .board-region--right,
+  .board-region--bottom {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .board {
+    min-height: 0;
+  }
+}
+
+/* ==========================================================================
+   PRIMARY NARRATIVE
+   Situational causal micro-narrative displayed above the primary primitive.
+   Explains why this object is in focus and what caused its current state.
+   Uses editorial framing — not a data label, not a header.
+   ========================================================================== */
+
+/*
+ * Primary narrative — editorial situational statement.
+ * No container background: the stage floor already provides context.
+ * Left accent is the only structural element. Text IS the signal.
+ */
+.primary-narrative {
+  margin: 0 0 var(--space-14);
+  padding: 0 0 0 var(--space-14);
+  border-left: 2px solid var(--border-default);
+  background: transparent;
+  border-radius: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+  max-width: 600px;
+}
+
+.primary-narrative[hidden] {
+  display: none;
+}

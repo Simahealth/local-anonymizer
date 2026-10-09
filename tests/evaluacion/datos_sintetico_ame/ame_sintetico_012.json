@@ -1,0 +1,17 @@
+{
+  "nombre": "ame_sintetico_012",
+  "descripcion": "Nota estilo export 'AME' (plantilla_interconsulta_contacto): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n653918\nId Consulta\n7069199\nDiagnóstico\nSe remite paciente Consuelo Chaverra Mina, identificado con documento 9293308142, afiliado a Comparta, por cuadro de sepsis neonatal temprana que requiere valoración por especialista. Se logra contactar al acudiente al número 3249029943 quien autoriza el traslado. Valorado por Dr. Brayan Patiño Bonilla, queda pendiente de cupo en la institución receptora.",
+  "ground_truth": {
+    "nombres": [
+      "Consuelo Chaverra Mina",
+      "Dr. Brayan Patiño Bonilla"
+    ],
+    "telefonos": [
+      "3249029943"
+    ],
+    "documentos": [
+      "9293308142"
+    ]
+  }
+}

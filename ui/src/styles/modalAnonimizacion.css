@@ -1,0 +1,138 @@
+/* ============================================================
+   ModalAnonimizacion — "Anonimizar" screen (third screen of the Nuevo Caso
+   flow). Chrome belongs to the DS `Modal` organism, same as
+   ModalProgresoCarga -- this file only styles this screen's own content:
+   a static explanation line (no ETA -- removed 2026-08-19, this screen
+   never estimates duration), the batch progress bar, and the 5-row
+   sliding file list. Every value below is a tokens.css custom property.
+
+   Deliberately the SAME rules as modalProgresoCarga.css (same structure,
+   same tokens, same status colors) under this screen's own class prefix
+   (`man-` vs `mpc-`) -- per the sprint's own "no crear estructura
+   paralela" instruction, this mirrors that file rather than inventing a
+   different visual language. Not literally shared/imported CSS because
+   each screen in this flow owns its own stylesheet (same precedent as
+   modalNuevoCaso.css vs modalProgresoCarga.css).
+
+   DS GAP: same one already logged for ModalProgresoCarga -- no
+   Progress-bar atom/molecule exists in the DS yet. `.man-progress__track/
+   __fill` is the same minimal local pattern, not promoted to a DS
+   molecule here either.
+
+   Status colors reuse the exact same semantic tokens already established
+   for this exact domain: --text-tertiary (pending), --text-brand-dark
+   (processing -- same blue AnalyzingIndicator/ModalProgresoCarga use for
+   "still working"), --text-success (completada), --text-error (error).
+   ============================================================ */
+
+.man-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.man-progress-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.man-info {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.man-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.man-progress__track {
+  width: 100%;
+  height: var(--space-8);
+  border-radius: var(--radius-full);
+  background: var(--surface-tertiary);
+  overflow: hidden;
+}
+
+.man-progress__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--surface-action);
+  transition: width var(--transition-slow);
+}
+
+.man-progress__label {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+/* "· N con error" -- same element as "<completed> de <total>", so
+   font-size/weight/line-height are inherited, never redeclared. Only
+   color changes (--text-error, the DS's one semantic error-text token). */
+.man-progress__label-errors {
+  color: var(--text-error);
+}
+
+.man-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.man-file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-200);
+}
+
+.man-file-row__icon {
+  flex-shrink: 0;
+  font-size: var(--text-base);
+}
+
+.man-file-row__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.man-file-row--pending .man-file-row__icon {
+  color: var(--text-tertiary);
+}
+
+.man-file-row--pending .man-file-row__name {
+  color: var(--text-tertiary);
+}
+
+.man-file-row--processing .man-file-row__icon {
+  color: var(--text-brand-dark);
+}
+
+.man-file-row--success .man-file-row__icon {
+  color: var(--text-success);
+}
+
+.man-file-row--error .man-file-row__icon {
+  color: var(--text-error);
+}
+
+/* NO migrado al componente TSX `Spinner` (2026-09-09, ver
+   spinner.css's propio docblock): mismo slot compartido de 4 estados
+   que ModalProgresoCarga -- el spin es solo uno de ellos. Sí reusa el
+   keyframe canónico (antes `@keyframes man-spin`, idéntico). */
+.man-file-row__icon--spin {
+  animation: spinner-spin 1.1s linear infinite;
+}
+/* prefers-reduced-motion is already handled globally (framework/motion.css
+   forces every animation-duration to 1ms), so no separate override here. */

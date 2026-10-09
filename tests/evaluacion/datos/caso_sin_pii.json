@@ -1,0 +1,6 @@
+{
+  "nombre": "caso_sin_pii",
+  "descripcion": "Texto clínico sin PII. Sirve para medir sobre-anonimización (falsos positivos).",
+  "texto": "Examen físico\n\nPaciente en regular estado general, consciente, orientado. Presenta dolor en región lumbar de moderada intensidad. Diagnóstico presuntivo: lumbalgia mecánica. Se ordena radiografía de columna lumbosacra. Tratamiento con ibuprofeno 400 mg cada ocho horas y reposo relativo. Se recomienda fisioterapia. Pronóstico favorable. Signos vitales dentro de límites normales.\n",
+  "ground_truth": {}
+}

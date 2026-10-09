@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_049",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: David López Quintero\ndocumento de identidad 634.047.267\nFecha de nacimiento: 12/01/2001\nProcedencia: Pereira, Nariño\nDirección: Transversal 56C # 46-7 piso 9, barrio Laureles\nTeléfono: 301 822 9768   Correo: david34@outlook.com\nEPS: Famisanar\nFecha de ingreso: 19 de septiembre de 1974\n\nMOTIVO DE CONSULTA\nPaciente Edad: 12 años que ingresa al servicio refiriendo edema en miembros inferiores de varios días de evolución. Reside en Pereira y consulta de forma espontánea. Se localiza al acompañante en el número 301 822 9768.\n\nVALORACIÓN\nAtendido por el Dr. Ana Jiménez Quintero (Registro médico 47827). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo david34@outlook.com o remitir a la dirección Transversal 56C # 46-7 piso 9.",
+  "ground_truth": {
+    "nombres": [
+      "David López Quintero",
+      "Ana Jiménez Quintero"
+    ],
+    "documentos": [
+      "634.047.267"
+    ],
+    "edades": [
+      "12 años"
+    ],
+    "ubicaciones": [
+      "Pereira",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Transversal 56C # 46-7 piso 9"
+    ],
+    "telefonos": [
+      "301 822 9768"
+    ],
+    "emails": [
+      "david34@outlook.com"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "12/01/2001"
+    ],
+    "fechas": [
+      "19 de septiembre de 1974"
+    ],
+    "numeros_registro": [
+      "Registro médico 47827"
+    ]
+  }
+}

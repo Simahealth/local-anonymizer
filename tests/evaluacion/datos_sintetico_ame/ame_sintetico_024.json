@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_024",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n193807\nId Consulta\n5681888\nDiagnóstico\nCONTROL POR BRONQUIOLITIS. PACIENTE FABIÁN ANGULO VALENCIA VALORADO POR DRA KATHERINE ANGULO GRUESO (TP 84789). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Fabián Angulo Valencia",
+      "DRA Katherine Angulo Grueso"
+    ],
+    "numeros_registro": [
+      "TP 84789"
+    ]
+  }
+}

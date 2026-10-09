@@ -1,0 +1,64 @@
+/**
+ * TagInfo — SimaHealth Design System · Layer 3 — Molecule
+ * ─────────────────────────────────────────────────────────────────
+ * design/react-visual-align, "tagInfo pattern": a single informational
+ * unit -- an "info" icon + a short line of contextual/explanatory text.
+ * Communicates context ABOUT the content around it (what the system
+ * did, where to look further), never clinical content itself and
+ * never an action. This is a TRANSVERSAL Design System pattern, not a
+ * DetailPanel-specific treatment -- use it any time ANY product surface
+ * needs this kind of quiet, contextual annotation.
+ *
+ * USE when:
+ *   — Explaining what happened or where to continue, without asking
+ *     for a decision (e.g. "Revisamos otras hipótesis que puedes
+ *     explorar en el detalle del caso.")
+ *   — Marking a value that's part of the contract but not yet provided
+ *     upstream (e.g. "Pendiente de integración")
+ *
+ * DO NOT USE when:
+ *   — The text is a value, a finding, or any primary clinical content
+ *     (use BODY directly)
+ *   — The text requires the user to act (use a button/action, not a
+ *     passive annotation)
+ *
+ * Typography: BODY role (--text-sm/--weight-regular/--leading-normal),
+ * but with (a) the same tenuous/"watermark" color already established
+ * for empty/placeholder values (`--text-disabled`) and (b) italic --
+ * both are now part of `tagInfo`'s own canonical definition, not a
+ * per-consumer choice. Every real consumer of this class of
+ * "contextual/explanatory, not primary content" text (DetailPanel's
+ * `EmptyValue`/"Pendiente de integración" and its "Otras hipótesis
+ * consideradas" note, at minimum) shares this exact rule -- one source
+ * of truth for how this kind of text looks, never two independent
+ * decisions.
+ *
+ * Icon: Material Symbols Outlined (the DS's existing icon mechanism --
+ * see foundations/icons/icons.css; no second icon implementation here),
+ * ligature `info`, sized with the DS's own type scale (`--text-base`)
+ * rather than a hardcoded pixel value, colored via `currentColor` so it
+ * always matches the text next to it exactly, never its own color.
+ *
+ * Markup:
+ *   <p class="tag-info">
+ *     <span class="tag-info__icon material-symbols-outlined" aria-hidden="true">info</span>
+ *     Texto contextual breve.
+ *   </p>
+ */
+.tag-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  font-style: italic;
+  line-height: var(--leading-normal);
+  color: var(--text-disabled);
+}
+
+.tag-info__icon {
+  font-size: var(--text-base);
+  color: currentColor;
+  flex-shrink: 0;
+}

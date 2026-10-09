@@ -1,0 +1,501 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════
+ * TEXT — SimaHealth Design System  ·  Atom  ·  v1.0
+ * ═══════════════════════════════════════════════════════════════════
+ *
+ * Sections:
+ *   1. Heading scale       h1–h6 + utility classes .t-h1–.t-h6
+ *   2. Body variants       .t-body  .t-body-strong  .t-body-emphasis
+ *                          .t-body-link  .t-body-small
+ *   3. BodyHeading pattern .body-heading  .body-heading--reverse
+ *   4. Hero pattern        .hero-text
+ *   5. Price display       .price  .price--sm
+ *   6. Typographic role canon (H1/H2/H3/HEADER/TITLE/LABEL/BODY) --
+ *      documentation only, no new selectors -- see the bottom of this
+ *      file.
+ *   7. Editorial scale     .t-editorial-h1-regular/-semibold,
+ *      .t-editorial-h2-regular/-semibold,
+ *      .t-editorial-h3-regular/-semibold, .t-editorial-h4,
+ *      .t-editorial-h5 (2026-08-26, revised twice same day) -- a
+ *      second, opt-in typographic voice, Noto Serif (`--font-serif`,
+ *      the same token the body-serif usage elsewhere already reads --
+ *      NOT a separate `--font-editorial` token, which this revision
+ *      removed). Utility-class only, no bare `h1`–`h5` selector, so it
+ *      can never silently override the sans Heading scale in section 1
+ *      -- both coexist, consumers choose explicitly. H1–H3 each have a
+ *      Regular (`--weight-regular`, 400) and a Semibold (`--weight-
+ *      semibold`, 600) named variant; H4/H5 are Regular-only (no bare
+ *      `.t-editorial-h1`/`-h2`/`-h3` any more -- see "7 — EDITORIAL
+ *      SCALE" below for the full rationale). `.t-editorial-h2-bold`
+ *      (700) is an older, narrower variant kept only for existing
+ *      CasePageV2 usage -- not part of this naming scheme.
+ *
+ * ── Token dependencies (tokens.css) ──────────────────────────────
+ *   --font-sans, --font-serif
+ *   --text-xs · sm · base · md · lg · xl · 2xl · 3xl · 4xl · 5xl
+ *   --weight-regular · medium · semibold · bold · black
+ *   --leading-tight · snug · normal
+ *   --text-primary · secondary · tertiary · brand
+ *   --space-4 · 8 · 12 · 16
+ * ═══════════════════════════════════════════════════════════════════
+ */
+
+/* ══════════════════════════════════════════════════════════════════
+   1 — HEADING SCALE
+   Dual selectors: semantic element + utility class.
+   Use h1–h6 in semantic HTML; .t-h1–.t-h6 when the element is not
+   a heading but should carry that visual weight.
+   ══════════════════════════════════════════════════════════════════ */
+
+.t-h1 {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-5xl, 64px);
+  font-weight: var(--weight-black, 900);
+  line-height: var(--leading-tight, 1.2);
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-h2 {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-4xl, 48px);
+  font-weight: var(--weight-bold, 700);
+  line-height: var(--leading-tight, 1.2);
+  letter-spacing: -0.015em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-h3 {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-3xl, 40px);
+  font-weight: var(--weight-bold, 700);
+  line-height: var(--leading-snug, 1.35);
+  letter-spacing: -0.01em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-h4 {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-2xl, 32px);
+  font-weight: var(--weight-semibold, 600);
+  line-height: var(--leading-snug, 1.35);
+  letter-spacing: -0.005em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-h5 {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-xl, 24px);
+  font-weight: var(--weight-semibold, 600);
+  line-height: var(--leading-snug, 1.35);
+  letter-spacing: 0;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-h6 {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-lg, 20px);
+  font-weight: var(--weight-semibold, 600);
+  line-height: var(--leading-normal, 1.5);
+  letter-spacing: 0;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   2 — BODY VARIANTS
+   All share the same base size (--text-base, 16px).
+   ══════════════════════════════════════════════════════════════════ */
+
+.t-body,
+.t-body-strong,
+.t-body-emphasis,
+.t-body-link,
+.t-body-small {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  line-height: var(--leading-normal, 1.5);
+  margin: 0;
+}
+
+.t-body {
+  font-size: var(--text-base, 16px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--text-primary, #0d0f10);
+}
+
+.t-body-strong {
+  font-size: var(--text-base, 16px);
+  font-weight: var(--weight-bold, 700);
+  color: var(--text-primary, #0d0f10);
+}
+
+.t-body-emphasis {
+  font-size: var(--text-base, 16px);
+  font-weight: var(--weight-regular, 400);
+  font-style: italic;
+  color: var(--text-primary, #0d0f10);
+}
+
+.t-body-link {
+  font-size: var(--text-base, 16px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--text-primary, #0d0f10);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.t-body-link:hover {
+  color: var(--text-brand, #d732ab);
+}
+
+.t-body-small {
+  font-size: var(--text-xs, 12px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--text-secondary, #4b5057);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   3 — BODY HEADING PATTERN
+   Two-element vertical composition: a heading + a body line.
+   Variants: default (heading first) and --reverse (body first).
+   ══════════════════════════════════════════════════════════════════ */
+
+.body-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8, 8px);
+}
+
+.body-heading--reverse {
+  flex-direction: column-reverse;
+}
+
+.body-heading__heading {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-3xl, 40px);
+  font-weight: var(--weight-bold, 700);
+  line-height: var(--leading-snug, 1.35);
+  letter-spacing: -0.01em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.body-heading__body {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-base, 16px);
+  font-weight: var(--weight-regular, 400);
+  line-height: var(--leading-normal, 1.5);
+  color: var(--text-tertiary, #7a7f87);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   4 — HERO PATTERN
+   Eyebrow (muted label) + oversized heading.
+   Typically used for intent titles or landing sections.
+   ══════════════════════════════════════════════════════════════════ */
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12, 12px);
+}
+
+.hero-text__eyebrow {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-md, 18px);
+  font-weight: var(--weight-regular, 400);
+  line-height: var(--leading-normal, 1.5);
+  color: var(--text-tertiary, #7a7f87);
+  margin: 0;
+}
+
+.hero-text__heading {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-5xl, 64px);
+  font-weight: var(--weight-black, 900);
+  line-height: var(--leading-tight, 1.2);
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   5 — PRICE DISPLAY
+   Three sub-elements: currency symbol · amount · period unit.
+   Sizes controlled via component tokens for easy --sm override.
+   ══════════════════════════════════════════════════════════════════ */
+
+.price {
+  /* ── Component tokens ──────────────────────────────── */
+  --price-currency-size: var(--text-xl, 24px);
+  --price-amount-size: var(--text-5xl, 64px);
+  --price-period-size: var(--text-sm, 14px);
+
+  /* ── Layout ────────────────────────────────────────── */
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2, 2px);
+}
+
+.price--sm {
+  --price-currency-size: var(--text-base, 16px);
+  --price-amount-size: var(--text-3xl, 40px);
+  --price-period-size: var(--text-xs, 12px);
+}
+
+.price__currency {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--price-currency-size);
+  font-weight: var(--weight-semibold, 600);
+  line-height: 1;
+  color: var(--text-primary, #0d0f10);
+  padding-top: 0.12em; /* optical top-align with amount */
+}
+
+.price__amount {
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--price-amount-size);
+  font-weight: var(--weight-black, 900);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0d0f10);
+}
+
+.price__period {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--price-period-size);
+  font-weight: var(--weight-regular, 400);
+  line-height: 1.3;
+  color: var(--text-secondary, #4b5057);
+  padding-top: 0.2em; /* align with top of amount */
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   6 — TYPOGRAPHIC ROLE CANON (H1 / H2 / H3 / HEADER / TITLE / LABEL /
+   BODY)
+
+   design/react-visual-align, "H1/H2/H3 canon": this section is
+   DOCUMENTATION ONLY -- no new selectors/classes are introduced here.
+   HEADER/TITLE/LABEL/BODY were already in real use, each documented
+   only as scattered comments inside the organisms that adopted them
+   (card.css, organisms/DetailPanel/detail-panel.css) -- this is the
+   first time the full 7-role scale is written down in one canonical
+   place. Adoption of H1/H2/H3 by any organism's actual markup/CSS is
+   DEFERRED to a future, separate pass per organism -- nothing in this
+   file or elsewhere was retrofitted to use these roles as part of
+   defining them.
+
+   ── THE CANON ──────────────────────────────────────────────────
+     H1      --text-xl   / --weight-semibold / --leading-tight   (24px/600/1.20)
+     H2      --text-lg   / --weight-semibold / --leading-tight   (20px/600/1.20)
+     H3      --text-md   / --weight-semibold / --leading-snug    (18px/600/1.35)
+     HEADER  --text-base / --weight-semibold / --leading-snug    (16px/600/1.35)
+     TITLE   --text-sm   / --weight-semibold / --leading-snug    (14px/600/1.35)
+     LABEL   --text-xs   / --weight-regular  / --leading-snug    (12px/400/1.35)
+     BODY    --text-sm   / --weight-regular  / --leading-normal  (14px/400/1.50)
+
+   ── TOKEN NAME ≠ TOKEN VALUE (resolved, approved) ────────────────
+   The H1/H2/H3 spec, as originally approved, named
+   `--text-2xl`/`--text-xl`/`--text-lg` for H1/H2/H3 respectively -- but
+   in tokens.css those tokens equal 32/24/20px, not the approved
+   24/20/18px. This was flagged during implementation and resolved,
+   confirmed by product: the visual canon (24/20/18px) is the
+   reference, NOT the literal token name written in the spec. The
+   tokens actually used above -- `--text-xl`/`--text-lg`/`--text-md` --
+   are the ones whose real, effective value matches 24/20/18px.
+
+   Standing rule, not just for this one correction: a token's NAME
+   never determines the typographic role -- its EFFECTIVE VALUE does.
+   `--text-xl` is not "the XL token" as a concept, it's whatever
+   tokens.css currently defines it to equal (24px, today). If tokens.css
+   is ever restructured and token values shift, re-derive which token
+   name matches each role's approved px value again -- never assume a
+   token keeps governing a role because its name once matched at the
+   time this canon was written. Do not use `--text-2xl` for H1 (or any
+   token whose name superficially "sounds right") without first
+   checking its actual value in tokens.css.
+
+   ── HTML HEADING LEVEL ≠ TYPOGRAPHY ROLE ────────────────────────
+   An `<h1>`/`<h2>`/`<h3>` element does NOT automatically get the H1/
+   H2/H3 visual role, and a role is not tied to any particular HTML
+   tag. `<h2>` does not mean "must look like H2" -- it might correctly
+   be HEADER, TITLE, or something else entirely, depending on what it
+   actually identifies in that specific composition; conversely, H1/H2/
+   H3 (or HEADER/TITLE/LABEL/BODY) can land on a `<div>`/`<p>`/`<span>`
+   when that's the correct semantic element for the content. Two
+   already-shipped, concrete examples of exactly this non-equivalence
+   in this codebase:
+     - DetailPanel's Hero `h2` uses the HEADER role (16px), not H2
+       (20px) -- see organisms/DetailPanel/detail-panel.css.
+     - Card's condition `.card__title.card__hero` (a `<div>`, not a
+       heading element at all) also uses HEADER.
+   Do NOT infer "this is an `<h2>`, therefore apply H2" in any future
+   pass -- always decide the role from what the text IS (a page title?
+   a section label? a value?), never from which HTML tag happens to
+   wrap it.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════
+   7 — EDITORIAL SCALE (2026-08-26, revised twice same day)
+   "Fuente editorial": a SECOND typographic voice for the DS -- entirely
+   additive, never a replacement for the sans Heading scale in section
+   1. Same dual-selector spirit as that scale (semantic size step +
+   utility class), but utility-class ONLY here (no bare `h1`–`h5`
+   selector) so it can never silently reskin an existing heading
+   element -- a component must explicitly opt in by applying the class.
+
+   Family: `--font-serif` (Noto Serif, tokens.css) -- this scale
+   originally had its own separate `--font-editorial` token (Cormorant
+   Garamond); product decided Editorial should read the SAME serif
+   token the rest of the app's body-serif usage already does (e.g.
+   Documentos' document titles), not a second font family.
+   `--font-editorial` was removed from tokens.css -- reusing the
+   existing token, not duplicating it.
+
+   Sizes reuse the exact same size tokens the sans scale already uses
+   for H1–H4 (`--text-5xl`/`4xl`/`3xl`/`2xl`) plus `--text-xl` for H5 --
+   same values, different family/weight/line-height/letter-spacing, so
+   the two scales stay size-comparable role-for-role. Line-heights:
+   1.10 (H1/H2) and 1.15 (H3) don't match any existing `--leading-*`
+   token (the scale jumps 1.2 -> 1.35) -- literal numbers, same
+   precedent this file already sets for letter-spacing in section 1.
+   H5's 1.20 DOES match `--leading-tight` (1.2) -- reused rather than
+   repeated as a literal. H4 explicitly reuses THREE existing tokens
+   verbatim, per product request: `--text-2xl` (32px), `--weight-
+   regular`, `--leading-snug` (1.35) -- the exact pattern the DS's own
+   `.case-page-c-conclusion`-equivalent historically used, not a new
+   value invented for this scale.
+
+   Weight variants (2026-08-26, second revision): H1–H3 each exist in
+   TWO explicitly-named weights -- `.t-editorial-h{1,2,3}-regular`
+   (`--weight-regular`, 400) and `.t-editorial-h{1,2,3}-semibold`
+   (`--weight-semibold`, 600) -- both real, first-class API entries, no
+   bare unsuffixed `.t-editorial-h1`/`-h2`/`-h3` any more (an earlier
+   same-day revision had made the bare class Semibold-only; that's now
+   split into two named siblings instead, since nothing in the app
+   consumed the bare class at the time of the split). H4/H5 stay
+   Regular-only -- explicit product scope -- so they keep their
+   original bare `.t-editorial-h4`/`.t-editorial-h5` names rather than
+   gaining a redundant `-regular` suffix for a variant that doesn't
+   exist. No new weight token anywhere -- `--weight-regular`/
+   `--weight-semibold` already existed and are already used elsewhere
+   in this file (section 1's own H4).
+
+   `.t-editorial-h2-bold` (`--weight-bold`, 700) is a narrower, older
+   variant that predates this Regular/Semibold split and is NOT part
+   of its naming scheme -- kept as-is (unchanged geometry/weight) only
+   because it's still real, live product usage (CasePageV2's
+   leading-hypothesis title, which this task does not touch); it is
+   deliberately absent from the DS's own Editorial preview and from
+   the "H1–H5 Regular/Semibold" naming API this revision defines.
+   ══════════════════════════════════════════════════════════════════ */
+
+.t-editorial-h1-regular {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-5xl, 64px);
+  font-weight: var(--weight-regular, 400);
+  font-style: normal;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h1-semibold {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-5xl, 64px);
+  font-weight: var(--weight-semibold, 600);
+  font-style: normal;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h2-regular {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-4xl, 48px);
+  font-weight: var(--weight-regular, 400);
+  font-style: normal;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h2-semibold {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-4xl, 48px);
+  font-weight: var(--weight-semibold, 600);
+  font-style: normal;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h2-bold {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-4xl, 48px);
+  font-weight: var(--weight-bold, 700);
+  font-style: normal;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h3-regular {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-3xl, 40px);
+  font-weight: var(--weight-regular, 400);
+  font-style: normal;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h3-semibold {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-3xl, 40px);
+  font-weight: var(--weight-semibold, 600);
+  font-style: normal;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h4 {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-2xl, 32px);
+  font-weight: var(--weight-regular, 400);
+  font-style: normal;
+  line-height: var(--leading-snug, 1.35);
+  letter-spacing: 0;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}
+
+.t-editorial-h5 {
+  font-family: var(--font-serif, "Noto Serif", Georgia, serif);
+  font-size: var(--text-xl, 24px);
+  font-weight: var(--weight-regular, 400);
+  font-style: normal;
+  line-height: var(--leading-tight, 1.2);
+  letter-spacing: 0;
+  color: var(--text-primary, #0d0f10);
+  margin: 0;
+}

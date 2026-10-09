@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_043",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Natalia Jiménez Gómez\nCC 15624520\nFecha de nacimiento: 16 de diciembre de 2013\nProcedencia: Cúcuta, Risaralda\nDirección: Transversal 166 # 37-46 apto 772, barrio Laureles\nTeléfono: 316.771.1251   Correo: natalia50@outlook.com\nEPS: Nueva EPS\nFecha de ingreso: 26/09/1984\n\nMOTIVO DE CONSULTA\nPaciente Edad: 40 años que ingresa al servicio refiriendo astenia y adinamia de varios días de evolución. Reside en Cúcuta y consulta de forma espontánea. Se localiza al acompañante en el número 316.771.1251.\n\nVALORACIÓN\nAtendido por el Dr. Camilo González Gómez (Registro médico 65640). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo natalia50@outlook.com o remitir a la dirección Transversal 166 # 37-46 apto 772.",
+  "ground_truth": {
+    "nombres": [
+      "Natalia Jiménez Gómez",
+      "Camilo González Gómez"
+    ],
+    "documentos": [
+      "15624520"
+    ],
+    "edades": [
+      "40 años"
+    ],
+    "ubicaciones": [
+      "Cúcuta",
+      "Risaralda"
+    ],
+    "direcciones": [
+      "Transversal 166 # 37-46 apto 772"
+    ],
+    "telefonos": [
+      "316.771.1251"
+    ],
+    "emails": [
+      "natalia50@outlook.com"
+    ],
+    "seguros": [
+      "Nueva EPS"
+    ],
+    "fechas_nacimiento": [
+      "16 de diciembre de 2013"
+    ],
+    "fechas": [
+      "26/09/1984"
+    ],
+    "numeros_registro": [
+      "Registro médico 65640"
+    ]
+  }
+}

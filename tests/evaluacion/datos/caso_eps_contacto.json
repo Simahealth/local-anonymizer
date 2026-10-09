@@ -1,0 +1,10 @@
+{
+  "nombre": "caso_eps_contacto",
+  "descripcion": "EPS conocidas más datos de contacto (celulares, fijos con indicativo, correos).",
+  "texto": "Datos administrativos\n\nAfiliado a Nueva EPS, régimen contributivo. En caso de urgencia contactar al celular 3209876543 o al teléfono fijo 6012345678. Segunda EPS reportada: Compensar. Correo de notificaciones: notificaciones.paciente@outlook.com. Para citas escribir a citas@compensar.com.co o llamar al 6041122334. La paciente también está afiliada a Coomeva en su núcleo familiar.\n",
+  "ground_truth": {
+    "telefonos": ["3209876543", "6012345678", "6041122334"],
+    "emails": ["notificaciones.paciente@outlook.com", "citas@compensar.com.co"],
+    "seguros": ["Nueva EPS", "Compensar", "Coomeva"]
+  }
+}

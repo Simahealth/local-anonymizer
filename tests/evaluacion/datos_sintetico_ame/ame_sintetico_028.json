@@ -1,0 +1,10 @@
+{
+  "nombre": "ame_sintetico_028",
+  "descripcion": "Nota estilo export 'AME' (plantilla_urgencias_narrativa): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n727864\nId Consulta\n5063658\nDiagnóstico\nEnfermedad Actual: Paciente de 1 meses de edad, traído por su madre sustituta, Yuliana de La Rosa Rentería, de 39 años; quien refiere cuadro clínico de dos días de evolución consistente en fiebre no cuantificada, decaimiento e irritabilidad. Niega vómito, niega diarrea. Antecedentes: sin importancia. Vacunación completa para la edad. Se ingresa con impresión diagnóstica de sindrome diarreico agudo para manejo intrahospitalario y toma de paraclínicos.",
+  "ground_truth": {
+    "nombres": [
+      "Yuliana de La Rosa Rentería"
+    ]
+  }
+}

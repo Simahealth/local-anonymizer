@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_025",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Mauricio García Rodríguez\nidentificado con C.C. 8270'110.908\nFecha de nacimiento: 15/03/1988\nProcedencia: Neiva, Bolívar\nDirección: Diagonal 161 Sur N° 98-63, barrio Ciudad Jardín\nTeléfono: 3244816586   Correo: mauricio56@gmail.com\nEPS: Sanitas\nFecha de ingreso: 2 de junio de 1957\n\nMOTIVO DE CONSULTA\nPaciente 11 años de edad que ingresa al servicio refiriendo fiebre de tres días de varios días de evolución. Reside en Neiva y consulta de forma espontánea. Se localiza al acompañante en el número 3244816586.\n\nVALORACIÓN\nAtendido por el Dr. Luisa Torres Castro (HC-475876). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo mauricio56@gmail.com o remitir a la dirección Diagonal 161 Sur N° 98-63.",
+  "ground_truth": {
+    "nombres": [
+      "Mauricio García Rodríguez",
+      "Luisa Torres Castro"
+    ],
+    "documentos": [
+      "8270'110.908"
+    ],
+    "edades": [
+      "11 años"
+    ],
+    "ubicaciones": [
+      "Neiva",
+      "Bolívar"
+    ],
+    "direcciones": [
+      "Diagonal 161 Sur N° 98-63"
+    ],
+    "telefonos": [
+      "3244816586"
+    ],
+    "emails": [
+      "mauricio56@gmail.com"
+    ],
+    "seguros": [
+      "Sanitas"
+    ],
+    "fechas_nacimiento": [
+      "15/03/1988"
+    ],
+    "fechas": [
+      "2 de junio de 1957"
+    ],
+    "numeros_registro": [
+      "HC-475876"
+    ]
+  }
+}

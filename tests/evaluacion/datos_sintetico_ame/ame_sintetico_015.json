@@ -1,0 +1,17 @@
+{
+  "nombre": "ame_sintetico_015",
+  "descripcion": "Nota estilo export 'AME' (plantilla_interconsulta_contacto): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n188896\nId Consulta\n3011649\nDiagnóstico\nSe remite paciente Yohana Forero Riascos, identificado con documento 3619643115, afiliado a Mallamas, por cuadro de bronquiolitis que requiere valoración por especialista. Se logra contactar al acudiente al número 3139097578 quien autoriza el traslado. Valorado por Dr. Cristian Chaverra Quiñonez, queda pendiente de cupo en la institución receptora.",
+  "ground_truth": {
+    "nombres": [
+      "Yohana Forero Riascos",
+      "Dr. Cristian Chaverra Quiñonez"
+    ],
+    "telefonos": [
+      "3139097578"
+    ],
+    "documentos": [
+      "3619643115"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "nombre": "ame_sintetico_010",
+  "descripcion": "Nota estilo export 'AME' (plantilla_urgencias_narrativa): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n258612\nId Consulta\n2702289\nDiagnóstico\nEnfermedad Actual: Paciente de 2 meses de edad, traído por su madre, Ingrid Maya Jurado, de 18 años; quien refiere cuadro clínico de dos días de evolución consistente en fiebre no cuantificada, decaimiento e irritabilidad. Niega vómito, niega diarrea. Antecedentes: sin importancia. Vacunación completa para la edad. Se ingresa con impresión diagnóstica de hiperbilirrubinemia neonatal para manejo intrahospitalario y toma de paraclínicos.",
+  "ground_truth": {
+    "nombres": [
+      "Ingrid Maya Jurado"
+    ]
+  }
+}

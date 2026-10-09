@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_013",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Patricia Rodríguez Jiménez\ncédula de ciudadanía No. 529.123.992\nFecha de nacimiento: Junio 20 de 2006\nProcedencia: Villavicencio, Antioquia\nDirección: Carrera 57 No. 90-67, barrio La Floresta\nTeléfono: (601) 8658158   Correo: patricia60@une.net.co\nEPS: Aliansalud\nFecha de ingreso: 2007-09-27\n\nMOTIVO DE CONSULTA\nPaciente Edad: 19 años que ingresa al servicio refiriendo fiebre de tres días de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número (601) 8658158.\n\nVALORACIÓN\nAtendido por el Dr. Mauricio González Moreno (Registro médico 72216). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo patricia60@une.net.co o remitir a la dirección Carrera 57 No. 90-67.",
+  "ground_truth": {
+    "nombres": [
+      "Patricia Rodríguez Jiménez",
+      "Mauricio González Moreno"
+    ],
+    "documentos": [
+      "529.123.992"
+    ],
+    "edades": [
+      "19 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Antioquia"
+    ],
+    "direcciones": [
+      "Carrera 57 No. 90-67"
+    ],
+    "telefonos": [
+      "(601) 8658158"
+    ],
+    "emails": [
+      "patricia60@une.net.co"
+    ],
+    "seguros": [
+      "Aliansalud"
+    ],
+    "fechas_nacimiento": [
+      "Junio 20 de 2006"
+    ],
+    "fechas": [
+      "2007-09-27"
+    ],
+    "numeros_registro": [
+      "Registro médico 72216"
+    ]
+  }
+}

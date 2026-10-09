@@ -1,0 +1,664 @@
+/* ============================================================
+   Especialista — estilos actor-local (Intent 1)
+   Refinado para paridad visual con Hospital y Farma.
+   Principios extraídos (no copiados): barra de señal fc-card-signal
+   (radius-100), headers de columna kanban (título+contador en una
+   sola línea, jerarquía TITLE/LABEL canónica + empty gris), botones
+   .btn apilados, ritmo de board gap 20 con respiración inferior
+   generosa.
+   Solo tokens del DS. No modifica ningún organism ni atom.
+
+   design/react-visual-align (AOW, ajuste de jerarquía y CTA):
+   título+contador de lane fusionados en una sola fila (gap --space-4);
+   `.esp-lane__title` -> TITLE canónico, `.esp-lane__count` ->
+   LABEL canónico; `.section-header__label`/`.section-header__context`
+   -> TITLE/LABEL canónico (ver comentarios junto a cada regla).
+
+   design/react-visual-align (AOW, Z3 layout adjustment): `.aow-search`
+   (nuevo) es el search que antes vivía en Z3/LeftPanel
+   (`.sidebar-z3-search-wrap`/`.sidebar-z3-search-icon`/
+   `.sidebar-z3-input`, organisms/LeftPanel/left-panel.css), reubicado en
+   el header del AOW junto al CTA. Reutiliza el mismo ícono SVG y el
+   mismo tratamiento de borde/radio/tokens que ya tenía ese search --
+   no es un estilo nuevo, es el mismo control en otra ubicación con un
+   estado resting/active adicional (círculo -> pill). El estado (`search`
+   en filtersStore) sigue siendo el mismo, ahora leído/escrito desde
+   App.tsx en vez de Z3Tools.tsx.
+   ============================================================ */
+
+/* ── Accesibilidad: sr-only (fallback si base.css no lo define) ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── LeftPanel — selector de actor ────────────────────────────────
+   Auditoría de cierre SP2: este bloque duplicaba byte a byte la regla
+   del organismo (LeftPanel/left-panel.css) — Especialista no necesita
+   un acento propio (usa el fallback --border-brand), así que no hace
+   falta declarar --sidebar-actor-focus aquí. Eliminado; el organismo
+   ya cubre esto por completo. ──────────────────────────────────────── */
+
+/* ── Título del workspace (#ws-intent) ───────────────────────────
+   El Actor ya está representado en la navegación (LeftPanel): el h1 ya
+   no necesita mostrar "Especialista". Muestra únicamente el Intent
+   activo, con la tipografía base de .workspace-meta h1 (base.css) —
+   a diferencia de Hospital/Farma, aquí no se aplica ningún override
+   tipográfico local; #ws-intent no lleva clase .ws-intent/.ws-sep. */
+
+/* Z3 (Intent Resultados) — Search ya no es fork local: usa el slot
+   oficial del organismo LeftPanel (SimahealthDS/organisms/LeftPanel),
+   ver ADR-008 (antes ADR-007). Sin CSS actor-local. */
+
+/* ── Section Header — patrón reutilizable ───────────────────────
+   Encabezado discreto de sección: label + hairline. Naming genérico
+   (sin prefijo esp-) porque este patrón está pensado para reutilizarse
+   en otros actores — hoy vive solo en especialista.css (único
+   consumidor); se promueve a SimahealthDS cuando aparezca un 2º
+   consumidor real (regla: no generalizar antes de tener dos actores,
+   ver architecture_actors). El margen-top (24px) es la única fuente del
+   espacio "contenido anterior → header": el bloque que sigue nunca debe
+   añadir su propio padding-top para esta transición (evita duplicar el
+   ritmo). */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-8, 8px);
+  margin: var(--space-24, 24px) var(--aow-grid-margin, 40px) 0;
+  padding-bottom: var(--space-8, 8px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* TITLE canónico (--text-sm/--weight-semibold/--leading-snug) -- título
+   de sección (p. ej. "Resumen operacional"). Antes 12px (--text-xs,
+   tamaño de LABEL) con weight ya correcto pero sin line-height propio;
+   ahora el tamaño canónico de TITLE (14px). letter-spacing/uppercase
+   son tratamiento decorativo fuera del canon de 4 roles, sin cambios.
+   Nota: esta clase también la usa el header "Casos eliminados" de la
+   Papelera (fuera del AOW) -- comparten selector, así que este ajuste
+   la alcanza también; no es una regresión, solo el mismo canon ya
+   aprobado aplicado consistentemente donde ya se usaba esta clase. */
+.section-header__label {
+  display: block;
+  font-size: var(--text-sm, 14px);
+  font-weight: var(--weight-semibold, 600);
+  line-height: var(--leading-snug);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+/* LABEL canónico (--text-xs/--weight-regular/--leading-snug) -- contexto
+   opcional junto al título (p. ej. "Desde tu última sesión"): contextualiza
+   el título, no es un segundo título. Antes 11px/weight-semibold(600)/1.25
+   (todos literales). */
+.section-header__context {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs, 12px);
+  font-weight: var(--weight-regular, 400);
+  line-height: var(--leading-snug);
+}
+
+/* ── AOW search (design/react-visual-align) ─────────────────────
+   Wrapper del header: alinea el search + el CTA "+ Nuevo caso" a la
+   derecha, sin tocar `.workspace-meta` (framework/base.css, DS
+   compartido) -- `.workspace-meta` sigue viendo exactamente 2 hijos
+   (h1 a la izquierda, este grupo a la derecha), su propio
+   justify-content:space-between no cambia. */
+.workspace-meta__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8, 8px);
+}
+
+/* El buscador que vivía acá (`.aow-search`/`.aow-search__icon`/
+   `.aow-search__input`) se formalizó (2026-09-09) como el componente DS
+   `SearchInput` -- ver `src/components/SearchInput/SearchInput.tsx` y
+   `src/styles/ds/molecules/search-input/search-input.css` (mismas
+   clases, mismo comportamiento resting-circle/expanded-pill, ahora con
+   botón clear + Escape-to-clear + Enter-to-submit). Nada actor-local
+   queda acá: el único consumidor (AOW) ya usa el componente. */
+
+/* ── Z1 — panorama operacional (Z1Contract.md) ─────────────────
+   Z1 responde "¿qué pasó desde mi última sesión?"; Z2 (el Board)
+   responde "¿en qué debo trabajar ahora?". Para que no se perciban
+   como una sola cosa (Z1 leía como una 5ª fila del Kanban al compartir
+   su grilla de 4 columnas), Z1 vive encapsulado en una superficie
+   propia (.esp-z1-panel): un panel de resumen, no una Card pesada —
+   fondo blanco, radio del DS, padding generoso, ancho completo, sin
+   sombra. El margen horizontal que antes tenía el grid ahora lo aporta
+   el panel.
+   design/react-visual-align: título/subtítulo de Z1 ("Resumen
+   operacional" / "Desde tu última sesión", antes .esp-z1-panel__header
+   en App.tsx) se eliminaron del todo a pedido explícito -- el panel ya
+   no reserva espacio para ellos. El borde general del panel también se
+   quitó (ver .esp-z1-panel abajo): ahora cada item tiene el suyo (ver
+   .esp-z1__metric). */
+/* design/react-visual-align: margin-top 24px -> 32px (var(--space-32))
+   a pedido explícito -- es el único contribuyente real al espacio
+   título del Intent (.workspace-meta h1) -> Z1: .workspace-meta tiene
+   padding-bottom:0 y el h1 no agrega margin-bottom (framework/base.css
+   los resetea a 0), así que este margin-top ES el espacio completo.
+   Right/left (--aow-grid-margin) y bottom (0) sin cambios -- no es
+   spacing interno de Z1, es el margen externo del panel.
+   design/z1-visual-refine: padding horizontal del panel (var(--space-24)
+   en los 4 lados) -> solo vertical, a pedido explícito -- el grupo de
+   métricas (.esp-z1) ya no tiene inset propio a izquierda/derecha, así
+   que la primera y la última box quedan alineadas al borde del panel
+   (el mismo borde que ya define --aow-grid-margin arriba, consistente
+   con el Board debajo). Vertical (var(--space-24) arriba/abajo) sin
+   cambios -- eso no es "sobrante" horizontal, es el respiro entre el
+   borde del panel y las métricas. */
+.esp-z1-panel {
+  margin: var(--space-32, 32px) var(--aow-grid-margin, 40px) 0;
+  padding: var(--space-24, 24px) 0;
+  background: var(--surface-primary);
+  border-radius: var(--radius-100);
+}
+/* Grid de KPIs, ya dentro de .esp-z1-panel — el padding/superficie los
+   aporta el panel, no cada KPI individualmente.
+   design/z1-visual-refine: fila horizontal única a pedido explícito --
+   flex-wrap en vez de grid de columnas fijas, para que las boxes se
+   acomoden en una sola línea y solo bajen a una fila nueva cuando ya no
+   entran (min-width en .esp-z1__metric define ese punto de quiebre).
+   gap 20px hardcodeado -> var(--space-24), token DS existente para
+   "separación entre items dentro de una misma sección" (ver la guía
+   semántica de spacing en tokens.css).
+   design/z1-wave: position:relative -- ancla al <DuneCanvas> (inset:0,
+   ver .esp-z1__wave abajo), que se posiciona relativo a este grupo, no a
+   cada box. Esa es la razón de fondo por la que la ola se percibe
+   continua: es LITERALMENTE una sola animación cubriendo las 4 boxes +
+   los gaps entre ellas; useZ1WaveMask.ts solo la recorta con una máscara
+   para que únicamente se vea dentro de cada box. */
+.esp-z1 {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-24, 24px);
+}
+/* El único canvas compartido, detrás de las 4 boxes. mask-image (dinámico,
+   recalculado por useZ1WaveMask.ts) es lo que lo convierte en 4 "ventanas"
+   -- sin él, se ve la animación completa sin recortar (solo pasa en el
+   primer frame antes de que el hook mida las boxes).
+   Colores: derivados de los tokens de marca existentes (--color-primary-400
+   / --surface-brand / --text-primary) vía color-mix a opacidad baja, no
+   valores nuevos ni copiados en crudo del sitio -- mismo lenguaje visual
+   (teal -> magenta) del <dune-background> del sitio, pero atado a los
+   tokens de esta app en vez de duplicar sus hex literales.
+   design/z1-wave-watermark: después de varias idas y vueltas (14/9/6/12%
+   -> 6/4/3/5% -> 3/2/1.5/2.5% -> 4.5/3/2.25/3.75% -> 5% parejo), asentado
+   en 4.5% parejo para las 4 variables a pedido explícito -- un solo
+   número simple de mantener, un paso por debajo del 5% anterior. */
+.esp-z1__wave {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  --dune-color-1: color-mix(in srgb, var(--color-primary-400) 4.5%, transparent);
+  --dune-color-2: color-mix(in srgb, var(--surface-brand) 4.5%, transparent);
+  --dune-color-3: color-mix(in srgb, var(--text-primary) 4.5%, transparent);
+  --dune-line-color: color-mix(in srgb, var(--text-primary) 4.5%, transparent);
+}
+/* Número/label apilados, sin icono (ver design/z1-visual-refine abajo).
+   Número y label muy próximos (row-gap mínimo + line-height ajustado en
+   el label): deben leerse como una sola unidad visual.
+   design/react-visual-align: cada item vuelve a tener su propio borde
+   (antes lo aportaba .esp-z1-panel una sola vez + una divisoria vertical
+   entre items); mismos tokens de color/grosor/estilo que tenía ese
+   borde general (1px solid var(--border-subtle)) -- ningún token nuevo,
+   solo aplicado por item en vez de una sola vez al grupo.
+   design/z1-visual-refine: se quitó el icono y su chip contenedor
+   (.esp-z1__icon) a pedido explícito, así que el grid de 2 columnas
+   (icono | número+label) ya no aplica -- ahora es un bloque simple.
+   border-radius: --radius-100 (8px) -> 26px, valor exacto a pedido
+   explícito -- no hay token DS que coincida con 26px, así que se usa el
+   literal en vez de forzar un token que no representa este valor.
+   design/z1-wave: position:relative + z-index:1 -- ambos existen solo
+   para pintar por encima de .esp-z1__wave (position:absolute, sin
+   z-index explícito). El box no tiene background propio (nunca lo tuvo),
+   así que la ola se ve directamente detrás del número/label a través de
+   ese hueco -- son ellos, no un fondo, los que quedan "por encima".
+   design/z1-drilldown: el elemento pasó de <div> a <button> (accionable,
+   abre el modal de drilldown) -- el reset de font/background/text-align/
+   cursor de abajo solo neutraliza los estilos nativos de <button>, no
+   cambia nada del layout que ya existía.
+   design/z1-drilldown-cta: se sacó el oscurecimiento en :hover (background
+   color-mix) a pedido explícito -- la única affordance de hover/focus que
+   queda es el ícono cambiando a magenta (.esp-z1__cta abajo) y el outline
+   de :focus-visible; el fondo del box ya no cambia. */
+.esp-z1__metric {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 1 200px;
+  flex-direction: column;
+  row-gap: var(--space-2, 2px);
+  padding: var(--space-16, 16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 26px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.esp-z1__metric:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}
+/* Tooltip DS (Z1Panel.tsx, "Casos pendientes" -- primer uso real de
+   Tooltip acá): ese único box se envuelve en el `.tooltip-wrapper` que
+   `Tooltip` genera, que de otro modo pasaría a ser el flex-item real
+   dentro de `.esp-z1` en su lugar (`.esp-z1__metric` ya no sería hijo
+   directo) -- copia el mismo `flex: 1 1 200px` de arriba para que ese
+   box no cambie de tamaño relativo a sus hermanos, y estira el
+   `<button>` para llenar el wrapper. Los demás metrics (sin
+   `tooltipId`) no pasan por este wrapper -- renderizan `.esp-z1__metric`
+   como hijo directo de `.esp-z1`, exactamente como antes. */
+.esp-z1__metric-tooltip {
+  flex: 1 1 200px;
+  display: flex;
+}
+.esp-z1__metric-tooltip .esp-z1__metric {
+  flex: 1 1 auto;
+  width: 100%;
+}
+/* Ícono de flecha (CTA "ver detalle de esta métrica"), esquina superior
+   derecha, 12px del borde -- puramente visual (aria-hidden en el JSX): el
+   <button> completo ya es el control, esto no es un botón anidado ni
+   tiene fondo/chip propio (sin background/border acá a propósito). Gris
+   en reposo (--text-tertiary, mismo tono que otros indicadores discretos
+   del DS) -> magenta (--text-brand) en hover/focus DEL BOX, no de sí
+   mismo -- por eso el selector es .esp-z1__metric:hover/:focus-visible
+   .esp-z1__cta, no .esp-z1__cta:hover (el ícono nunca recibe el foco). */
+.esp-z1__cta {
+  position: absolute;
+  /* top/right:12px posicionarían el ícono a 12px del padding-box (donde
+     empieza el offset de un absolute), que es 1px MÁS separado del
+     borde visible (border: 1px solid, .esp-z1__metric arriba) -- el
+     -1px acá es exactamente ese ajuste, para que el gap real medido
+     desde el borde sea 12px, no 13px. */
+  top: calc(var(--space-12, 12px) - 1px);
+  right: calc(var(--space-12, 12px) - 1px);
+  font-size: var(--text-lg, 20px);
+  line-height: 1;
+  color: var(--text-tertiary);
+  transition: color var(--transition-base);
+  /* arrow_back apunta a la izquierda por defecto (glyph de "Volver") --
+     180deg a pedido explícito, así queda mirando hacia la derecha (entrar
+     al detalle), no hacia atrás. Mismo glifo, sin cambiar el ícono. */
+  transform: rotate(180deg);
+}
+.esp-z1__metric:hover .esp-z1__cta,
+.esp-z1__metric:focus-visible .esp-z1__cta {
+  color: var(--text-brand);
+}
+/* Fila del número: número + indicador de cambio (opcional) alineados
+   por baseline, a la derecha del número — nunca debajo. */
+.esp-z1__value-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-8, 8px);
+}
+.esp-z1__value {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+/* Micro-resumen de actividad reciente ("2 nuevos", "1 urgente"): no es
+   una variación matemática (sin flechas, sin +/-, sin badge/chip, sin
+   color de estado) — es una etiqueta breve de qué pasó desde la última
+   sesión. Mismo tratamiento que el contador de cards del Kanban
+   (.esp-lane__count, línea ~184): 11px/500/texto terciario — mismo
+   lenguaje visual para "cantidad discreta asociada a un título/valor".
+   Alineada al baseline del valor principal (.esp-z1__value-row). */
+.esp-z1__activity {
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+/* design/react-visual-align: subtext de cada item alineado al rol BODY
+   del canon (--text-sm/--weight-regular/--leading-normal) a pedido
+   explícito -- font-size ya era --text-sm; font-weight no estaba
+   declarado (heredaba normal/400 del navegador, ahora explícito vía
+   token) y line-height pasó de 1.2 literal a var(--leading-normal)
+   (1.5). El número principal (.esp-z1__value) no se tocó. */
+.esp-z1__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+/* ── Z1 drilldown — Modal del DS con los casos de una métrica ──
+   `.esp-z1-drilldown` va como `overlayClassName` DIRECTO en `<Modal>`
+   (Z1DrilldownModal.tsx), no en un wrapper alrededor de él -- `Modal`
+   portea su `.modal-overlay` directo a `document.body` (ver su propio
+   docblock), así que un wrapper nunca termina siendo su ancestro real en
+   el DOM. Confirmado en producción (chat 2026-09-27): con el wrapper
+   viejo, este override nunca matcheaba nada y el modal de Z1 se pintaba
+   con el z-index:60 por default (modal.css) -- por ENCIMA de
+   DetailPanel, en vez de debajo.
+
+   z-index:35 es deliberado: menor que el backdrop de DetailPanel (40,
+   detail-panel.css) y su panel (50) -- así, si el especialista abre un
+   caso desde este modal, el backdrop+panel de DetailPanel se pintan POR
+   ENCIMA del modal de Z1 (lo oscurecen entero), y al cerrar el
+   DetailPanel el modal de Z1 vuelve a verse exactamente como estaba (su
+   propio estado en App.tsx nunca se tocó). Mayor que el contenido base
+   de la página (z-index:auto). No toca modal.css ni el z-index:60 por
+   default que usan ModalNuevoCaso y cualquier otro consumidor -- la
+   clase solo la lleva ESTA instancia del Modal. */
+.modal-overlay.esp-z1-drilldown {
+  z-index: 35;
+}
+.esp-z1-drilldown__summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-12, 12px);
+  padding-bottom: var(--space-16, 16px);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-16, 16px);
+}
+.esp-z1-drilldown__count {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.esp-z1-drilldown__description {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+.esp-z1-drilldown__state {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  padding: var(--space-24, 24px) 0;
+  text-align: center;
+}
+.esp-z1-drilldown__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16, 16px);
+}
+.esp-z1-drilldown__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-16, 16px);
+  padding: var(--space-16, 16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-100);
+}
+.esp-z1-drilldown__row-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+.esp-z1-drilldown__row-condition {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-2, 2px);
+}
+.esp-z1-drilldown__row-fields {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-16, 16px);
+  row-gap: var(--space-4, 4px);
+  margin: var(--space-8, 8px) 0 0;
+}
+.esp-z1-drilldown__row-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 2px);
+}
+.esp-z1-drilldown__row-field dt {
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+}
+.esp-z1-drilldown__row-field dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+.esp-z1-drilldown__open {
+  flex-shrink: 0;
+}
+
+/* ── Z2 — Board de lanes (kanban del actor) ──────────────────── */
+.esp-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-20, 20px);
+  align-items: start;
+  padding: var(--space-24, 24px) var(--aow-grid-margin, 40px)
+    var(--space-48, 48px);
+}
+.esp-lane {
+  display: flex;
+  flex-direction: column;
+}
+/* Header de columna: título + contador, ahora en una sola línea de
+   encabezado (AOW, design/react-visual-align) -- el contador se lee
+   pegado al nombre de la columna, no empujado al borde opuesto. Sin
+   justify-content:space-between (no hay más elementos en esta fila);
+   gap 4px (--space-4) es la separación exacta pedida entre nombre y
+   número. Hairline propia de la columna (100% de su ancho) como único
+   separador hacia las cards -- sin sombra, sin efecto decorativo. */
+.esp-lane__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4, 4px);
+  padding: 0 var(--space-2, 2px) var(--space-12, 12px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* TITLE canónico (--text-sm/--weight-semibold/--leading-snug) -- título
+   de columna/bloque. Peso movido de 700 (literal) a --weight-semibold
+   (600); line-height añadido (no existía). letter-spacing es un ajuste
+   decorativo fuera del canon de 4 roles, sin cambios. */
+.esp-lane__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+/* Tooltip DS (AOW rollout, Lane.tsx): el label gana `tabIndex={0}` solo
+   cuando lleva un `tooltipId` (los 4 lanes canon), para que el tooltip
+   funcione en foco de teclado además de hover -- no era focusable antes
+   (no había ningún control acá), así que no había ningún estilo de foco
+   que preservar. Mismo tratamiento que `.esp-z1__metric:focus-visible`. */
+.esp-lane__title:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-100, 4px);
+}
+/* LABEL canónico (--text-xs/--weight-regular/--leading-snug) -- el
+   contador contextualiza/identifica cuántos casos tiene la columna,
+   no es contenido narrativo. Antes 11px/500 (ambos literales). */
+.esp-lane__count {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  color: var(--text-tertiary);
+}
+.esp-lane__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12, 12px);
+  margin-top: var(--space-12, 12px);
+}
+.esp-lane__empty {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  padding: var(--space-12, 12px) var(--space-4, 4px);
+}
+
+/* .esp-signal* se retiró 2026-07-23: duplicaba el mismo estado que ya
+   comunican Convicción y el estado operativo del caso. Sin
+   consumidores — ver renderers/card.js. */
+
+/* ── Ancla superior derecha: tiempo (tensión del borde derecho) ── */
+.esp-card__time {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* .esp-conviction* se retiró 2026-07-23: la Convicción ahora se
+   renderiza como campo del organismo (card__primary + los
+   modificadores semánticos card__value--warning/--danger definidos
+   en SimahealthDS/organisms/Card/card.css). Sin consumidores desde
+   la migración — ver renderers/card.js. */
+
+/* ── Card slot — contenedor que el adaptador agrega alrededor de la
+   card del organismo, para el estado "muted" (no pertenece al
+   organismo). Reemplaza a .card.esp-card--muted: el opacity ahora
+   se aplica al slot, no solo a la card. */
+.esp-card-slot--muted {
+  opacity: 0.72;
+}
+.esp-card-slot--muted:hover,
+.esp-card-slot--muted:has(.card.selected) {
+  opacity: 1;
+}
+
+/* ── Detail Panel — dot de alerta + acciones ─────────────────── */
+.esp-alert-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-error);
+  flex-shrink: 0;
+}
+.esp-alert-dot--warn {
+  background: var(--text-warning);
+}
+
+/* Densidad editorial dentro de un mismo bloque: líneas secundarias
+   y procedencia con respiración mínima (spacing, no componentes). */
+.panel-block .esp-line-sub {
+  margin-top: var(--space-6, 6px);
+}
+.panel-block .primitive-mirror-badge {
+  margin-top: var(--space-10, 10px);
+}
+
+/* Contenido indentado 16px bajo el título de cada sección — SOLO
+   esp-1001. El título (`.block-label`) queda en el borde; todo lo
+   demás dentro de cada `.panel-block` (texto, filas, timeline,
+   acciones) se corre 16px a la derecha. */
+.panel-overlay:has(.case-fiche__sticky) .panel-block > *:not(.block-label) {
+  margin-left: var(--space-16, 16px);
+}
+
+/* Acciones apiladas — path GENÉRICO del actor (casos sin ficha). Los
+   casos CON ficha (hoy esp-1001) NO usan esta clase: consumen la capacidad
+   Acciones del organism CaseFiche (`.case-fiche__actions` /
+   `.case-fiche__actions-list`) — ver SimahealthDS/organisms/CaseFiche/case-fiche.css. */
+.esp-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-8, 8px);
+}
+/* La presentación de Acciones de CaseFiche (fila horizontal + superficie
+   bleed + responsive ≤1100px) se extrajo al organism en fase A y el
+   consumidor esp-1001 se migró en fase B. Fuente única de verdad:
+   SimahealthDS/organisms/CaseFiche/case-fiche.css (`.case-fiche__actions*`).
+   Ya NO vive aquí (se eliminó el override horizontal `:has()` y el bleed
+   `:last-child`). */
+
+/* ════════════════════════════════════════════════════════════
+   FICHA EJECUTIVA — overrides actor-local (solo caso de referencia).
+   La estructura reusable (sticky, análisis, evidencia, timeline) fue
+   extraída a SimahealthDS/organisms/CaseFiche/case-fiche.css. Lo que
+   queda aquí son overrides cuantitativos puntuales de esp-1001
+   (padding/gap del panel, acciones horizontales + bleed) sin segunda
+   implementación que los generalice todavía.
+   ════════════════════════════════════════════════════════════ */
+
+/* Margen del panel a la mitad — SOLO para esp-1001 (`:has(.case-fiche__sticky)`
+   detecta este caso puntual sin tocar `.panel-overlay` del DS, que
+   sigue igual para el resto de los actores/casos). Valores originales:
+   40px 48px (y 28px 24px en ≤1100px) → mitad: 20px 24px / 14px 12px. */
+.panel-overlay:has(.case-fiche__sticky) {
+  padding: 20px 24px;
+}
+@media (max-width: 1100px) {
+  .panel-overlay:has(.case-fiche__sticky) {
+    padding: 14px 12px;
+  }
+}
+
+/* Espacio parejo de 60px entre cada sección — SOLO para esp-1001,
+   igual técnica de scoping que arriba (no toca `.panel-body` del DS). */
+.panel-body:has(.case-fiche__sticky) {
+  gap: 40px;
+}
+
+/* Estado del caso (sticky), fila de estado, análisis, evidencia y
+   timeline: extraídos a SimahealthDS/organisms/CaseFiche/case-fiche.css.
+   Ver ese archivo para las clases .case-fiche__sticky, .case-fiche__status*,
+   .case-fiche__contribution*, .case-fiche__conclusion,
+   .case-fiche__evidence*, .case-fiche__timeline* — namespace público
+   del organism, sin prefijo de actor. */
+
+/* Z3 — región Tools: sin overrides actor-local. El organismo
+   (SimahealthDS/organisms/LeftPanel) genera Search/Sort/Filter Groups
+   y su propio control «Ver más» (ADR-008, antes ADR-007); el fix de
+   especificidad de `[hidden]` vive en left-panel.css (era genérico,
+   no de Especialista). */
+
+/* .esp-toast/.esp-toast--in (2026-09-08): eliminado -- reemplazado por
+   el pattern DS Toast/LiveRegion (organisms/Toast/toast.css,
+   `.toast`/`.toast--in`), sin usos restantes. Mismos valores de fondo/
+   texto/radius/shadow/z-index/timing de transición, ver ese archivo. */
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .esp-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* .esp-z1 no necesita override acá: flex-wrap ya resuelve el quiebre a
+     una fila nueva por sí solo cuando las boxes no entran (design/z1-visual-
+     refine) -- solo el Board (Z2) necesita un breakpoint explícito. */
+}
+/* design/fase2b-breakpoint: 680px -> 760px (Fase 2.b DS normalization) --
+   680px no tenía ninguna razón documentada; 760px ya es la convención
+   "mobile/small viewport" reutilizada explícitamente por base.css,
+   board.css y modal.css (ver el comentario de modal.css:125-127 citando
+   esa reutilización). Validado visualmente en 680/760/390/430/1024/1440px
+   antes de aplicar -- ver memoria de sesión para la evidencia. */
+@media (max-width: 760px) {
+  .esp-board {
+    grid-template-columns: 1fr;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .esp-z1-panel {
+    margin-left: var(--space-16, 16px);
+    margin-right: var(--space-16, 16px);
+  }
+  .esp-board {
+    margin-left: var(--space-16, 16px);
+    margin-right: var(--space-16, 16px);
+  }
+}

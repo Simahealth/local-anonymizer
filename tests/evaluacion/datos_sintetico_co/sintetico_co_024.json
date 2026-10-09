@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_024",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Daniel Ospina Torres\nC.C. 5933'179.746\nFecha de nacimiento: Noviembre 13 de 1969\nProcedencia: Bucaramanga, Bolívar\nDirección: Diagonal 83 Bis # 25-90, barrio Suba\nTeléfono: 605 1732280   Correo: daniel96@yahoo.es\nEPS: Famisanar\nFecha de ingreso: 2 de marzo de 2014\n\nMOTIVO DE CONSULTA\nPaciente Edad: 62 años que ingresa al servicio refiriendo lumbalgia de varios días de evolución. Reside en Bucaramanga y consulta de forma espontánea. Se localiza al acompañante en el número 605 1732280.\n\nVALORACIÓN\nAtendido por el Dr. Juliana Pérez Vargas (RM 23069). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo daniel96@yahoo.es o remitir a la dirección Diagonal 83 Bis # 25-90.",
+  "ground_truth": {
+    "nombres": [
+      "Daniel Ospina Torres",
+      "Juliana Pérez Vargas"
+    ],
+    "documentos": [
+      "5933'179.746"
+    ],
+    "edades": [
+      "62 años"
+    ],
+    "ubicaciones": [
+      "Bucaramanga",
+      "Bolívar"
+    ],
+    "direcciones": [
+      "Diagonal 83 Bis # 25-90"
+    ],
+    "telefonos": [
+      "605 1732280"
+    ],
+    "emails": [
+      "daniel96@yahoo.es"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "Noviembre 13 de 1969"
+    ],
+    "fechas": [
+      "2 de marzo de 2014"
+    ],
+    "numeros_registro": [
+      "RM 23069"
+    ]
+  }
+}

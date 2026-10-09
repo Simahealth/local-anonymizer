@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_033",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Carolina Rojas Martínez\ncédula de ciudadanía No. 702'332.331\nFecha de nacimiento: 03/03/1953\nProcedencia: Villavicencio, Nariño\nDirección: Calle 169 Bis # 89-35 apto 285, barrio Manga\nTeléfono: (602) 1102438   Correo: carolina19@une.net.co\nEPS: Famisanar\nFecha de ingreso: Septiembre 24 de 1977\n\nMOTIVO DE CONSULTA\nPaciente Edad: 79 años que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número (602) 1102438.\n\nVALORACIÓN\nAtendido por el Dr. Patricia Torres Ramírez (HC-540226). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo carolina19@une.net.co o remitir a la dirección Calle 169 Bis # 89-35 apto 285.",
+  "ground_truth": {
+    "nombres": [
+      "Carolina Rojas Martínez",
+      "Patricia Torres Ramírez"
+    ],
+    "documentos": [
+      "702'332.331"
+    ],
+    "edades": [
+      "79 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Calle 169 Bis # 89-35 apto 285"
+    ],
+    "telefonos": [
+      "(602) 1102438"
+    ],
+    "emails": [
+      "carolina19@une.net.co"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "03/03/1953"
+    ],
+    "fechas": [
+      "Septiembre 24 de 1977"
+    ],
+    "numeros_registro": [
+      "HC-540226"
+    ]
+  }
+}

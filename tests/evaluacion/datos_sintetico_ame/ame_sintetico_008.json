@@ -1,0 +1,10 @@
+{
+  "nombre": "ame_sintetico_008",
+  "descripcion": "Nota estilo export 'AME' (plantilla_urgencias_narrativa): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n578825\nId Consulta\n7583025\nDiagnóstico\nEnfermedad Actual: Paciente de 6 meses de edad, traído por su madre sustituta, Ingrid Angulo Palacios, de 38 años; quien refiere cuadro clínico de dos días de evolución consistente en fiebre no cuantificada, decaimiento e irritabilidad. Niega vómito, niega diarrea. Antecedentes: sin importancia. Vacunación completa para la edad. Se ingresa con impresión diagnóstica de dificultad respiratoria para manejo intrahospitalario y toma de paraclínicos.",
+  "ground_truth": {
+    "nombres": [
+      "Ingrid Angulo Palacios"
+    ]
+  }
+}

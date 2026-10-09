@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_030",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n392478\nId Consulta\n9434980\nDiagnóstico\nCONTROL POR CRISIS ASMATICA. PACIENTE JESSICA JURADO MINA VALORADO POR DR OSCAR MANSUR ZAMBRANO (RM 53952). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Jessica Jurado Mina",
+      "DR Oscar Mansur Zambrano"
+    ],
+    "numeros_registro": [
+      "RM 53952"
+    ]
+  }
+}

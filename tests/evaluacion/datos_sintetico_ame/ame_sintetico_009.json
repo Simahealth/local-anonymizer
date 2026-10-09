@@ -1,0 +1,10 @@
+{
+  "nombre": "ame_sintetico_009",
+  "descripcion": "Nota estilo export 'AME' (plantilla_urgencias_narrativa): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n170619\nId Consulta\n4502465\nDiagnóstico\nEnfermedad Actual: Paciente de 7 meses de edad, traído por su acudiente, Leidy Chaverra Oyaga, de 19 años; quien refiere cuadro clínico de dos días de evolución consistente en fiebre no cuantificada, decaimiento e irritabilidad. Niega vómito, niega diarrea. Antecedentes: sin importancia. Vacunación completa para la edad. Se ingresa con impresión diagnóstica de sepsis neonatal temprana para manejo intrahospitalario y toma de paraclínicos.",
+  "ground_truth": {
+    "nombres": [
+      "Leidy Chaverra Oyaga"
+    ]
+  }
+}

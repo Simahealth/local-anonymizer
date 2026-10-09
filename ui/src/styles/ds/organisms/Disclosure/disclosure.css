@@ -1,0 +1,215 @@
+/* ==========================================================================
+   Pattern: Disclosure / Accordion
+   Layer: 5 — Patterns (organism-level, con estado propio)
+   Owner: Design System
+   Estado: active
+
+   Formaliza la técnica que ya existía duplicada en CasePageV2:
+   `ClinicalHistoryYearGroupV2` (trigger `.btn.btn--subtle`, panel
+   `grid-template-rows: 0fr -> 1fr`, "el contenido queda en el DOM, el
+   colapso es puramente visual") y la región hover-reveal de Documentos
+   (otra técnica más, sin trigger real de teclado). Este archivo define
+   el mecanismo de animación GENÉRICO (mismo truco de grid-rows que
+   `ClinicalHistoryYearGroupV2` ya tenía, ahora reusable) + el ciclo de
+   vida de accesibilidad que ninguna de las técnicas anteriores tenía:
+   `hidden` real cuando está cerrado y NO animando (`DisclosurePanel.tsx`
+   controla esto vía JS, quitando/agregando el atributo).
+
+   Ver `src/components/Disclosure/*.tsx` para los componentes React y el
+   contrato completo (controlado/no controlado, Accordion type=single/
+   multiple, teclado).
+   ========================================================================== */
+
+/* ── Disclosure (root) ──────────────────────────────────────────────── */
+
+.disclosure {
+  display: flex;
+  flex-direction: column;
+}
+
+/* "plain": sin contenedor fuerte -- el caso de ClinicalHistoryYearGroupV2
+   (ningún borde/fondo propio, el trigger reusa `.btn.btn--subtle`). */
+.disclosure--plain {
+  /* sin declaraciones propias -- el default ya es "sin contenedor". */
+}
+
+/* "card": superficie + borde DS, para un disclosure que necesita leerse
+   como su propio bloque separado del resto del contenido. */
+.disclosure--card {
+  border: 1px solid var(--border-subtle, #e9ebef);
+  border-radius: var(--radius-100, 8px);
+  background: var(--surface-primary, #ffffff);
+  overflow: hidden; /* el borde/radius no se rompe cuando el panel crece */
+}
+
+/* "inline": "ver más / ver menos" -- el trigger es un CTA de bajo
+   énfasis, nunca un bloque de header propio. */
+.disclosure--inline {
+  gap: var(--space-8, 8px);
+}
+
+.disclosure--disabled {
+  opacity: 0.6;
+}
+
+/* ── DisclosureTrigger ───────────────────────────────────────────────── */
+
+/* Reset estructural mínimo, deliberadamente SIN `display`/`background`/
+   `color` acá -- esas tres son justo las que un consumidor "plain" que
+   compone sus propias clases encima (p. ej.
+   `ClinicalHistoryYearGroupV2`, que agrega `.btn.btn--subtle.btn--sm`)
+   necesita que NO estén en esta regla compartida: `button.css` se
+   importa antes que este archivo, así que a igual especificidad
+   (0,1,0 cada una) esta hoja gana el empate por orden de carga -- si
+   `display`/`background`/`color` vivieran acá, le ganarían a los
+   tokens de `.btn` (`--btn-bg`, `--btn-text`, `display:inline-flex`)
+   para cualquier trigger que combine ambas clases, silenciosamente. Las
+   3 variantes que sí quieren un look propio (`card`/`inline`) las
+   declaran ellas mismas, más abajo -- `plain` no las toca. */
+.disclosure-trigger {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  width: 100%;
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast, 80ms ease), color var(--transition-fast, 80ms ease);
+}
+
+.disclosure-trigger:disabled {
+  cursor: not-allowed;
+}
+
+.disclosure-trigger:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: 2px;
+}
+
+/* "plain": sin display/background/color/padding propios -- ver el
+   comentario de arriba. Si se usa genuinamente solo (sin clases del
+   consumidor encima), el único feedback visual que da es este color de
+   texto en hover/active; para cualquier otra cosa (fondo, radius,
+   padding) hace falta `card` o clases propias. */
+.disclosure-trigger--plain:hover:not(:disabled) {
+  color: var(--text-brand, #d732ab);
+}
+.disclosure-trigger--plain:active:not(:disabled) {
+  opacity: 0.85;
+}
+.disclosure-trigger--plain:disabled {
+  color: var(--text-disabled, #b9bdc4);
+}
+
+/* "card": sí tiene un look propio completo -- fondo, color, display,
+   padding, hover de superficie (mismo tratamiento que
+   `.dropdown-menu__item:hover`, --surface-secondary). */
+.disclosure-trigger--card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8, 8px);
+  padding: var(--space-16, 16px);
+  background: transparent;
+  color: var(--text-primary, #0d0f10);
+  font-size: var(--text-sm, 14px);
+  font-weight: var(--weight-medium, 500);
+}
+.disclosure-trigger--card:hover:not(:disabled) {
+  background: var(--surface-secondary, #f8f9fc);
+}
+.disclosure-trigger--card:active:not(:disabled) {
+  opacity: 0.88;
+}
+.disclosure-trigger--card:disabled {
+  color: var(--text-disabled, #b9bdc4);
+}
+
+/* "inline": compacto, tono de link secundario -- "ver más/ver menos". */
+.disclosure-trigger--inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8, 8px);
+  width: auto;
+  background: transparent;
+  color: var(--text-tertiary, #6b7280);
+  font-size: var(--text-xs, 12px);
+  font-weight: var(--weight-medium, 500);
+}
+.disclosure-trigger--inline:hover:not(:disabled) {
+  color: var(--text-brand, #d732ab);
+}
+.disclosure-trigger--inline:disabled {
+  color: var(--text-disabled, #b9bdc4);
+}
+
+.disclosure-trigger__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.disclosure-trigger__chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: var(--text-tertiary, #6b7280);
+  transition: transform var(--transition-base, 150ms ease);
+}
+.disclosure-trigger__chevron--open {
+  transform: rotate(180deg);
+}
+
+/* ── DisclosurePanel ─────────────────────────────────────────────────── */
+
+/* Mismo mecanismo exacto que `.case-page-v2__historial-year-content`
+   (grid-template-rows 0fr -> 1fr) -- generalizado. `[hidden]` es lo que
+   agrega este pattern que la técnica original no tenía: cuando
+   `DisclosurePanel.tsx` termina la animación de cierre, agrega el
+   atributo real, sacando el contenido del árbol de accesibilidad y del
+   tab order -- no solo "invisible", genuinamente ausente. Se declara
+   explícito para ganarle a `.disclosure-panel{display:grid}` (misma
+   especificidad, pero [hidden] necesita ganar siempre que esté
+   presente). */
+.disclosure-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-base, 150ms ease);
+}
+.disclosure-panel[hidden] {
+  display: none;
+}
+.disclosure-panel[data-state="open"] {
+  grid-template-rows: 1fr;
+}
+
+.disclosure-panel__inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* "card": el padding vive en `-inner`, no en `.disclosure-panel` mismo --
+   igual que el comentario original de ClinicalHistoryYearGroupV2 ya
+   explicaba: padding directo en el elemento de tamaño de grid-row fuerza
+   la fila cerrada (0fr) a quedar al menos tan alta como ese padding,
+   rompiendo la animación de cierre. */
+.disclosure--card .disclosure-panel__inner {
+  padding: var(--space-16, 16px);
+  padding-top: var(--space-8, 8px);
+}
+.disclosure--inline .disclosure-panel__inner {
+  padding-top: var(--space-8, 8px);
+}
+
+/* ── Accordion (grupo) ───────────────────────────────────────────────── */
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+}
+.accordion > .disclosure--card + .disclosure--card {
+  margin-top: var(--space-8, 8px);
+}

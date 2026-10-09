@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Molecule: Tooltip
+   Layer: 3 — Molecules
+   Owner: Design System
+   Estado: active
+
+   Anotación flotante de una sola línea/frase corta, revelada en
+   hover/focus del trigger que envuelve -- nunca el tooltip nativo del
+   navegador (`title`), que no se puede estilar y desaparece con
+   cualquier scroll. Patrón transversal: cualquier superficie del
+   producto que hoy resuelve esto con `title=` (icon buttons sin label
+   visible, texto truncado, etc.) migra a este único componente en vez
+   de mantener variantes locales -- ver
+   `src/components/Tooltip/Tooltip.tsx` para el componente React y el
+   contrato de accesibilidad (aria-describedby/role="tooltip").
+
+   Visual: superficie invertida casi negra en modo "glass" (translúcida +
+   `backdrop-filter: blur`, ver `--tt-bg` abajo) con texto claro
+   (`--text-inverse`), borde sutil, radius medio, sombra suave -- mismo
+   lenguaje que un popup DS (`--shadow-md`), pero tono invertido porque
+   flota sobre cualquier superficie del producto, no solo sobre
+   `--surface-primary`. Ancho ajustado al contenido con un techo
+   (`max-width`) para que una frase larga haga wrap en vez de estirar el
+   tooltip a lo ancho de la pantalla. Sin flecha -- el DS no tiene ese
+   patrón definido todavía en ningún otro popup (DropdownMenu tampoco la
+   usa), así que no se inventa acá.
+
+   Posicionamiento: `position: fixed`, con `top`/`left` puestos inline
+   por `Tooltip.tsx` (portal a `document.body` + medición real de
+   trigger/tooltip/viewport en JS) -- este archivo YA NO calcula la
+   posición en CSS puro (nada de `left: 50%`/`transform`/modifiers de
+   alineación acá). El componente clampea contra los bordes del
+   viewport, así que el tooltip nunca se corta contra un ancestro con
+   `overflow: hidden` (una card, un panel, el catálogo DS) ni contra el
+   borde de la pantalla -- ver el docstring de `Tooltip.tsx` para el
+   detalle del cálculo.
+   ========================================================================== */
+
+.tooltip-wrapper {
+  display: inline-flex;
+}
+
+.tooltip {
+  /* `--surface-inverse` (#0d0f10) no tiene variante alpha en tokens.css
+     -- mismo tipo de deuda ya documentada en otras partes del DS (ej.
+     `.card.selected`'s anillo rgba en card.css): se reproduce su rgb
+     acá mismo, a 0.66 de opacidad (bajado desde 0.82 -- ~20% relativo
+     menos opaco, pedido explícito para que el glass se vea más liviano
+     sin perder contraste), en vez de inventar un token nuevo. */
+  --tt-bg: rgba(13, 15, 16, 0.66);
+  --tt-fg: var(--text-inverse, #f8f9fc);
+  --tt-border: var(--border-subtle, #e9ebef);
+  --tt-radius: var(--radius-100, 8px);
+  --tt-shadow: var(--shadow-md);
+  --tt-max-width: 240px;
+  /* Capa local, misma lógica que `.dropdown-menu`'s `--dm-z`: un
+     tooltip nunca compite con el stack global (backdrop/panel/overlay,
+     40-60) -- ver el comentario en tokens.css sobre esta capa
+     "todavía sin decidir". Se resuelve acá, no ahí. Al portalarse a
+     `document.body` este z-index ya no compite con ningún stacking
+     context local (card/panel), solo con el stack global -- por eso
+     sigue alcanzando con un valor fijo, sin necesidad de subirlo. */
+  --tt-z: 70;
+
+  position: fixed;
+  z-index: var(--tt-z);
+
+  width: max-content;
+  max-width: var(--tt-max-width);
+  padding: var(--space-6, 6px) var(--space-12, 12px);
+
+  background: var(--tt-bg);
+  /* Ningún otro popup del DS usa blur todavía (ver docstring arriba) --
+     primer uso, con fallback: si el navegador no soporta
+     `backdrop-filter` simplemente queda el fondo translúcido sólido de
+     arriba, sigue siendo legible, no rompe nada. */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--tt-fg);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius);
+  box-shadow: var(--tt-shadow);
+
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  /* `--text-xs` (12px) ya es el token más chico de la escala tipográfica
+     (tokens.css) -- no existe un `--text-2xs`. Un paso más chico
+     replica el mismo hardcode de 11px que el resto del DS ya usa para
+     este mismo caso (eyebrows/labels secundarios: ver
+     `Card/card.css`, `DetailPanel/detail-panel.css`,
+     `LeftPanel/left-panel.css`) -- deuda preexistente, no un valor
+     inventado nuevo. */
+  font-size: 11px;
+  font-weight: var(--weight-regular, 400);
+  line-height: var(--leading-normal, 1.4);
+  text-align: left;
+  white-space: normal;
+
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-fast, 80ms ease);
+}
+
+.tooltip--visible {
+  opacity: 1;
+  visibility: visible;
+}

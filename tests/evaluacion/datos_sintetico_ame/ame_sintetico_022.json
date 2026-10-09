@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_022",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n120429\nId Consulta\n6670358\nDiagnóstico\nCONTROL POR BRONQUIOLITIS. PACIENTE YEISON VALENCIA PALACIOS VALORADO POR DRA INGRID VALENCIA QUIÑONEZ (RM 56742). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Yeison Valencia Palacios",
+      "DRA Ingrid Valencia Quiñonez"
+    ],
+    "numeros_registro": [
+      "RM 56742"
+    ]
+  }
+}

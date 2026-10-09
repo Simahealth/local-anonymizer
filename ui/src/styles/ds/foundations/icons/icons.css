@@ -1,0 +1,35 @@
+/* ============================================================
+   Icon Catalog — Infraestructura de renderizado
+   Sprint DS-10 | 2026-07-17
+
+   Único punto de carga de Material Symbols Outlined y única definición
+   del contrato de markup (.material-symbols-outlined) para todo
+   consumidor del catálogo. Ver foundations/icons/README.md.
+
+   Tamaño y color son responsabilidad del contexto consumidor (p. ej.
+   .sidebar-reading-item__icon) — esta clase solo resuelve la fuente y
+   la renderización correcta del ligature.
+
+   El eje wght se sirve como rango (100..700, no un valor fijo) para que
+   un consumidor pueda pedir un peso distinto del default vía
+   font-variation-settings (p. ej. .esp-z1__icon, Z1). Sin ese override,
+   el default de la fuente (400) no cambia — no afecta a consumidores
+   existentes (Sidebar).
+   ============================================================ */
+
+/* App de escritorio (sima-anonimizador-desktop): Material Symbols Outlined se empaqueta en local
+   (ver src/styles/fuentes.css) — la app debe funcionar sin conexión. */
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "liga";
+}

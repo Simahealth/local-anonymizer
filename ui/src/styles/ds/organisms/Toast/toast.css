@@ -1,0 +1,168 @@
+/* ==========================================================================
+   Pattern: Toast / LiveRegion
+   Layer: 5 — Patterns (organism-level, con estado propio)
+   Owner: Design System
+   Estado: active
+
+   Unifica los dos canales paralelos que existían antes de esto:
+   `showToast()` (`src/utils/toast.ts`, DOM manual vía
+   `document.body.appendChild`, clases `.esp-toast`/`.esp-toast--in`) y
+   `announce()` (`src/utils/announce.ts`, escribía directo a
+   `[data-live-region]`). Ambos archivos y sus clases quedan eliminados
+   -- ver `src/components/Toast/` para el componente React y
+   `ToastProvider`/`useToast` para la API.
+
+   Valores reutilizados 1:1 de `.esp-toast` (el toast visual anterior),
+   para que la migración no cambie la apariencia de ningún mensaje ya
+   visto en producto: `--surface-action` de fondo, `--text-inverse` de
+   texto, `--radius-200`, `--shadow-md`, mismo timing de transición
+   (180ms). z-index: se reutiliza `var(--z-overlay)` (60) -- el mismo
+   valor que `.esp-toast` ya usaba hardcodeado -- no se crea `--z-toast`
+   sin evidencia real de que 60 no alcance (ningún caso real lo pidió).
+
+   `prefers-reduced-motion` ya está resuelto globalmente
+   (`framework/motion.css` fuerza `transition-duration`/`animation-
+   duration` a 1ms), no se repite acá -- mismo patrón que el resto del DS.
+   ========================================================================== */
+
+.toast-viewport {
+  position: fixed;
+  z-index: var(--z-overlay, 60);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8, 8px);
+  /* Desktop: bottom-right. Overridden a full-width bottom en mobile,
+     ver el media query más abajo. */
+  right: var(--space-16, 16px);
+  bottom: var(--space-16, 16px);
+  width: 360px;
+  max-width: calc(100vw - var(--space-32, 32px));
+  pointer-events: none; /* el viewport en sí nunca intercepta clicks -- solo cada .toast individual (ver abajo) */
+}
+
+.toast-viewport__item {
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .toast-viewport {
+    left: var(--space-16, 16px);
+    right: var(--space-16, 16px);
+    bottom: calc(var(--space-16, 16px) + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* ── Toast individual ────────────────────────────────────────────────── */
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8, 8px);
+  padding: var(--space-12, 12px) var(--space-16, 16px);
+  background: var(--surface-action, rgba(0, 2, 2, 0.95));
+  color: var(--text-inverse, #f8f9fc);
+  border-radius: var(--radius-200, 4px);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-sm, 14px);
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+/* Estado "entering"/"visible": mismo mecanismo que `.esp-toast--in` --
+   una clase agregada un frame después del mount (ver Toast.tsx) para
+   que la transición de entrada sí corra (opacity/transform de golpe en
+   el mismo frame del mount no anima). */
+.toast--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Estado "exiting": Toast.tsx quita `--in` y espera `transitionend`
+   (o un fallback por timeout) antes de desmontar -- mismo patrón exacto
+   que `showToast()` ya usaba. */
+
+.toast:hover,
+.toast:focus-within {
+  box-shadow: var(--shadow-lg);
+}
+
+.toast__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  margin-top: 1px;
+}
+
+.toast--success .toast__icon {
+  color: var(--color-success-500, #14ae5c);
+}
+.toast--error .toast__icon {
+  color: var(--color-error-500, #ec221f);
+}
+.toast--warning .toast__icon {
+  color: var(--color-warning-500, #ffc909);
+}
+/* Gap de token (documentado, no inventado): no existe --text-info/
+   --color-info-500 en tokens.css -- solo --surface-info (un fondo chip
+   celeste, framework/product.css). Se reusa --text-brand-dark (#5798b3),
+   el tono azul existente más cercano, ya usado en otro contexto (hover
+   de Ghost). Ver docs/design-system/index.html → Gaps. */
+.toast--info .toast__icon {
+  color: var(--text-brand-dark, #5798b3);
+}
+/* neutral: sin ícono (opcional por tono, ver Toast.tsx) -- no hay señal
+   de color/ícono específica para "genérico", el tono por defecto ya lo
+   comunica con el mismo fondo/texto que el resto. */
+
+.toast__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__message {
+  font-weight: var(--weight-medium, 500);
+  color: inherit;
+}
+
+.toast__description {
+  margin-top: var(--space-4, 4px);
+  font-size: var(--text-xs, 12px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--text-inverse, #f8f9fc);
+  opacity: 0.8;
+}
+
+.toast__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8, 8px);
+  margin-top: var(--space-8, 8px);
+}
+
+.toast__close {
+  flex-shrink: 0;
+  color: var(--text-inverse, #f8f9fc);
+  opacity: 0.7;
+}
+.toast__close:hover {
+  opacity: 1;
+}
+
+/* `.icon-btn` (átomo real, icon-button.css) fija su propio `color` vía
+   `--sb-subtle`/`--text-secondary`, pensado para fondos claros -- acá el
+   toast tiene fondo oscuro (`--surface-action`), así que se sobreescribe
+   el color explícitamente arriba (`.toast__close`) en vez de tocar el
+   átomo compartido. */
+
+/* Live region: sin CSS propio -- `LiveRegion.tsx` reusa el mismo
+   `.sr-only` compartido (`framework/base.css`) que `App.tsx` ya usaba
+   para su `[data-live-region]` original, no se duplica esa receta acá. */

@@ -1,0 +1,42 @@
+{
+  "nombre": "meddocan_S0004-06142006000600015-1",
+  "descripcion": "MEDDOCAN dev · S0004-06142006000600015-1 (corpus español, conjunto neutral)",
+  "texto": "﻿Nombre: Marc.\nApellidos:  Garcia Prieto.\nCIPA: 270058.\nNASS: 27 2226350 05.\nDomicilio: Av. Litoral, 30, 1C .\nLocalidad/ Provincia: Barcelona.\nCP: 08005.\nNHC: 270058.\nDatos asistenciales.\nFecha de nacimiento: 27-10-1968.\nPaís: España.\nEdad: 47 Sexo: H.\nFecha de Ingreso: 13-12-2015.\nEspecialidad: andrología.\nMédico:  Anna Bujons Tur       NºCol: 08 08 76541.\nAntecedentes: sin antecedentes patológicos de interés ni hábitos tóxicos.\nHistoria Actual: Paciente varón de 47 años de edad,  acude a la consulta de andrología por presentar erecciones prolongadas no dolorosas de aproximadamente 4 años de evolución tras traumatismo perineal cerrado con el manillar de una bicicleta.\nExploración física:En la exploración física se observan cuerpos cavernosos aumentados de consistencia, no dolorosos a la palpación, sin palpar pulsos anómalos. Sensibilidad peneana conservada. Testes móviles en ambas bolsas escrotales y sin alteraciones.\nResumen de pruebas complementarias: Como exploraciones complementarias se le realiza ecodoppler penenano: vascularización cavernosa derecha aparentemente conservada; en la porción más proximal del cuerpo cavernoso izquierdo se observa formación anecoica (2x1.8x1.5cm) con flujo turbulento en su interior compatible con fístula arteriovenosa (FAV) de larga duración.\nEvolución y comentarios: Con la orientación diagnóstica de Priapismo de alto flujo se decide realización de Arteriografía pudenda con anestesia local confirmándose FAV y posterior embolización de la misma mediante 2 coil 3x5. Tras la embolización el paciente evoluciona favorablemente con detumecencia peneana completa y erecciones normales. Actualmente está asintomático.\nDiagnóstico Principal: Priapismo\nRemitido por: Anna Bujons Tur Calle Joaquim Folguera, 3 - 5º 2ª 08022 Barcelona. abujons@gmail.com\n",
+  "ground_truth": {
+    "emails": [
+      "abujons@gmail.com"
+    ],
+    "ubicaciones": [
+      "Barcelona",
+      "08022",
+      "España",
+      "08005"
+    ],
+    "direcciones": [
+      "Calle Joaquim Folguera, 3 - 5º 2ª",
+      "Av. Litoral, 30, 1C"
+    ],
+    "nombres": [
+      "Anna Bujons Tur",
+      "Garcia Prieto",
+      "Marc"
+    ],
+    "edades": [
+      "47 años",
+      "47"
+    ],
+    "numeros_registro": [
+      "08 08 76541"
+    ],
+    "fechas": [
+      "13-12-2015",
+      "27-10-1968"
+    ],
+    "documentos": [
+      "270058"
+    ],
+    "seguros": [
+      "27 2226350 05"
+    ]
+  }
+}

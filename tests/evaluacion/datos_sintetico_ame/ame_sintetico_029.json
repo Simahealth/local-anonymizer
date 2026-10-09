@@ -1,0 +1,13 @@
+{
+  "nombre": "ame_sintetico_029",
+  "descripcion": "Nota estilo export 'AME' (plantilla_breve): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n481829\nId Consulta\n6518465\nDiagnóstico\nPACIENTE NUBIA ZAMBRANO CAICEDO DE 58 AÑOS. CUADRO CLINICO COMPATIBLE CON DIFICULTAD RESPIRATORIA. SE INICIA MANEJO.",
+  "ground_truth": {
+    "edades": [
+      "58 AÑOS"
+    ],
+    "nombres": [
+      "Nubia Zambrano Caicedo"
+    ]
+  }
+}

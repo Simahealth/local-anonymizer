@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_047",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Felipe Castro Ramírez\ncédula de ciudadanía No. 43.635.675\nFecha de nacimiento: 2 de noviembre de 2023\nProcedencia: Cúcuta, Santander\nDirección: Cra 158C N° 12-65, barrio Laureles\nTeléfono: 329-666-4316   Correo: felipe6@gmail.com\nEPS: Sanitas\nFecha de ingreso: Abril 21 de 2023\n\nMOTIVO DE CONSULTA\nPaciente Edad: 82 años que ingresa al servicio refiriendo edema en miembros inferiores de varios días de evolución. Reside en Cúcuta y consulta de forma espontánea. Se localiza al acompañante en el número 329-666-4316.\n\nVALORACIÓN\nAtendido por el Dr. Óscar Ospina Vargas (Registro médico 93753). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo felipe6@gmail.com o remitir a la dirección Cra 158C N° 12-65.",
+  "ground_truth": {
+    "nombres": [
+      "Felipe Castro Ramírez",
+      "Óscar Ospina Vargas"
+    ],
+    "documentos": [
+      "43.635.675"
+    ],
+    "edades": [
+      "82 años"
+    ],
+    "ubicaciones": [
+      "Cúcuta",
+      "Santander"
+    ],
+    "direcciones": [
+      "Cra 158C N° 12-65"
+    ],
+    "telefonos": [
+      "329-666-4316"
+    ],
+    "emails": [
+      "felipe6@gmail.com"
+    ],
+    "seguros": [
+      "Sanitas"
+    ],
+    "fechas_nacimiento": [
+      "2 de noviembre de 2023"
+    ],
+    "fechas": [
+      "Abril 21 de 2023"
+    ],
+    "numeros_registro": [
+      "Registro médico 93753"
+    ]
+  }
+}

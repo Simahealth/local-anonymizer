@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_034",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Patricia Rodríguez Gómez\ndocumento de identidad 5645357285\nFecha de nacimiento: 1950-01-20\nProcedencia: Pereira, Tolima\nDirección: Transversal 56 Bis No. 66-15 apto 541, barrio Suba\nTeléfono: +57 327 9840487   Correo: patricia6@hotmail.com\nEPS: Famisanar\nFecha de ingreso: 10 de abril de 1967\n\nMOTIVO DE CONSULTA\nPaciente de 85 años que ingresa al servicio refiriendo lumbalgia de varios días de evolución. Reside en Pereira y consulta de forma espontánea. Se localiza al acompañante en el número +57 327 9840487.\n\nVALORACIÓN\nAtendido por el Dr. Miguel López Gómez (HC-403507). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo patricia6@hotmail.com o remitir a la dirección Transversal 56 Bis No. 66-15 apto 541.",
+  "ground_truth": {
+    "nombres": [
+      "Patricia Rodríguez Gómez",
+      "Miguel López Gómez"
+    ],
+    "documentos": [
+      "5645357285"
+    ],
+    "edades": [
+      "85 años"
+    ],
+    "ubicaciones": [
+      "Pereira",
+      "Tolima"
+    ],
+    "direcciones": [
+      "Transversal 56 Bis No. 66-15 apto 541"
+    ],
+    "telefonos": [
+      "+57 327 9840487"
+    ],
+    "emails": [
+      "patricia6@hotmail.com"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "1950-01-20"
+    ],
+    "fechas": [
+      "10 de abril de 1967"
+    ],
+    "numeros_registro": [
+      "HC-403507"
+    ]
+  }
+}

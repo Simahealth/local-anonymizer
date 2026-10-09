@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_027",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n755830\nId Consulta\n5288153\nDiagnóstico\nCONTROL POR NEUMONIA CONGENITA. PACIENTE MARISOL RIASCOS BONILLA VALORADO POR DR BRAYAN RENTERÍA SEGURA (RM 17128). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Marisol Riascos Bonilla",
+      "DR Brayan Rentería Segura"
+    ],
+    "numeros_registro": [
+      "RM 17128"
+    ]
+  }
+}

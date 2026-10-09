@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_029",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Carolina García Moreno\ncédula de ciudadanía No. 730'651.895\nFecha de nacimiento: 13/05/1974\nProcedencia: Cali, Risaralda\nDirección: Carrera 158B N° 36-5 piso 5, barrio Suba\nTeléfono: +57 305 2666893   Correo: carolina70@outlook.com\nEPS: Sura\nFecha de ingreso: 1961-08-28\n\nMOTIVO DE CONSULTA\nPaciente de 94 años que ingresa al servicio refiriendo dolor abdominal de varios días de evolución. Reside en Cali y consulta de forma espontánea. Se localiza al acompañante en el número +57 305 2666893.\n\nVALORACIÓN\nAtendido por el Dr. María Rojas Cárdenas (HC-772875). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo carolina70@outlook.com o remitir a la dirección Carrera 158B N° 36-5 piso 5.",
+  "ground_truth": {
+    "nombres": [
+      "Carolina García Moreno",
+      "María Rojas Cárdenas"
+    ],
+    "documentos": [
+      "730'651.895"
+    ],
+    "edades": [
+      "94 años"
+    ],
+    "ubicaciones": [
+      "Cali",
+      "Risaralda"
+    ],
+    "direcciones": [
+      "Carrera 158B N° 36-5 piso 5"
+    ],
+    "telefonos": [
+      "+57 305 2666893"
+    ],
+    "emails": [
+      "carolina70@outlook.com"
+    ],
+    "seguros": [
+      "Sura"
+    ],
+    "fechas_nacimiento": [
+      "13/05/1974"
+    ],
+    "fechas": [
+      "1961-08-28"
+    ],
+    "numeros_registro": [
+      "HC-772875"
+    ]
+  }
+}

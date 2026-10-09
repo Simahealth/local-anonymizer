@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_048",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Luisa Ramírez Moreno\nidentificado con C.C. 1257324536\nFecha de nacimiento: 1981-08-09\nProcedencia: Manizales, Tolima\nDirección: Cl 37A N° 92-41, barrio Manga\nTeléfono: 607 2781470   Correo: luisa31@yahoo.es\nEPS: Sanitas\nFecha de ingreso: Enero 4 de 1987\n\nMOTIVO DE CONSULTA\nPaciente Edad: 54 años que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Manizales y consulta de forma espontánea. Se localiza al acompañante en el número 607 2781470.\n\nVALORACIÓN\nAtendido por el Dr. Camilo Jiménez Rodríguez (HC-745270). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo luisa31@yahoo.es o remitir a la dirección Cl 37A N° 92-41.",
+  "ground_truth": {
+    "nombres": [
+      "Luisa Ramírez Moreno",
+      "Camilo Jiménez Rodríguez"
+    ],
+    "documentos": [
+      "1257324536"
+    ],
+    "edades": [
+      "54 años"
+    ],
+    "ubicaciones": [
+      "Manizales",
+      "Tolima"
+    ],
+    "direcciones": [
+      "Cl 37A N° 92-41"
+    ],
+    "telefonos": [
+      "607 2781470"
+    ],
+    "emails": [
+      "luisa31@yahoo.es"
+    ],
+    "seguros": [
+      "Sanitas"
+    ],
+    "fechas_nacimiento": [
+      "1981-08-09"
+    ],
+    "fechas": [
+      "Enero 4 de 1987"
+    ],
+    "numeros_registro": [
+      "HC-745270"
+    ]
+  }
+}

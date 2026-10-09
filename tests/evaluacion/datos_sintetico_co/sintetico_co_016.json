@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_016",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Laura Rodríguez Gómez\nidentificado con C.C. 12'735.359\nFecha de nacimiento: Noviembre 19 de 1998\nProcedencia: Barranquilla, Valle del Cauca\nDirección: Transversal 145 No. 60-90, barrio Manga\nTeléfono: (604) 6218367   Correo: laura75@gmail.com\nEPS: Coomeva\nFecha de ingreso: 1959-04-23\n\nMOTIVO DE CONSULTA\nPaciente de 20 años que ingresa al servicio refiriendo cefalea persistente de varios días de evolución. Reside en Barranquilla y consulta de forma espontánea. Se localiza al acompañante en el número (604) 6218367.\n\nVALORACIÓN\nAtendido por el Dr. Patricia Pérez Ramírez (RM 99687). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo laura75@gmail.com o remitir a la dirección Transversal 145 No. 60-90.",
+  "ground_truth": {
+    "nombres": [
+      "Laura Rodríguez Gómez",
+      "Patricia Pérez Ramírez"
+    ],
+    "documentos": [
+      "12'735.359"
+    ],
+    "edades": [
+      "20 años"
+    ],
+    "ubicaciones": [
+      "Barranquilla",
+      "Valle del Cauca"
+    ],
+    "direcciones": [
+      "Transversal 145 No. 60-90"
+    ],
+    "telefonos": [
+      "(604) 6218367"
+    ],
+    "emails": [
+      "laura75@gmail.com"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "Noviembre 19 de 1998"
+    ],
+    "fechas": [
+      "1959-04-23"
+    ],
+    "numeros_registro": [
+      "RM 99687"
+    ]
+  }
+}

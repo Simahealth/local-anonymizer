@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_042",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Paula Rojas Ramírez\nCC 3869'961.166\nFecha de nacimiento: 24/06/1967\nProcedencia: Medellín, Nariño\nDirección: Calle 121 No. 82-50 apto 360, barrio Kennedy\nTeléfono: 6025045421   Correo: paula85@gmail.com\nEPS: Mutual SER\nFecha de ingreso: 1993-09-12\n\nMOTIVO DE CONSULTA\nPaciente de 47 años que ingresa al servicio refiriendo lumbalgia de varios días de evolución. Reside en Medellín y consulta de forma espontánea. Se localiza al acompañante en el número 6025045421.\n\nVALORACIÓN\nAtendido por el Dr. Diana Muñoz López (RM 70899). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo paula85@gmail.com o remitir a la dirección Calle 121 No. 82-50 apto 360.",
+  "ground_truth": {
+    "nombres": [
+      "Paula Rojas Ramírez",
+      "Diana Muñoz López"
+    ],
+    "documentos": [
+      "3869'961.166"
+    ],
+    "edades": [
+      "47 años"
+    ],
+    "ubicaciones": [
+      "Medellín",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Calle 121 No. 82-50 apto 360"
+    ],
+    "telefonos": [
+      "6025045421"
+    ],
+    "emails": [
+      "paula85@gmail.com"
+    ],
+    "seguros": [
+      "Mutual SER"
+    ],
+    "fechas_nacimiento": [
+      "24/06/1967"
+    ],
+    "fechas": [
+      "1993-09-12"
+    ],
+    "numeros_registro": [
+      "RM 70899"
+    ]
+  }
+}

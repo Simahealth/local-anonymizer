@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_046",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: David García Ramírez\nCC 694'875.990\nFecha de nacimiento: 15 de noviembre de 2016\nProcedencia: Manizales, Nariño\nDirección: Cra 23 N° 40-51 piso 10, barrio Suba\nTeléfono: (607) 2237331   Correo: david41@gmail.com\nEPS: Coosalud\nFecha de ingreso: 1973-09-05\n\nMOTIVO DE CONSULTA\nPaciente 48 años de edad que ingresa al servicio refiriendo edema en miembros inferiores de varios días de evolución. Reside en Manizales y consulta de forma espontánea. Se localiza al acompañante en el número (607) 2237331.\n\nVALORACIÓN\nAtendido por el Dr. Valentina Quintero Pérez (HC-553633). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo david41@gmail.com o remitir a la dirección Cra 23 N° 40-51 piso 10.",
+  "ground_truth": {
+    "nombres": [
+      "David García Ramírez",
+      "Valentina Quintero Pérez"
+    ],
+    "documentos": [
+      "694'875.990"
+    ],
+    "edades": [
+      "48 años"
+    ],
+    "ubicaciones": [
+      "Manizales",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Cra 23 N° 40-51 piso 10"
+    ],
+    "telefonos": [
+      "(607) 2237331"
+    ],
+    "emails": [
+      "david41@gmail.com"
+    ],
+    "seguros": [
+      "Coosalud"
+    ],
+    "fechas_nacimiento": [
+      "15 de noviembre de 2016"
+    ],
+    "fechas": [
+      "1973-09-05"
+    ],
+    "numeros_registro": [
+      "HC-553633"
+    ]
+  }
+}

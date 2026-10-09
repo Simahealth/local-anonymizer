@@ -1,0 +1,137 @@
+/**
+ * ContextCta — SimaHealth Design System · Layer 3 — Molecule
+ * ─────────────────────────────────────────────────────────────────
+ * Ported from the historical vanilla lab's `.note-cta` pattern
+ * (SimaHealth/frontend/features/case-page/case-page.css, "Nueva Nota —
+ * CTA para el estado SIN conversación", and case-page.js's
+ * `renderNoteCta()`) -- same anatomy, reveal mechanism and motion,
+ * generalized from "annotate this thing" (icon `edit_note` + label
+ * "Nueva nota") to ANY icon+label action that should stay invisible
+ * until the user shows intent. This is a TRANSVERSAL Design System
+ * pattern, not exclusive to Evidence or to CasePage -- any surface that
+ * wants a quiet, contextual action revealed on hover/focus of its
+ * container can reuse it as-is.
+ *
+ * USE when:
+ *   — A secondary action belongs to a specific piece of content (a
+ *     finding, a row, a label) and should stay out of the way until the
+ *     user is actually looking at/focused on that content (e.g. "Ver
+ *     fuente" on an Evidence finding, "Nueva nota" on a hypothesis).
+ *   — The container the action belongs to is already identifiable in
+ *     markup (a span/div wrapping the content) -- see "Reveal contract"
+ *     below.
+ *
+ * DO NOT USE when:
+ *   — The action is primary/always-relevant (use `.btn`, not this --
+ *     this pattern is deliberately silent until hover/focus).
+ *   — There's no natural container to carry the reveal attribute (see
+ *     below) -- don't invent one just to use this pattern.
+ *
+ * Anatomy:
+ *   <button class="context-cta" aria-label="...">
+ *     <span class="context-cta__icon material-symbols-outlined" aria-hidden="true">{glyph}</span>
+ *     <span class="context-cta__label">Label</span>
+ *   </button>
+ * Reuses the DS's existing icon mechanism (Material Symbols, see
+ * foundations/icons/icons.ts) -- no second icon system.
+ *
+ * Reveal contract: the CTA is invisible (opacity, not display:none --
+ * see below) until the CONTAINER it lives inside is hovered or
+ * contains focus. That container must carry `data-has-context-cta`:
+ *
+ *   <span class="detail-panel__finding" data-has-context-cta>
+ *     A Case Report <button class="context-cta">...</button>
+ *   </span>
+ *
+ * The attribute lives on the container (not the CTA) because the CTA
+ * itself can't receive `:hover` while it's invisible -- hovering
+ * anywhere in the container reveals it. `:focus-within` mirrors this
+ * for keyboard users: tabbing onto the CTA puts its container into
+ * `:focus-within`, which is what actually reveals it -- opacity/
+ * pointer-events, never `display:none`/`visibility:hidden`, so Tab
+ * can always reach it regardless of hover state.
+ *
+ * Typography: the label is LABEL-adjacent (`--text-xs`/
+ * `--weight-regular`) but intentionally never uses `--text-tertiary`
+ * as its resting color the way LABEL text normally would end there --
+ * historical note-cta already starts at `--text-tertiary` and steps to
+ * `--text-secondary` on hover/focus (never all the way to
+ * `--text-primary`): a quiet affordance, not a primary value.
+ *
+ * Motion: opacity + a small translateX creep, matching the historical
+ * pattern's felt motion (a subtle slide-in, not a plain fade). Duration
+ * uses `var(--transition-base)` (150ms ease) -- the historical lab used
+ * a hardcoded 160ms "ease, same curve as --transition-base" (its own
+ * words) because the token didn't yet exist as the product-wide
+ * convention it is today; reusing the token now is the equivalent
+ * choice, not a new value.
+ */
+/* Margin: the historical `.note-cta` cancels padding on 3 sides but
+   keeps a REAL left margin ("para que el conjunto se lea como una
+   anotación asociada al elemento, no como parte del título que lo
+   precede") -- that's because its own container is plain inline text
+   with no other spacing mechanism between the label and the CTA. Any
+   `data-has-context-cta` container built as `inline-flex`/`flex` with
+   its own `gap` (e.g. `.detail-panel__finding`) already provides that
+   text→CTA spacing via the gap itself -- keeping a real left margin
+   here too would double it up. Canceling all 4 sides is the correct
+   adaptation for a flex-gap container; a non-flex consumer that wants
+   the historical asymmetric margin can still add its own. */
+.context-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: var(--space-4);
+  margin: calc(-1 * var(--space-4));
+  border-radius: var(--radius-200);
+  vertical-align: middle;
+  opacity: 0;
+  transform: translateX(-6px);
+  pointer-events: none;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+.context-cta__icon {
+  font-size: var(--text-base);
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.context-cta__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+/* design/react-visual-align, "ContextualAction hover/focus color": was
+   `--text-secondary` (a neutral step up from the resting
+   `--text-tertiary`) -- now the DS's own canonical interactive-hover
+   token, `--text-brand` (#d732ab), already used for this exact
+   purpose elsewhere (atoms/text/text.css's `.t-body-link:hover`,
+   atoms/button/button.css's `--btn-text-hover`,
+   organisms/DetailPanel/detail-panel.css's `.detail-panel__source-
+   link:hover`) -- not a new convention, just this molecule adopting
+   the one that already exists. Icon and label are still styled via
+   two explicit selectors (not `color` on `.context-cta` +
+   `currentColor` on the children) because that's the pre-existing
+   architecture here -- both already had their own explicit `color`
+   at rest (`--text-tertiary`), so keeping them explicit at hover/
+   focus too avoids mixing two different color mechanisms in the same
+   component. */
+.context-cta:hover .context-cta__icon,
+.context-cta:hover .context-cta__label,
+.context-cta:focus-visible .context-cta__icon,
+.context-cta:focus-visible .context-cta__label {
+  color: var(--text-brand);
+}
+.context-cta:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+}
+[data-has-context-cta]:hover .context-cta,
+[data-has-context-cta]:focus-within .context-cta {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}

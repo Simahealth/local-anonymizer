@@ -1,0 +1,157 @@
+/**
+ * StatusBadge — SimaHealth Design System · Atom · Badge Family
+ * ─────────────────────────────────────────────────────────────
+ * Communicates operational pipeline state. System-owned.
+ *
+ * Rules:
+ *   - Icon is REQUIRED (WCAG 1.4.1 — color is not the only differentiator)
+ *   - Never dismissible (state belongs to the system, not the user)
+ *   - aria-live on the parent container, NOT on the badge itself
+ *   - In table cells: plain <span> — the <td> handles semantics
+ *   - Standalone: use role="status" on the parent region
+ *
+ * Markup:
+ *   <span role="img" class="status-badge status-badge--processed"
+ *         aria-label="Estado: Procesado">
+ *     <span class="status-badge__icon" aria-hidden="true"><!-- svg --></span>
+ *     Procesado
+ *   </span>
+ */
+
+.status-badge {
+  --badge-font-weight: var(--weight-medium, 500);
+  --badge-px: var(--space-8, 8px);
+  --badge-py: var(--space-3, 3px);
+  --badge-gap: var(--space-4, 4px);
+  --badge-radius: var(--radius-full, 9999px);
+  --badge-icon-size: 12px;
+  max-width: 180px;
+}
+
+/* ═══════════════════════════════════════════════
+   10 OPERATIONAL STATES
+   Color contract: background-100 + text-dark pairing
+   for tinted-light fills (ensures contrast on white cards).
+   ═══════════════════════════════════════════════ */
+
+/* En cola — waiting to enter pipeline */
+.status-badge--queued {
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-secondary, #4b5057);
+}
+
+/* Procesado — successfully completed */
+.status-badge--processed {
+  --badge-bg: var(--color-success-100, #ebffee);
+  --badge-text: var(--text-success, #008043);
+}
+
+/* Falla — pipeline failure */
+.status-badge--failed {
+  --badge-bg: var(--color-error-100, #fee9e7);
+  --badge-text: var(--text-error, #c00f0c);
+}
+
+/* En análisis IA — AI processing in progress */
+.status-badge--analyzing {
+  --badge-bg: color-mix(
+    in srgb,
+    var(--sima-blue, #5798b3) 10%,
+    var(--surface-primary, #fff)
+  );
+  --badge-text: var(--sima-blue, #5798b3);
+}
+
+/* Pendiente validación — awaiting human review */
+.status-badge--pending {
+  --badge-bg: var(--color-warning-100, #fffbeb);
+  --badge-text: var(--text-warning, #975102);
+}
+
+/* Validado — human validation confirmed */
+.status-badge--validated {
+  --badge-bg: var(--color-success-100, #ebffee);
+  --badge-text: var(--text-success, #008043);
+}
+
+/* Rechazado — rejected after review */
+.status-badge--rejected {
+  --badge-bg: var(--color-error-100, #fee9e7);
+  --badge-text: var(--text-error, #c00f0c);
+}
+
+/* Cancelado — terminated by operator.
+   Outlined (not filled): still traceable, intentionally stopped.
+   Distinct from Archivado (filled+faded) — different terminal semantics. */
+.status-badge--cancelled {
+  --badge-bg: transparent;
+  --badge-text: var(--text-tertiary, #7a7f87);
+  --badge-border: var(--border-default, #d9dce1);
+}
+
+/* Archivado — moved to archive, terminal */
+.status-badge--archived {
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-tertiary, #7a7f87);
+  opacity: 0.65;
+}
+
+/* Reproceso en curso — retry loop active */
+.status-badge--reprocessing {
+  --badge-bg: var(--color-warning-100, #fffbeb);
+  --badge-text: var(--text-warning, #975102);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER VARIANT
+   Status badges used as toggleable filter chips.
+
+   Use <button> (not <span>) for keyboard access.
+
+   Markup:
+   <button class="status-badge status-badge--processed status-badge--filter"
+           type="button" aria-pressed="false">
+     <span class="status-badge__icon" aria-hidden="true">…svg…</span>
+     Procesado
+   </button>
+
+   JS toggles aria-pressed between "true" / "false".
+
+   All inactive filters collapse to the same neutral outlined pill —
+   variant colors only appear when aria-pressed="true".
+   ═══════════════════════════════════════════════════════════════ */
+
+.status-badge--filter {
+  cursor: pointer;
+  user-select: none;
+  font: inherit;
+  background: none; /* reset native <button> bg */
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    opacity 120ms ease;
+}
+
+/* Inactive — neutral outlined pill regardless of variant */
+.status-badge--filter[aria-pressed="false"] {
+  --badge-bg: transparent;
+  --badge-border: var(--border-default, #d9dce1);
+  --badge-text: var(--text-tertiary, #7a7f87);
+  opacity: 1; /* override archived's 0.65 */
+}
+
+.status-badge--filter[aria-pressed="false"]:hover {
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-secondary, #4b5057);
+}
+
+/* Active — full variant colors from .status-badge--{state} */
+.status-badge--filter[aria-pressed="true"]:hover {
+  filter: brightness(0.94);
+}
+
+.status-badge--filter:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(87, 152, 179, 0.5));
+  outline-offset: 2px;
+}

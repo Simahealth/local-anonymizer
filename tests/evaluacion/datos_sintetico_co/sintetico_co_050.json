@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_050",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Juliana Martínez García\ncédula de ciudadanía No. 698967370\nFecha de nacimiento: 20 de diciembre de 1988\nProcedencia: Barranquilla, Huila\nDirección: Diagonal 12 No. 18-92 piso 10, barrio Kennedy\nTeléfono: 322-650-2353   Correo: juliana41@hotmail.com\nEPS: Famisanar\nFecha de ingreso: Septiembre 17 de 2018\n\nMOTIVO DE CONSULTA\nPaciente 19 años de edad que ingresa al servicio refiriendo dolor abdominal de varios días de evolución. Reside en Barranquilla y consulta de forma espontánea. Se localiza al acompañante en el número 322-650-2353.\n\nVALORACIÓN\nAtendido por el Dr. Santiago Moreno Rojas (Registro médico 83783). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo juliana41@hotmail.com o remitir a la dirección Diagonal 12 No. 18-92 piso 10.",
+  "ground_truth": {
+    "nombres": [
+      "Juliana Martínez García",
+      "Santiago Moreno Rojas"
+    ],
+    "documentos": [
+      "698967370"
+    ],
+    "edades": [
+      "19 años"
+    ],
+    "ubicaciones": [
+      "Barranquilla",
+      "Huila"
+    ],
+    "direcciones": [
+      "Diagonal 12 No. 18-92 piso 10"
+    ],
+    "telefonos": [
+      "322-650-2353"
+    ],
+    "emails": [
+      "juliana41@hotmail.com"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "20 de diciembre de 1988"
+    ],
+    "fechas": [
+      "Septiembre 17 de 2018"
+    ],
+    "numeros_registro": [
+      "Registro médico 83783"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "nombre": "ame_sintetico_025",
+  "descripcion": "Nota estilo export 'AME' (plantilla_uci_evolucion): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n214768\nId Consulta\n3708666\nDiagnóstico\nINGRESO A CUIDADO INTENSIVO NEONATAL: DR FABIÁN FORERO MAYA (GINECOOBSTETRA) - PACIENTE DUVAN FORERO CAICEDO (RECIEN NACIDO PRETERMINO DE 28 SEMANAS). MADRE DE 29 AÑOS, SIN CONTROL PRENATAL. DIAGNOSTICOS: GASTROENTERITIS AGUDA, DESNUTRICION AGUDA MODERADA, SINDROME DIARREICO AGUDO. EVOLUCION DIA 2 DE VIDA DR ANDRÉS CAICEDO PATIÑO PEDIATRA DE TURNO. PACIENTE HEMODINAMICAMENTE ESTABLE, AFEBRIL, TOLERA VIA ORAL, SIN DIFICULTAD RESPIRATORIA. CONTINUA MANEJO ANTIBIOTICO Y FOTOTERAPIA. ECOCARDIOGRAMA DE CONTROL (20/03/15) SIN CAMBIOS. ",
+  "ground_truth": {
+    "nombres": [
+      "Duvan Forero Caicedo",
+      "DR Fabián Forero Maya",
+      "DR Andrés Caicedo Patiño"
+    ],
+    "edades": [
+      "29 AÑOS"
+    ],
+    "fechas": [
+      "20/03/15"
+    ]
+  }
+}

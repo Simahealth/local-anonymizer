@@ -1,0 +1,9 @@
+{
+  "nombre": "caso_cedulas",
+  "descripcion": "Variaciones de cédula: con/sin prefijo, con puntos de miles, distintas redacciones.",
+  "texto": "Listado de pacientes para revisión:\n\n1. Juan Pablo Ríos, identificado con CC: 52341890.\n2. Ana Lucía Torres, con cédula 1002345678.\n3. Pedro Martínez, C.C. 1.234.567.890.\n4. Sofía Ramírez, tarjeta de identidad 1098765432.\n5. Laura Quintero, cédula de ciudadanía No. 79.456.123.\n6. Documento de identidad: 80123456 correspondiente a Diego Ortega.\n",
+  "ground_truth": {
+    "nombres": ["Juan Pablo Ríos", "Ana Lucía Torres", "Pedro Martínez", "Sofía Ramírez", "Laura Quintero", "Diego Ortega"],
+    "documentos": ["52341890", "1002345678", "1.234.567.890", "1098765432", "79.456.123", "80123456"]
+  }
+}

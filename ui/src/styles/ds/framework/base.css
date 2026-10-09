@@ -1,0 +1,250 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* design/react-visual-align: html/body/.workspace pasaron de
+   --surface-canvas (#fbfcfd, un blanco ligeramente distinto) a
+   --surface-primary -- el mismo token que ya usa el background de
+   Card -- a pedido explícito de que el fondo base de TODA la UI sea
+   exactamente ese "Blanco", no uno visualmente parecido. El Sidebar
+   (--sb-bg, organisms/LeftPanel/left-panel.css) se actualizó al mismo
+   token por la misma razón que motivaba usar un solo tono acá: que no
+   quede una costura de un blanco distinto en el hueco/esquinas entre
+   Sidebar y Canvas. */
+html {
+  min-width: 320px;
+  background: var(--surface-primary);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+}
+
+button {
+  font: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.aow-shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.aow-header {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-24);
+  padding: var(--space-16) clamp(var(--space-20), 4vw, var(--space-56, 56px));
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-primary);
+  z-index: 20;
+}
+
+.aow-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-14);
+}
+
+.aow-mark {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-100);
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  font-weight: var(--weight-bold);
+}
+
+.aow-eyebrow {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: 0.04em;
+}
+
+/* ── AOW Product Layer — heading overrides ────────────────────────
+   These rules intentionally deviate from the DS type scale (.t-h1 etc.)
+   because they operate as UI chrome labels, not document headings.
+
+   .workspace-meta h1  → intent title (e.g. "Gestión de Casos"): the
+                         workspace's own H2-editorial-weight heading --
+                         see its own rule below for the current size/
+                         weight decision and history. Reads as the
+                         main heading of the current workspace, not a
+                         small state label.
+   .board-region h2    → region label: 12–16px (overridden in board.css).
+                         Reads as navigation/section chrome, not content heading.
+
+   Do NOT align these to the DS scale without a deliberate UX decision.
+   ──────────────────────────────────────────────────────────────── */
+.workspace-meta h1,
+.board-region h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+/* .aow-header h1 — header removed in VH1-A experiment (see index_v2.html) */
+
+/* Role badge → product.css (DS-EX-01) */
+
+.intent-bar {
+  min-height: 60px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-10) clamp(var(--space-20), 4vw, var(--space-56, 56px));
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-primary);
+  z-index: 15;
+  scrollbar-width: none;
+}
+
+.intent-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.intent-bar__label {
+  margin-right: var(--space-6);
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* .intent-chip family → product.css (DS-EX-01) */
+
+.workspace {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: auto;
+  /* S11: piso unificado — el workspace usa el mismo App Background que
+     html/body, así no se ve una costura en el hueco Sidebar↔Canvas ni en
+     sus esquinas redondeadas.
+     Elimina la banda surface-primary → surface-secondary en el borde
+     izquierdo del canvas.
+     Las superficies elevadas (regiones del board, cards) usan
+     surface-primary y siguen siendo visibles.
+     design/react-visual-align: el piso pasó de --surface-canvas a
+     --surface-primary (mismo token que Card) -- ver nota arriba en
+     html/body. */
+  background: var(--surface-primary);
+}
+
+.workspace-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-20);
+  padding: var(--space-24) clamp(var(--space-20), 4vw, var(--space-48, 48px)) 0;
+}
+
+/* AOW title-treatment task (this branch, 2026-09-21): "Gestión de
+   Casos" read as a small label/eyebrow, not the workspace's main
+   heading -- explicit deliberate UX decision (the one the comment
+   block above asks for) reversing an EARLIER deliberate decision that
+   had shrunk it to the DS TITLE role (--text-sm/--weight-semibold/
+   --leading-snug, aligned with role parity with other TITLE-level
+   text elsewhere in the app). Bumped to an "H2 editorial" treatment --
+   the DS's own `.t-editorial-h2-*` utility classes (Noto Serif,
+   --text-4xl/48px, text.css) are deliberately NOT used here: that
+   family is a content-headline role (CasePageV2's hypothesis name)
+   and would read as an oversized hero, explicitly ruled out for this
+   UI-chrome title. Existing DS tokens instead: --text-xl (24px, one
+   step below that editorial scale) keeps this reading as a workspace
+   heading without competing with the KPI stat numbers right below it;
+   --weight-semibold (unchanged) + --leading-tight (tighter than the
+   old --leading-snug, appropriate at this larger size) +
+   --text-primary (explicit, previously inherited) for full-strength
+   ink instead of a muted label tone. No hardcoded values -- every
+   declaration below is an existing DS token. */
+.workspace-meta h1 {
+  margin-top: var(--space-4);
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Intent subtitle — operational context line below the active intent heading.
+   Describes what the user should understand from the current board composition. */
+.intent-subtitle {
+  margin: var(--space-5) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  max-width: 640px;
+}
+
+/*
+ * workspace-mode — quiet persistent context indicator.
+ * No pill border: reduces boxiness in workspace-meta header.
+ */
+.workspace-mode {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  body {
+    overflow: auto;
+  }
+
+  .aow-shell {
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .aow-header,
+  .workspace-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .intent-bar {
+    min-height: 56px;
+  }
+
+  /* No responsive override for `.workspace-meta h1` at this breakpoint
+     -- it's a fixed size across breakpoints (see its own rule above),
+     not a responsive scale; a past --text-xl mobile-only override was
+     removed for this same reason back when the desktop size was
+     smaller (--text-sm) -- now moot since desktop itself is
+     --text-xl, but still no responsive override is being reintroduced
+     here (out of scope for the AOW title-treatment task, this pass is
+     desktop-only per its own instructions). */
+}

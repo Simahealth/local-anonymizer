@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_007",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n104292\nId Consulta\n3444044\nDiagnóstico\nCONTROL POR SINDROME DIARREICO AGUDO. PACIENTE ANDRÉS MANSUR ANGULO VALORADO POR DR CRISTIAN ZAMBRANO CHAVERRA (TP 33900). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Andrés Mansur Angulo",
+      "DR Cristian Zambrano Chaverra"
+    ],
+    "numeros_registro": [
+      "TP 33900"
+    ]
+  }
+}

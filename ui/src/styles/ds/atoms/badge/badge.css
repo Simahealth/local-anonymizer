@@ -1,0 +1,78 @@
+/**
+ * Badge — SimaHealth Design System · Atom · Badge Family
+ * ─────────────────────────────────────────────────────────────
+ * Generic tone-based sibling of `.status-badge` (see that file's own
+ * docblock for the 10 pipeline-specific states this consolidates,
+ * currently unused by any real consumer). `Badge.tsx` renders these
+ * classes -- `.badge` reuses the exact same shared tokens as
+ * `.status-badge`/`.tag`/`.metric-chip` (`badge-base.css`), so visually
+ * it is the same pill unless a tone/size modifier says otherwise.
+ *
+ * Tone → color contract (background-100 tint + matching dark text,
+ * same "tinted-light fill" pairing `status-badge.css` already
+ * established): reuses existing tokens, no new colors invented.
+ */
+
+.badge {
+  --badge-font-weight: var(--weight-medium, 500);
+}
+
+/* Tooltip DS (DetailPanel evidence/status badges): `Badge` itself stays
+   non-interactive by design (no onClick, see Badge.tsx's docstring),
+   but a `Tooltip`-wrapped instance gets `tabIndex={0}` so hover AND
+   keyboard focus both reveal it -- this is the focus ring for that
+   state. No effect on any `.badge` that isn't focusable (the vast
+   majority), and scoped to `.badge` only, not the whole family
+   (`.status-badge`/`.tag`/`.metric-chip` are untouched). */
+.badge:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}
+
+.badge--neutral {
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-secondary, #4b5057);
+}
+
+.badge--success {
+  --badge-bg: var(--color-success-100, #ebffee);
+  --badge-text: var(--text-success, #008043);
+}
+
+.badge--warning {
+  --badge-bg: var(--color-warning-100, #fffbeb);
+  --badge-text: var(--text-warning, #975102);
+}
+
+.badge--error {
+  --badge-bg: var(--color-error-100, #fee9e7);
+  --badge-text: var(--text-error, #c00f0c);
+}
+
+/* Gap de token documentado, no inventado (mismo que Toast ya documentó):
+   no existe --text-info/--color-info-100 en tokens.css -- reusa
+   --sima-blue/--text-brand-dark, el azul existente más cercano, mismo
+   color-mix que .tag--accent ya usa para el mismo propósito. */
+.badge--info {
+  --badge-bg: color-mix(in srgb, var(--sima-blue, #5798b3) 10%, var(--surface-primary, #fff));
+  --badge-text: var(--text-brand-dark, #5798b3);
+}
+
+.badge--sm {
+  --badge-px: var(--space-6, 6px);
+  --badge-py: var(--space-2, 2px);
+  --badge-icon-size: 10px;
+}
+
+.badge__icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: var(--badge-icon-size);
+  height: var(--badge-icon-size);
+}
+
+.badge__icon .material-symbols-outlined {
+  font-size: var(--badge-icon-size);
+  line-height: 1;
+}

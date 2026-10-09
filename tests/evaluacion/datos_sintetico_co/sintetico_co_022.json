@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_022",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Diana Gómez López\ndocumento de identidad 294'872.482\nFecha de nacimiento: 11/02/2001\nProcedencia: Villavicencio, Tolima\nDirección: Carrera 105A # 42-86 piso 7, barrio La Floresta\nTeléfono: 316.161.5675   Correo: diana12@outlook.com\nEPS: Coomeva\nFecha de ingreso: Septiembre 22 de 2009\n\nMOTIVO DE CONSULTA\nPaciente Edad: 56 años que ingresa al servicio refiriendo astenia y adinamia de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número 316.161.5675.\n\nVALORACIÓN\nAtendido por el Dr. Luisa Ospina Jiménez (Registro médico 34586). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo diana12@outlook.com o remitir a la dirección Carrera 105A # 42-86 piso 7.",
+  "ground_truth": {
+    "nombres": [
+      "Diana Gómez López",
+      "Luisa Ospina Jiménez"
+    ],
+    "documentos": [
+      "294'872.482"
+    ],
+    "edades": [
+      "56 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Tolima"
+    ],
+    "direcciones": [
+      "Carrera 105A # 42-86 piso 7"
+    ],
+    "telefonos": [
+      "316.161.5675"
+    ],
+    "emails": [
+      "diana12@outlook.com"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "11/02/2001"
+    ],
+    "fechas": [
+      "Septiembre 22 de 2009"
+    ],
+    "numeros_registro": [
+      "Registro médico 34586"
+    ]
+  }
+}

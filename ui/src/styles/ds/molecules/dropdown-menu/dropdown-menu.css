@@ -1,0 +1,269 @@
+/* ==========================================================================
+   Molecule: DropdownMenu
+   Layer: 3 — Molecules
+   Owner: Design System
+   Estado: active
+
+   Menú desplegable de selección (listbox), no de acciones (menu) --
+   trigger `<button>` + `role="listbox"`/`role="option"` + `aria-selected`.
+   Generaliza el `StatusDropdown` ad-hoc que vivía en
+   `case-page-v2/casePageV2.css` (`.case-page-v2__status-*`) -- mismos
+   valores exactos (altura 28px, `--radius-200`/`--radius-100`,
+   `--shadow-md`, `--text-xs`/`--text-sm`) para que migrar StatusDropdown
+   a este átomo no cambie un solo píxel del header. El chevron ahora es
+   `expand_more` del Icon Registry (`foundations/icons/icons.ts`), no un
+   SVG inline nuevo -- ver Button.spec.md/DropdownMenu doc para el porqué.
+
+   Ver `src/components/DropdownMenu/DropdownMenu.tsx` para el componente
+   React y el contrato de teclado/foco completo.
+   ========================================================================== */
+
+.dropdown-menu {
+  /* ── Component tokens ── */
+  --dm-trigger-height: 36px;
+  --dm-trigger-px: var(--space-12, 12px);
+  --dm-trigger-py: var(--space-8, 8px);
+  --dm-trigger-font-size: var(--text-sm, 14px);
+  --dm-trigger-radius: var(--radius-200, 4px);
+  --dm-gap: var(--space-8, 8px);
+
+  --dm-menu-radius: var(--radius-100, 8px);
+  --dm-menu-shadow: var(--shadow-md);
+  --dm-menu-bg: var(--surface-primary, #ffffff);
+  --dm-menu-border: var(--border-default, #d9dce1);
+  --dm-menu-min-width: 240px;
+  --dm-item-py: var(--space-8, 8px);
+  --dm-item-px: var(--space-12, 12px);
+
+  /* Capa local -- este control nunca necesita competir con overlays
+     globales (Modal/backdrop, 40-60): basta con ganarle a los hermanos
+     inmediatos de su propio contenedor posicionado. Mismo razonamiento
+     que el `.case-page-v2__status-menu` original que reemplaza (ver
+     ese archivo antes de esta migración) -- si un futuro consumidor
+     necesita más, lo resuelve con su propio z-index en el contenedor,
+     no acá. */
+  --dm-z: 2;
+
+  display: inline-flex;
+  position: relative;
+}
+
+/* ── Compact modifier: control de header (StatusDropdown) ──────────────
+   Valores idénticos a `.case-page-v2__status-trigger`/`-menu` (28px,
+   4px 12px, text-xs) para que la migración no mueva un píxel. */
+.dropdown-menu--compact {
+  --dm-trigger-height: 28px;
+  --dm-trigger-px: 12px;
+  --dm-trigger-py: 4px;
+  --dm-trigger-font-size: var(--text-xs, 12px);
+}
+
+/* ── Trigger ─────────────────────────────────────────────────────────── */
+
+.dropdown-menu__trigger {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dm-gap);
+  width: 100%;
+  height: var(--dm-trigger-height);
+  padding: var(--dm-trigger-py) var(--dm-trigger-px);
+  background: var(--surface-primary, #ffffff);
+  border: 1px solid var(--border-default, #d9dce1);
+  border-radius: var(--dm-trigger-radius);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--dm-trigger-font-size);
+  color: var(--text-primary, #0d0f10);
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 120ms ease;
+}
+
+.dropdown-menu__trigger:hover:not(:disabled) {
+  border-color: var(--border-strong, #7a7f87);
+}
+
+.dropdown-menu__trigger:active:not(:disabled) {
+  opacity: 0.88;
+}
+
+.dropdown-menu__trigger[aria-expanded="true"] {
+  border-color: var(--border-brand, #d732ab);
+}
+
+.dropdown-menu__trigger:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: 2px;
+}
+
+.dropdown-menu__trigger:disabled {
+  background: var(--surface-tertiary, #f1f3f7);
+  border-color: var(--border-subtle, #e9ebef);
+  color: var(--text-disabled, #b9bdc4);
+  cursor: not-allowed;
+}
+
+.dropdown-menu__trigger-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  color: inherit;
+}
+
+.dropdown-menu__trigger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: var(--text-tertiary, #6b7280);
+  transition: transform var(--transition-base, 150ms ease), color 120ms ease;
+}
+
+.dropdown-menu__trigger[aria-expanded="true"] .dropdown-menu__trigger-icon {
+  transform: rotate(180deg);
+}
+
+/* ── Popup (listbox) ─────────────────────────────────────────────────── */
+
+.dropdown-menu__popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  z-index: var(--dm-z);
+  background: var(--dm-menu-bg);
+  border: 1px solid var(--dm-menu-border);
+  border-radius: var(--dm-menu-radius);
+  box-shadow: var(--dm-menu-shadow);
+  list-style: none;
+  margin: 0;
+  padding: var(--space-4, 4px) 0;
+}
+
+/* align: dónde queda el borde del menú respecto al trigger. "end"
+   (default) reproduce el `.case-page-v2__status-menu` original
+   (`right:0;left:auto`). */
+.dropdown-menu--align-end .dropdown-menu__popup {
+  right: 0;
+  left: auto;
+}
+.dropdown-menu--align-start .dropdown-menu__popup {
+  left: 0;
+  right: auto;
+}
+
+/* width: "content" (default) usa un piso de 240px igual al original;
+   "trigger" iguala el ancho del propio trigger (el wrapper `.dropdown-menu`
+   ya es `inline-flex`, del ancho exacto del trigger); "auto" no impone
+   ningún mínimo -- se ajusta solo al contenido más angosto. */
+.dropdown-menu--width-content .dropdown-menu__popup {
+  min-width: var(--dm-menu-min-width);
+}
+.dropdown-menu--width-trigger .dropdown-menu__popup {
+  width: 100%;
+}
+.dropdown-menu--width-auto .dropdown-menu__popup {
+  min-width: 0;
+}
+
+/* ── Items ───────────────────────────────────────────────────────────── */
+
+.dropdown-menu__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8, 8px);
+  padding: var(--dm-item-py) var(--dm-item-px);
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--text-sm, 14px);
+  color: var(--text-primary, #0d0f10);
+  line-height: 1.3;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.dropdown-menu__item:hover:not([aria-disabled="true"]),
+.dropdown-menu__item--active:not([aria-disabled="true"]) {
+  background: var(--surface-secondary, #f8f9fc);
+}
+
+.dropdown-menu__item:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: -2px;
+}
+
+/* Señal de "seleccionado" que no depende solo del color: check_mark
+   propio (--dm-item-check) + peso de fuente, no solo `--text-brand`. */
+.dropdown-menu__item[aria-selected="true"] {
+  color: var(--text-brand, #d732ab);
+  font-weight: var(--weight-medium, 500);
+}
+
+.dropdown-menu__item[aria-disabled="true"] {
+  color: var(--text-disabled, #b9bdc4);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.dropdown-menu__item--danger {
+  color: var(--text-error, #c00f0c);
+}
+.dropdown-menu__item--danger[aria-selected="true"] {
+  /* El tono danger no compite con el color de "seleccionado" -- si un
+     item danger está seleccionado, danger gana (es la señal de riesgo
+     más importante); el checkmark sigue indicando selección igual. */
+  color: var(--text-error, #c00f0c);
+}
+.dropdown-menu__item--danger:hover:not([aria-disabled="true"]),
+.dropdown-menu__item--danger.dropdown-menu__item--active:not([aria-disabled="true"]) {
+  background: var(--color-error-100, #fee9e7);
+}
+
+.dropdown-menu__item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.dropdown-menu__item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-menu__item-description {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-xs, 12px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--text-tertiary, #6b7280);
+}
+
+.dropdown-menu__item-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  margin-top: 1px;
+  color: inherit;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────── */
+
+.dropdown-menu__empty {
+  padding: var(--dm-item-py) var(--dm-item-px);
+  font-size: var(--text-sm, 14px);
+  color: var(--text-tertiary, #6b7280);
+  font-style: italic;
+}

@@ -1,0 +1,20 @@
+{
+  "nombre": "ame_sintetico_018",
+  "descripcion": "Nota estilo export 'AME' (plantilla_interconsulta_contacto): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n683506\nId Consulta\n2036081\nDiagnóstico\nSe remite paciente Oscar Ibargüen de La Rosa, identificado con documento 9386376989, afiliado a Comparta, por cuadro de ictericia neonatal que requiere valoración por especialista. Se logra contactar al acudiente al número 3089565557 quien autoriza el traslado. Valorado por Dra. Yolima Angulo Grueso, queda pendiente de cupo en la institución receptora. Cualquier novedad reportar al correo grueso485@hotmail.com.",
+  "ground_truth": {
+    "nombres": [
+      "Oscar Ibargüen de La Rosa",
+      "Dra. Yolima Angulo Grueso"
+    ],
+    "telefonos": [
+      "3089565557"
+    ],
+    "documentos": [
+      "9386376989"
+    ],
+    "emails": [
+      "grueso485@hotmail.com"
+    ]
+  }
+}

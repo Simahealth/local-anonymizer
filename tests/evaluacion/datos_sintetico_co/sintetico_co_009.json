@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_009",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Camilo Martínez García\nidentificado con C.C. 3376077463\nFecha de nacimiento: Diciembre 6 de 2006\nProcedencia: Ibagué, Atlántico\nDirección: Av 163 Bis No. 34-65, barrio Suba\nTeléfono: +57 310 1059486   Correo: camilo99@hotmail.com\nEPS: Coomeva\nFecha de ingreso: 18/01/1964\n\nMOTIVO DE CONSULTA\nPaciente Edad: 37 años que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Ibagué y consulta de forma espontánea. Se localiza al acompañante en el número +57 310 1059486.\n\nVALORACIÓN\nAtendido por el Dr. Jorge Martínez Martínez (HC-824586). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo camilo99@hotmail.com o remitir a la dirección Av 163 Bis No. 34-65.",
+  "ground_truth": {
+    "nombres": [
+      "Camilo Martínez García",
+      "Jorge Martínez Martínez"
+    ],
+    "documentos": [
+      "3376077463"
+    ],
+    "edades": [
+      "37 años"
+    ],
+    "ubicaciones": [
+      "Ibagué",
+      "Atlántico"
+    ],
+    "direcciones": [
+      "Av 163 Bis No. 34-65"
+    ],
+    "telefonos": [
+      "+57 310 1059486"
+    ],
+    "emails": [
+      "camilo99@hotmail.com"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "Diciembre 6 de 2006"
+    ],
+    "fechas": [
+      "18/01/1964"
+    ],
+    "numeros_registro": [
+      "HC-824586"
+    ]
+  }
+}

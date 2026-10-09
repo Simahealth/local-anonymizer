@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_023",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Patricia Gómez González\nC.C. 570'423.569\nFecha de nacimiento: 2010-08-27\nProcedencia: Medellín, Antioquia\nDirección: Cl 80C No. 2-71, barrio Cabecera\nTeléfono: +57 302 9361353   Correo: patricia66@outlook.com\nEPS: Famisanar\nFecha de ingreso: Septiembre 15 de 1968\n\nMOTIVO DE CONSULTA\nPaciente 63 años de edad que ingresa al servicio refiriendo disnea de esfuerzo de varios días de evolución. Reside en Medellín y consulta de forma espontánea. Se localiza al acompañante en el número +57 302 9361353.\n\nVALORACIÓN\nAtendido por el Dr. Jorge Cárdenas García (RM 76616). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo patricia66@outlook.com o remitir a la dirección Cl 80C No. 2-71.",
+  "ground_truth": {
+    "nombres": [
+      "Patricia Gómez González",
+      "Jorge Cárdenas García"
+    ],
+    "documentos": [
+      "570'423.569"
+    ],
+    "edades": [
+      "63 años"
+    ],
+    "ubicaciones": [
+      "Medellín",
+      "Antioquia"
+    ],
+    "direcciones": [
+      "Cl 80C No. 2-71"
+    ],
+    "telefonos": [
+      "+57 302 9361353"
+    ],
+    "emails": [
+      "patricia66@outlook.com"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "2010-08-27"
+    ],
+    "fechas": [
+      "Septiembre 15 de 1968"
+    ],
+    "numeros_registro": [
+      "RM 76616"
+    ]
+  }
+}

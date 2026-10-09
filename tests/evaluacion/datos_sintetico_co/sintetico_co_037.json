@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_037",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Camilo Jiménez Jiménez\ncédula de ciudadanía No. 182'389.284\nFecha de nacimiento: 2014-02-23\nProcedencia: Ibagué, Huila\nDirección: Diagonal 142 Bis No. 95-6, barrio Cabecera\nTeléfono: 3183531028   Correo: camilo58@gmail.com\nEPS: Salud Total\nFecha de ingreso: Abril 2 de 2006\n\nMOTIVO DE CONSULTA\nPaciente 12 años de edad que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Ibagué y consulta de forma espontánea. Se localiza al acompañante en el número 3183531028.\n\nVALORACIÓN\nAtendido por el Dr. Carlos Gómez Rojas (HC-649525). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo camilo58@gmail.com o remitir a la dirección Diagonal 142 Bis No. 95-6.",
+  "ground_truth": {
+    "nombres": [
+      "Camilo Jiménez Jiménez",
+      "Carlos Gómez Rojas"
+    ],
+    "documentos": [
+      "182'389.284"
+    ],
+    "edades": [
+      "12 años"
+    ],
+    "ubicaciones": [
+      "Ibagué",
+      "Huila"
+    ],
+    "direcciones": [
+      "Diagonal 142 Bis No. 95-6"
+    ],
+    "telefonos": [
+      "3183531028"
+    ],
+    "emails": [
+      "camilo58@gmail.com"
+    ],
+    "seguros": [
+      "Salud Total"
+    ],
+    "fechas_nacimiento": [
+      "2014-02-23"
+    ],
+    "fechas": [
+      "Abril 2 de 2006"
+    ],
+    "numeros_registro": [
+      "HC-649525"
+    ]
+  }
+}

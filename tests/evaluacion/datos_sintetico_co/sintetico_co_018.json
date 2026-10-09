@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_018",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Natalia Torres Cárdenas\ncédula de ciudadanía No. 42'394.260\nFecha de nacimiento: 14 de diciembre de 2020\nProcedencia: Manizales, Nariño\nDirección: Cl 166 Sur # 63-58, barrio El Prado\nTeléfono: 304.719.1135   Correo: natalia71@une.net.co\nEPS: Salud Total\nFecha de ingreso: 12 de diciembre de 2008\n\nMOTIVO DE CONSULTA\nPaciente de 53 años que ingresa al servicio refiriendo fiebre de tres días de varios días de evolución. Reside en Manizales y consulta de forma espontánea. Se localiza al acompañante en el número 304.719.1135.\n\nVALORACIÓN\nAtendido por el Dr. Juan Ospina González (HC-421517). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo natalia71@une.net.co o remitir a la dirección Cl 166 Sur # 63-58.",
+  "ground_truth": {
+    "nombres": [
+      "Natalia Torres Cárdenas",
+      "Juan Ospina González"
+    ],
+    "documentos": [
+      "42'394.260"
+    ],
+    "edades": [
+      "53 años"
+    ],
+    "ubicaciones": [
+      "Manizales",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Cl 166 Sur # 63-58"
+    ],
+    "telefonos": [
+      "304.719.1135"
+    ],
+    "emails": [
+      "natalia71@une.net.co"
+    ],
+    "seguros": [
+      "Salud Total"
+    ],
+    "fechas_nacimiento": [
+      "14 de diciembre de 2020"
+    ],
+    "fechas": [
+      "12 de diciembre de 2008"
+    ],
+    "numeros_registro": [
+      "HC-421517"
+    ]
+  }
+}

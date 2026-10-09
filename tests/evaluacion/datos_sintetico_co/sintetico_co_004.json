@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_004",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Iván Jiménez Ospina\ncédula de ciudadanía No. 4095'476.665\nFecha de nacimiento: 2014-11-27\nProcedencia: Pasto, Santander\nDirección: Manzana 14 Casa 11, La Floresta, barrio El Poblado\nTeléfono: 324 939 8441   Correo: iván65@gmail.com\nEPS: Coomeva\nFecha de ingreso: 05/06/1970\n\nMOTIVO DE CONSULTA\nPaciente 69 años de edad que ingresa al servicio refiriendo cefalea persistente de varios días de evolución. Reside en Pasto y consulta de forma espontánea. Se localiza al acompañante en el número 324 939 8441.\n\nVALORACIÓN\nAtendido por el Dr. Jorge Cárdenas Pérez (HC-728038). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo iván65@gmail.com o remitir a la dirección Manzana 14 Casa 11, La Floresta.",
+  "ground_truth": {
+    "nombres": [
+      "Iván Jiménez Ospina",
+      "Jorge Cárdenas Pérez"
+    ],
+    "documentos": [
+      "4095'476.665"
+    ],
+    "edades": [
+      "69 años"
+    ],
+    "ubicaciones": [
+      "Pasto",
+      "Santander"
+    ],
+    "direcciones": [
+      "Manzana 14 Casa 11, La Floresta"
+    ],
+    "telefonos": [
+      "324 939 8441"
+    ],
+    "emails": [
+      "iván65@gmail.com"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "2014-11-27"
+    ],
+    "fechas": [
+      "05/06/1970"
+    ],
+    "numeros_registro": [
+      "HC-728038"
+    ]
+  }
+}

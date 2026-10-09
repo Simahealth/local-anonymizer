@@ -1,0 +1,17 @@
+{
+  "nombre": "ame_sintetico_002",
+  "descripcion": "Nota estilo export 'AME' (plantilla_traslado_rural): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n687472\nId Consulta\n4032085\nDiagnóstico\nPACIENTE YESENIA RIASCOS JURADO DE 10 AÑOS PROCEDENTE DE VEREDA BUENAVISTA, MUNICIPIO DE SANTANDER DE QUILICHAO, TRASLADADO POR CUADRO DE SINDROME DIARREICO AGUDO DE 3 DIAS DE EVOLUCION. VALORADO POR DR WILSON VALENCIA ANGULO QUIEN INDICA MANEJO INTRAHOSPITALARIO Y SOLICITA PARACLINICOS DE INGRESO. SE EXPLICA A LA FAMILIA RIESGOS Y BENEFICIOS DEL MANEJO PROPUESTO, ACEPTAN Y FIRMAN CONSENTIMIENTO.",
+  "ground_truth": {
+    "nombres": [
+      "Yesenia Riascos Jurado",
+      "DR Wilson Valencia Angulo"
+    ],
+    "direcciones": [
+      "vereda Buenavista, municipio de Santander de Quilichao"
+    ],
+    "edades": [
+      "10 AÑOS"
+    ]
+  }
+}

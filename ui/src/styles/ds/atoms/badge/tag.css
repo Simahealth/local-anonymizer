@@ -1,0 +1,267 @@
+/**
+ * Tag — SimaHealth Design System · Atom · Badge Family
+ * ──────────────────────────────────────────────────────
+ * Taxonomy labels. Non-operational metadata applied by
+ * the system or the user: disease area, cohort, filter chips.
+ *
+ * Shape: radius-100 (rect) — visual distinction from StatusBadge (pill).
+ *   Pill = "system-assigned state"
+ *   Rect = "applied label / taxonomy"
+ *
+ * Dismissibility:
+ *   M size: YES — target area ≥ 24px (WCAG 2.5.8)
+ *   S size: NO  — X cannot reach 24px at that height
+ *
+ * Markup (read-only):
+ *   <span class="tag">AME 5q</span>
+ *   <span class="tag tag--accent">Alto riesgo</span>
+ *   <span class="tag tag--outlined">Pendiente</span>
+ *
+ * Markup (dismissible — M only):
+ *   <span class="tag tag--removable">
+ *     AME 5q
+ *     <button class="tag__remove" aria-label="Eliminar etiqueta AME 5q">
+ *       <svg ...></svg>
+ *     </button>
+ *   </span>
+ *
+ * Keyboard: Tab → X → Enter/Space to dismiss.
+ * NOT Delete/Backspace (conflicts with adjacent text inputs).
+ */
+
+.tag {
+  --badge-radius: var(--radius-100, 4px); /* rect: "applied" not "system" */
+  --badge-px: var(--space-6, 6px);
+  --badge-py: var(--space-3, 3px);
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-secondary, #4b5057);
+  --badge-border: transparent;
+}
+
+/* Tooltip DS (CaseCanonSidebar's "Estado del caso" tag): `Tag` itself
+   stays non-interactive by design (no onClick), but a `Tooltip`-wrapped
+   instance gets `tabIndex={0}` so hover AND keyboard focus both reveal
+   it -- this is the focus ring for that state. No effect on any `.tag`
+   that isn't focusable (the vast majority). Same pattern already
+   applied to `.badge:focus-visible` (badge.css). */
+.tag:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}
+
+/* Variant: Accent — clinical/domain classification */
+.tag--accent {
+  --badge-bg: color-mix(
+    in srgb,
+    var(--sima-blue, #5798b3) 8%,
+    var(--surface-primary, #fff)
+  );
+  --badge-text: var(--sima-blue, #5798b3);
+  --badge-border: var(--border-default, #d9dce1);
+}
+
+/* Variant: Outlined — filter chips, selectable, read-only display */
+.tag--outlined {
+  --badge-bg: transparent;
+  --badge-text: var(--text-secondary, #4b5057);
+  --badge-border: var(--border-default, #d9dce1);
+}
+
+/* Variant: Subtle (2026-09-09, Tag.tsx `variant="subtle"`) — tinted
+   background, no border. Sin consumidor real hoy (ver docs/design-
+   system/index.html → Deuda / On-demand); mismo patrón "fondo tenue,
+   sin borde" que `.btn--subtle` ya usa para su propio "ghost". */
+.tag--subtle {
+  --badge-bg: var(--surface-secondary, #f8f9fc);
+  --badge-border: transparent;
+}
+
+/* Tone: brand (2026-09-09, Tag.tsx `tone="brand"`) — magenta de marca.
+   Sin consumidor real hoy. Mismo `color-mix` al 8% que `.tag--accent`
+   ya usa para sima-blue, aplicado acá a `--text-brand` en vez de
+   inventar una receta nueva -- fill magenta completo fue evaluado y
+   descartado en otro lugar del DS (selection-group.css) por demasiado
+   fuerte; este tinte tenue es la misma decisión ya tomada. */
+.tag--brand {
+  --badge-bg: color-mix(in srgb, var(--text-brand, #d732ab) 8%, var(--surface-primary, #fff));
+  --badge-text: var(--text-brand, #d732ab);
+  --badge-border: var(--border-default, #d9dce1);
+}
+
+/* Tones success/warning/error (2026-09-09, Tag.tsx) — sin consumidor
+   real hoy; mismos pares bg-100/text ya usados por Badge/StatusBadge,
+   no colores nuevos. */
+.tag--success {
+  --badge-bg: var(--color-success-100, #ebffee);
+  --badge-text: var(--text-success, #008043);
+  --badge-border: transparent;
+}
+
+.tag--warning {
+  --badge-bg: var(--color-warning-100, #fffbeb);
+  --badge-text: var(--text-warning, #975102);
+  --badge-border: transparent;
+}
+
+.tag--error {
+  --badge-bg: var(--color-error-100, #fee9e7);
+  --badge-text: var(--text-error, #c00f0c);
+  --badge-border: transparent;
+}
+
+/* Size: sm (2026-09-09, Tag.tsx `size="sm"`) — sin consumidor real hoy;
+   el default (`md`, sin modificador) preserva el padding exacto que los
+   4 call sites migrados ya usaban. */
+.tag--sm {
+  --badge-px: var(--space-4, 4px);
+  --badge-py: var(--space-2, 2px);
+}
+
+/* ── Filter variant ───────────────────────────────────────── */
+/* Tags used as toggleable filter chips.
+   Use <button> for keyboard access. aria-pressed controls state.
+
+   <button class="tag tag--filter" type="button" aria-pressed="false">AME 5q</button>
+   <button class="tag tag--accent tag--filter" type="button" aria-pressed="true">Alto riesgo</button>
+*/
+
+.tag--filter {
+  cursor: pointer;
+  user-select: none;
+  font: inherit;
+  background: none;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+/* Inactive */
+.tag--filter[aria-pressed="false"] {
+  --badge-bg: transparent;
+  --badge-border: var(--border-default, #d9dce1);
+  --badge-text: var(--text-tertiary, #7a7f87);
+}
+
+.tag--filter[aria-pressed="false"]:hover {
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-secondary, #4b5057);
+}
+
+/* Active — uses the variant's natural colors */
+.tag--filter[aria-pressed="true"]:hover {
+  filter: brightness(0.94);
+}
+
+.tag--filter:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(87, 152, 179, 0.5));
+  outline-offset: 2px;
+}
+
+/* Disabled (2026-09-09, Chip.tsx's interactive form reuses tag--filter)
+ * -- no existía antes porque tag--filter no tenía consumidor real.
+ * Mismo tratamiento que Button ya usa para disabled: opacidad reducida +
+ * sin interacción, no un color nuevo. */
+.tag--filter:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Combined selected + removable (2026-09-09, Chip.tsx) ─────────────
+ * Sin consumidor real hoy -- ningún caso real necesita las dos cosas a
+ * la vez. Evita anidar <button> dentro de <button> (HTML inválido):
+ * el wrapper exterior es un <span class="tag"> normal (dueño del
+ * padding/pill), y adentro van DOS <button> hermanos -- la acción
+ * principal (reseteada a "sin chrome propio", hereda color/tipografía
+ * del wrapper) y `.tag__remove` (como siempre). */
+.tag__action {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--badge-gap, var(--space-4, 4px));
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.tag__action:disabled {
+  cursor: not-allowed;
+}
+
+.tag__action:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(87, 152, 179, 0.5));
+  outline-offset: 2px;
+  border-radius: var(--radius-200, 2px);
+}
+
+/* ── Remove button (M size only) ──────────────────────────── */
+
+.tag__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  min-width: 16px; /* prevent shrink */
+  flex-shrink: 0;
+  padding: 0;
+  margin-right: calc(var(--space-3, 3px) * -1);
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  background: transparent;
+  color: currentColor;
+  opacity: 0.55;
+  cursor: pointer;
+  transition:
+    opacity 100ms ease,
+    background 100ms ease;
+  /* WCAG 2.5.8: 24px minimum — achieved via parent tag height + this margin context */
+}
+
+.tag__remove:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.tag__remove:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(87, 152, 179, 0.5));
+  outline-offset: 1px;
+  opacity: 1;
+}
+
+.tag__remove svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  forced-color-adjust: none;
+}
+
+/* Ícono real (2026-09-09, Chip.tsx): del Icon Registry (`close`,
+ * `.material-symbols-outlined`), no el SVG inline que el markup de
+ * ejemplo de este archivo documentaba -- mismo tamaño que el slot ya
+ * define arriba. */
+.tag__remove .material-symbols-outlined {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* ── Dismiss animation (JS adds this class, removes on transitionend) ── */
+
+.tag--dismissing {
+  opacity: 0;
+  max-width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  transition:
+    opacity 150ms ease,
+    max-width 150ms ease,
+    padding 150ms ease,
+    margin 150ms ease;
+  pointer-events: none;
+}

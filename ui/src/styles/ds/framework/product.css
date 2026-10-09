@@ -1,0 +1,38 @@
+/* ==========================================================================
+   product.css — Product Layer (Workspace Composition)
+
+   Only styles actively consumed by the current runtime (Especialista +
+   LeftPanel/Card/DetailPanel). Rewritten in Frontend Cleanup Phase 2:
+   previous Actor Preview Mode, Sidebar Context, Role Badge, Intent Chip,
+   Panel Close, and Checklist rules removed — none had a live consumer.
+
+   Autoridad: DESIGN_SYSTEM_CONSTITUTION.md §3, DS_BOUNDARY_MAP.md (Product),
+              ADR-DS-001-BOUNDARY.md.
+   ========================================================================== */
+
+/* ==========================================================================
+   CASE BOARD — STATUS CHIPS
+   Clasificación: Producto — Case Board (Workspace Composition).
+   Consumidores: renderers/card.js (.chip.blue — badge "NUEVO"),
+                 renderers/detail-panel.js (.chip.red — deadline chip).
+   ========================================================================== */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.chip.blue {
+  background: var(--surface-info);
+  color: var(--sima-blue);
+}
+.chip.red {
+  background: var(--color-error-100);
+  color: var(--text-error);
+}

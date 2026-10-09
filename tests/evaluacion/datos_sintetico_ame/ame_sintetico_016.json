@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_016",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n233209\nId Consulta\n1462193\nDiagnóstico\nCONTROL POR ICTERICIA NEONATAL. PACIENTE ANDERSON MANSUR VALENCIA VALORADO POR DRA YULIANA RENTERÍA IBARGÜEN (RM 62610). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Anderson Mansur Valencia",
+      "DRA Yuliana Rentería Ibargüen"
+    ],
+    "numeros_registro": [
+      "RM 62610"
+    ]
+  }
+}

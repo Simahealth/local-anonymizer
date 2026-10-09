@@ -1,0 +1,18 @@
+{
+  "nombre": "ame_sintetico_013",
+  "descripcion": "Nota estilo export 'AME' (plantilla_uci_evolucion): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n642783\nId Consulta\n9267507\nDiagnóstico\nINGRESO A CUIDADO INTENSIVO NEONATAL: DRA YOLIMA SEGURA MANSUR (GINECOOBSTETRA) - PACIENTE FAIVER MINA OYAGA (RECIEN NACIDO PRETERMINO DE 36 SEMANAS). MADRE DE 39 AÑOS, SIN CONTROL PRENATAL. DIAGNOSTICOS: SEPSIS NEONATAL TEMPRANA, HIPERBILIRRUBINEMIA NEONATAL, GASTROENTERITIS AGUDA. EVOLUCION DIA 2 DE VIDA DRA JESSICA GRUESO GRUESO PEDIATRA DE TURNO. PACIENTE HEMODINAMICAMENTE ESTABLE, AFEBRIL, TOLERA VIA ORAL, SIN DIFICULTAD RESPIRATORIA. CONTINUA MANEJO ANTIBIOTICO Y FOTOTERAPIA. ECOCARDIOGRAMA DE CONTROL (27/07/18) SIN CAMBIOS. ",
+  "ground_truth": {
+    "nombres": [
+      "Faiver Mina Oyaga",
+      "DRA Yolima Segura Mansur",
+      "DRA Jessica Grueso Grueso"
+    ],
+    "edades": [
+      "39 AÑOS"
+    ],
+    "fechas": [
+      "27/07/18"
+    ]
+  }
+}

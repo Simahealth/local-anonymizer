@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_021",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Natalia Jiménez Rodríguez\nC.C. 6.144.594.354\nFecha de nacimiento: Febrero 15 de 1955\nProcedencia: Barranquilla, Valle del Cauca\nDirección: Avenida 19 N° 22-40 piso 6, barrio Laureles\nTeléfono: +57 324 7752972   Correo: natalia65@une.net.co\nEPS: Coosalud\nFecha de ingreso: 24/06/1982\n\nMOTIVO DE CONSULTA\nPaciente Edad: 70 años que ingresa al servicio refiriendo astenia y adinamia de varios días de evolución. Reside en Barranquilla y consulta de forma espontánea. Se localiza al acompañante en el número +57 324 7752972.\n\nVALORACIÓN\nAtendido por el Dr. Catalina Ramírez Torres (RM 98381). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo natalia65@une.net.co o remitir a la dirección Avenida 19 N° 22-40 piso 6.",
+  "ground_truth": {
+    "nombres": [
+      "Natalia Jiménez Rodríguez",
+      "Catalina Ramírez Torres"
+    ],
+    "documentos": [
+      "6.144.594.354"
+    ],
+    "edades": [
+      "70 años"
+    ],
+    "ubicaciones": [
+      "Barranquilla",
+      "Valle del Cauca"
+    ],
+    "direcciones": [
+      "Avenida 19 N° 22-40 piso 6"
+    ],
+    "telefonos": [
+      "+57 324 7752972"
+    ],
+    "emails": [
+      "natalia65@une.net.co"
+    ],
+    "seguros": [
+      "Coosalud"
+    ],
+    "fechas_nacimiento": [
+      "Febrero 15 de 1955"
+    ],
+    "fechas": [
+      "24/06/1982"
+    ],
+    "numeros_registro": [
+      "RM 98381"
+    ]
+  }
+}

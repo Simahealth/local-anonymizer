@@ -1,0 +1,5 @@
+-r requirements.txt
+pyinstaller==6.22.3
+pytest==9.1.1
+# Solo para la prueba de interfaz en el navegador (tests de UI con WebKit).
+playwright==1.63.0

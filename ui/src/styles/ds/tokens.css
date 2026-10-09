@@ -1,0 +1,426 @@
+/**
+ * SimaHealth Design System — CSS Tokens
+ * Extraído de Figma: SimaHealth-DS (BwiPQ2Jphb2W1cm9oKDulv)
+ * Fecha de extracción: 2026-05-05
+ *
+ * Localizado en 06_AOW_B2B_V2 para portabilidad standalone.
+ * Fuente canónica: 06_AOW_B2B_V1/01_Design_V1-V7/simahealth-ds.css
+ *
+ * Colecciones extraídas: Primitives → Alias → Mapped
+ * Font: DM Sans (UI), DM Mono (code), Noto Serif (body-serif AND the
+ * Editorial scale, 2026-08-26 revision -- see `--font-serif` and
+ * `atoms/text/text.css`'s "7 — EDITORIAL SCALE" section; Cormorant
+ * Garamond, this scale's original 2026-08-26 family, was replaced by
+ * Noto Serif per explicit product decision and is no longer loaded)
+ */
+
+/* ─────────────────────────────────────────
+   GOOGLE FONTS IMPORT
+   ───────────────────────────────────────── */
+/* App de escritorio (sima-anonimizador-desktop): DM Sans / DM Mono / Noto Serif se empaqueta en local
+   (ver src/styles/fuentes.css) — la app debe funcionar sin conexión. */
+
+/* ─────────────────────────────────────────
+   PRIMITIVES — BRAND COLORS (SimaHealth)
+   ───────────────────────────────────────── */
+:root {
+  /* Brand */
+  --sima-magenta: #d732ab;
+  --sima-magenta-dark: #bf2a92;
+  --sima-blue: #5798b3;
+  --sima-iceberg: #caf0f4;
+  --sima-rosa: #fc10c3;
+  --sima-purple: #704bff;
+  --sima-turquoise: #01edeb;
+
+  /* ─────────────────────────────────────
+     PRIMITIVES — GRAY SCALE
+     ───────────────────────────────────── */
+  --gray-100: #f8f9fc;
+  --gray-150: #f1f3f7;
+  --gray-200: #e9ebef;
+  --gray-300: #d9dce1;
+  --gray-400: #b9bdc4;
+  --gray-500: #7a7f87;
+  --gray-600: #4b5057;
+  --gray-700: #2f3338;
+  --gray-800: #303030;
+  --gray-900: #0d0f10;
+  --gray-1000: #000202;
+
+  /* ─────────────────────────────────────
+     PRIMITIVES — STATUS PALETTES
+     ───────────────────────────────────── */
+
+  /* Red / Error */
+  --red-100: #fee9e7;
+  --red-200: #fdd3d0;
+  --red-300: #fcb3ad;
+  --red-400: #f4776a;
+  --red-500: #ec221f;
+  --red-600: #c00f0c;
+  --red-700: #900b09;
+  --red-800: #690807;
+  --red-900: #4d0b0a;
+  --red-1000: #300603;
+
+  /* Yellow / Warning */
+  --yellow-100: #fffbeb;
+  --yellow-200: #fff1c2;
+  --yellow-300: #ffe8a3;
+  --yellow-400: #ffda54;
+  --yellow-500: #ffc909;
+  --yellow-600: #e1ac00;
+  --yellow-700: #975102;
+  --yellow-800: #682d03;
+  --yellow-900: #522504;
+  --yellow-1000: #401b01;
+
+  /* Green / Success */
+  --green-100: #ebffee;
+  --green-200: #cff7d3;
+  --green-300: #aff4c6;
+  --green-400: #85e0a3;
+  --green-500: #14ae5c;
+  --green-600: #009951;
+  --green-700: #008043;
+  --green-800: #02542d;
+  --green-900: #024023;
+  --green-1000: #062d1b;
+
+  /* Pink */
+  --pink-100: #fcf1fd;
+  --pink-200: #fae1fa;
+  --pink-300: #f5c0ef;
+  --pink-400: #f19edc;
+  --pink-500: #ea3fb8;
+  --pink-600: #d732a8;
+  --pink-700: #ba2a92;
+  --pink-800: #8a226f;
+  --pink-900: #57184a;
+  --pink-1000: #3f1536;
+
+  /* ─────────────────────────────────────
+     ALIAS — SEMANTIC COLOR TOKENS
+     ───────────────────────────────────── */
+
+  /* Primary (Magenta → Blue range) */
+  --color-primary-100: #d732ab;
+  --color-primary-200: #bf2a92;
+  --color-primary-300: #bf2a92;
+  --color-primary-400: #5798b3;
+  --color-primary-500: #caf0f4;
+
+  /* Neutral */
+  --color-neutral-100: #f8f9fc;
+  --color-neutral-150: #f1f3f7;
+  --color-neutral-200: #e9ebef;
+  --color-neutral-300: #d9dce1;
+  --color-neutral-400: #b9bdc4;
+  --color-neutral-500: #7a7f87;
+  --color-neutral-600: #4b5057;
+  --color-neutral-700: #2f3338;
+  --color-neutral-800: #303030;
+  --color-neutral-900: #0d0f10;
+  --color-neutral-1000: #000202;
+
+  /* Success */
+  --color-success-100: #ebffee;
+  --color-success-200: #cff7d3;
+  --color-success-300: #aff4c6;
+  --color-success-400: #85e0a3;
+  --color-success-500: #14ae5c;
+  --color-success-600: #009951;
+  --color-success-700: #008043;
+  --color-success-800: #02542d;
+
+  /* Error */
+  --color-error-100: #fee9e7;
+  --color-error-200: #fdd3d0;
+  --color-error-300: #fcb3ad;
+  --color-error-400: #f4776a;
+  --color-error-500: #ec221f;
+  --color-error-600: #c00f0c;
+  --color-error-700: #900b09;
+  --color-error-800: #690807;
+
+  /* Warning */
+  --color-warning-100: #fffbeb;
+  --color-warning-200: #fff1c2;
+  --color-warning-300: #ffe8a3;
+  --color-warning-400: #ffda54;
+  --color-warning-500: #ffc909;
+  --color-warning-600: #e1ac00;
+  --color-warning-700: #975102;
+  --color-warning-800: #682d03;
+
+  /* ─────────────────────────────────────
+     MAPPED — SEMANTIC SURFACE & TEXT TOKENS
+     ───────────────────────────────────── */
+
+  /* Surfaces */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f8f9fc;
+  /* App Background — plano de fondo compartido por el Workspace
+     (.workspace, base.css) y el organismo LeftPanel (--sb-bg,
+     SimahealthDS/organisms/LeftPanel/left-panel.css): ambos se apoyan en
+     este mismo token para que la app se perciba como un único canvas
+     continuo. El resto de las superficies (Card, DetailPanel, etc.)
+     sigue en --surface-secondary/--surface-primary sin cambios; este
+     token existe para poder ajustar ese plano compartido de forma
+     aislada sin propagarse a esos otros consumidores. */
+  --surface-canvas: #fbfcfd;
+  --surface-tertiary: #f1f3f7;
+  --surface-inverse: #0d0f10;
+  --surface-brand: #d732ab;
+  --surface-brand-subtle: #fcf1fd;
+  --surface-info: #caf0f4;
+  /* Action surfaces — primary button (Figma: Surface/Action, Surface/Action-hover) */
+  --surface-action: rgba(0, 2, 2, 0.95); /* near-black — default primary bg */
+  --surface-action-hover: var(
+    --gray-700
+  ); /* #2f3338 — corrected hover (Figma was #7a7f87) */
+
+  /* Text */
+  --text-primary: #0d0f10;
+  --text-secondary: #4b5057;
+  --text-tertiary: #7a7f87;
+  --text-disabled: #b9bdc4;
+  --text-inverse: #f8f9fc;
+  --text-brand: #d732ab;
+  --text-brand-dark: #5798b3;
+  --text-success: #008043;
+  --text-error: #c00f0c;
+  --text-warning: #975102;
+
+  /* Borders */
+  --border-default: #d9dce1;
+  --border-subtle: #e9ebef;
+  --border-strong: #7a7f87;
+  --border-brand: #d732ab;
+  --border-error: #ec221f;
+  --border-success: #009951;
+  --border-warning: #e1ac00;
+
+  /* Interactive states */
+  --state-hover-bg: rgba(215, 50, 171, 0.06);
+  --state-active-bg: rgba(215, 50, 171, 0.12);
+  --state-focus-ring: rgba(215, 50, 171, 0.35);
+  --state-disabled-bg: #f1f3f7;
+  --state-disabled-text: #b9bdc4;
+  --state-overlay: rgba(0, 2, 2, 0.4);
+
+  /* Control tokens (toggle, checkbox, radio) */
+  --surface-control-off: var(
+    --border-strong
+  ); /* toggle / switch track — inactive */
+  --control-selected: var(
+    --surface-action
+  ); /* checkbox / radio — selected fill */
+  --field-ring-offset: 2px; /* focus ring offset for all field inputs */
+
+  /* Role-specific accents (B2B profiles) */
+  --role-farma: #d732ab;
+  --role-farma-subtle: #fcf1fd;
+  --role-asegurador: #008043;
+  --role-asegurador-subtle: #ebffee;
+  --role-hospital: #5798b3;
+  --role-hospital-subtle: #caf0f4;
+
+  /* ─────────────────────────────────────
+     SPACING SCALE
+     ───────────────────────────────────── */
+  --space-0: 0px;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-80: 80px;
+  --space-96: 96px;
+  --space-160: 160px;
+
+  /* ─────────────────────────────────────
+     SPACING — GUÍA SEMÁNTICA DE USO
+     ─────────────────────────────────────
+     No es una regla matemática rígida ("usar space-X en la posición Y").
+     Es una guía para elegir el token según la RELACIÓN entre los
+     elementos que se están separando, no según su posición en el layout.
+     Los valores de la escala no cambian; esto documenta cómo leerlos.
+
+     --space-4   → íntimo.      Elementos que forman un mismo grupo
+                                 visual (icono + label, índice + nombre
+                                 de un item). Ver regla "mismo item" abajo.
+     --space-8   → relacionado. Elementos distintos pero relacionados
+                                 dentro de un mismo bloque (p. ej. los
+                                 botones de una toolbar, ver
+                                 organisms/LeftPanel/left-panel.css).
+     --space-16  → bloque.      Entre un label/título y su contenido.
+     --space-24  → items.       Entre items dentro de una misma sección
+                                 (p. ej. filas de una lista).
+     --space-32  → secciones.   Entre secciones o bloques principales
+                                 de una página/panel.
+
+     Regla del "mismo item": cuando dos elementos son conceptualmente
+     UN mismo item (no dos elementos independientes que comparten fila),
+     se tratan como un único grupo visual y usan spacing íntimo
+     (--space-4) -- nunca un layout de columnas ni
+     `justify-content: space-between` para separarlos.
+     Ejemplo: en una fila de documento "01  HC-036.pdf", el índice "01"
+     y el nombre del archivo "HC-036.pdf" son un mismo bloque (la
+     identidad del item), no dos columnas -- van con --space-4.
+     `justify-content: space-between` sigue siendo correcto para separar
+     el item de OTRO grupo distinto en la misma fila (p. ej. el nombre
+     del documento contra su fecha), no para separar el índice de su
+     propio nombre.
+
+     Esta escala no es exhaustiva ni exclusiva: sigue habiendo casos
+     documentados caso por caso en el propio archivo del componente
+     cuando la relación entre elementos no encaja limpiamente en esta
+     guía (ver p. ej. el comentario sobre `.case-page-v2__evidence-columns`
+     en features/case-page-v2/casePageV2.css, donde el gap documentado
+     es la distancia visible medida entre columnas, no un valor elegido
+     por esta guía). Úsala como punto de partida, no como sustituto del
+     criterio caso por caso.
+     ───────────────────────────────────── */
+
+  /* ─────────────────────────────────────
+     BORDER RADIUS
+     ───────────────────────────────────── */
+  --radius-100: 8px;
+  --radius-200: 4px;
+  --radius-400: 16px;
+  --radius-full: 9999px;
+
+  /* ─────────────────────────────────────
+     TYPOGRAPHY
+     ───────────────────────────────────── */
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", "Fira Code", monospace;
+  /* Serves double duty: the original body-serif usage (e.g. Documentos'
+     document titles) AND, since 2026-08-26's revision, the DS's
+     "Fuente editorial" scale (`atoms/text/text.css`'s "7 — EDITORIAL
+     SCALE", `.t-editorial-h1..h5`) -- that scale originally had its own
+     separate `--font-editorial` token (Cormorant Garamond), removed
+     when product decided Editorial should use this same Noto Serif
+     family instead, not a second one. Already loaded across its full
+     100–900 weight range (see the `@import` below), so no font-loading
+     change was needed for this revision. */
+  --font-serif: "Noto Serif", Georgia, serif;
+
+  /* Sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-md: 18px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 40px;
+  --text-4xl: 48px;
+  --text-5xl: 64px;
+  --text-6xl: 96px;
+
+  /* Weights */
+  --weight-thin: 100;
+  --weight-extralight: 200;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --weight-black: 900;
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* ─────────────────────────────────────
+     SHADOWS
+     ───────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(0, 2, 2, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 2, 2, 0.08), 0 1px 2px rgba(0, 2, 2, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 2, 2, 0.1), 0 2px 6px rgba(0, 2, 2, 0.06);
+  --shadow-xl: 0 20px 48px rgba(0, 2, 2, 0.12), 0 4px 12px rgba(0, 2, 2, 0.08);
+  --shadow-brand: 0 4px 16px rgba(215, 50, 171, 0.25);
+  /* Lateral surface separation — sidebar casting rightward onto board canvas.
+     Direction X≠0 by design: this is a panel boundary, not vertical elevation. */
+  --shadow-sidebar: 2px 0 12px rgba(0, 2, 2, 0.1);
+
+  /* ─────────────────────────────────────
+     TRANSITIONS
+     ───────────────────────────────────── */
+  --transition-fast: 80ms ease;
+  --transition-base: 150ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ─────────────────────────────────────
+     Z-INDEX — AOW overlay stack
+     Names the 3 values DetailPanel/Modal/CasePage overlays already used
+     consistently (backdrop below panel below full-screen overlay) --
+     not new numbers, just naming what was already the de facto contract
+     (Fase 2 DS normalization audit). Local/component-internal z-index
+     (sticky headers, a dot vs. its connector, sidebar vs. canvas, etc.)
+     stays untokenized on purpose: those never compete with this stack,
+     so a shared name would add indirection without reducing any real
+     risk. `.esp-toast`/dropdown/tooltip z-index are a separate, still
+     undecided "floating above everything" tier -- not part of this one,
+     left as-is until that decision is made. */
+  --z-backdrop: 40;
+  --z-panel: 50;
+  --z-overlay: 60;
+
+  /* ─────────────────────────────────────
+     AOW WORKSPACE EXTENSIONS
+     Tokens used by the AOW workspace that
+     fall between the DS spacing steps.
+     Kept here so the workspace is fully
+     self-contained without modifying the
+     canonical DS spacing scale.
+     ───────────────────────────────────── */
+  --space-3: 3px;
+  --space-5: 5px;
+  --space-9: 9px;
+  --space-10: 10px;
+  --space-11: 11px;
+  --space-18: 18px;
+  --space-56: 56px;
+}
+
+/* ─────────────────────────────────────────
+   BASE RESET & GLOBAL STYLES
+   ───────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--surface-primary);
+}

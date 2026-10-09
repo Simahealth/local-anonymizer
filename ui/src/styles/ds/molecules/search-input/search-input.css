@@ -1,0 +1,174 @@
+/**
+ * SearchInput — SimaHealth Design System · Molecule
+ * ─────────────────────────────────────────────────────────────
+ * Formaliza (2026-09-09) el buscador ad-hoc que vivía en
+ * `especialista.css` (`.aow-search`/`.aow-search__icon`/
+ * `.aow-search__input`) -- movido acá tal cual, mismas clases, mismo
+ * comportamiento resting-circle/expanded-pill, para no romper nada de
+ * lo que ya funcionaba. Ver `src/components/SearchInput/SearchInput.tsx`
+ * para el componente real.
+ *
+ * Resting (círculo perfecto, --aow-search-size en ancho Y alto: solo el
+ * ícono, sin placeholder) -> expanded (`.aow-search--expanded`, al
+ * enfocar el input o si ya hay texto: pill horizontal con
+ * input+placeholder+clear visibles). La transición es solo de `width`
+ * -- el alto no cambia, sin salto de layout.
+ */
+.aow-search {
+  --aow-search-size: 34px;
+  position: relative;
+  width: var(--aow-search-size);
+  height: var(--aow-search-size);
+  /* min-width:0 anula el min-width:auto implícito de un hijo flex: sin
+     esto, el navegador ensancha este contenedor al ancho mínimo de
+     contenido del <input> interno e ignora el `width` explícito. */
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.aow-search--expanded {
+  width: 240px;
+}
+
+.aow-search__icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.aow-search__icon .material-symbols-outlined {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.aow-search__input {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: var(--aow-search-size);
+  height: var(--aow-search-size);
+  min-width: 0;
+  box-sizing: border-box;
+  /* En reposo, sin padding: con box-sizing:border-box, un padding
+     horizontal de 40px (12+28) más el borde (3px) ya suma 43px -- más
+     que los 34px del círculo -- así que el navegador ignora el `width`
+     declarado y fuerza el ancho al mínimo que ese padding necesita
+     (43px), rompiendo el círculo perfecto. En reposo no hay texto
+     visible (placeholder=""), así que el padding no hace falta hasta
+     expanded, donde sí hay lugar para él. */
+  padding: 0;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+  transition:
+    width 160ms ease,
+    border-color 120ms ease,
+    padding 160ms ease,
+    background 120ms ease;
+}
+
+.aow-search--expanded .aow-search__input {
+  width: 240px;
+  /* padding-right agrandado (2026-09-09, formalización SearchInput): deja
+     lugar al botón clear (20px) + su propio respiro -- antes era 12px,
+     no había clear button. padding-left (28px) sin cambios. */
+  padding: 0 30px 0 28px;
+  cursor: text;
+}
+
+/* Mismo tratamiento que el hover del CTA outline del DS (btn--neutral,
+   atoms/button/button.css -- "+ Nuevo caso"): --btn-bg-hover/
+   --btn-border-hover, sin cambio visual respecto al valor de reposo
+   anterior, solo declarado explícito por consistencia con el CTA.
+   :hover se declara ANTES de :focus-within para que el foco siga
+   ganando el color de borde si ambos aplican a la vez. Cubre resting y
+   expanded: es el mismo <input>, solo cambia su tamaño entre estados. */
+.aow-search:hover .aow-search__input {
+  background: var(--surface-tertiary);
+  border-color: var(--border-default);
+}
+
+.aow-search:hover .aow-search__icon {
+  color: var(--text-primary);
+}
+
+/* `:focus-within` en el wrapper (2026-09-09) en vez de `:focus` en el
+   propio input -- ahora hay un segundo elemento focuseable adentro (el
+   botón clear); el borde de marca debe seguir aplicando mientras el
+   foco esté en CUALQUIERA de los dos, no solo en el input. */
+.aow-search:focus-within .aow-search__input {
+  border-color: var(--border-brand);
+}
+
+.aow-search__input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ── Clear button (2026-09-09) ────────────────────────────────────
+ * Solo se monta cuando hay valor (siempre en estado expanded -- ver
+ * SearchInput.tsx). Mismo slot posicional que el ícono de búsqueda,
+ * espejado a la derecha. */
+.aow-search__clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition:
+    background 100ms ease,
+    color 100ms ease;
+}
+
+.aow-search__clear .material-symbols-outlined {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.aow-search__clear:hover {
+  background: var(--surface-tertiary);
+  color: var(--text-primary);
+}
+
+.aow-search__clear:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 1px;
+}
+
+.aow-search__clear:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  /* Mismo breakpoint ya usado en Modal/otros "viewport chico" del DS --
+     el pill expandido (240px) no cabe cómodo en una pantalla angosta;
+     se acorta, nunca se oculta ni cambia de mecanismo. */
+  .aow-search--expanded {
+    width: 180px;
+  }
+  .aow-search--expanded .aow-search__input {
+    width: 180px;
+  }
+}

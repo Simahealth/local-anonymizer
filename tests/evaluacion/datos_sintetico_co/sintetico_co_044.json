@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_044",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Daniel Martínez Rodríguez\ncédula de ciudadanía No. 747'060.047\nFecha de nacimiento: 5 de febrero de 1980\nProcedencia: Cali, Tolima\nDirección: Av 91C N° 56-36 piso 3, barrio Kennedy\nTeléfono: 322 152 2452   Correo: daniel78@yahoo.es\nEPS: Sura\nFecha de ingreso: 12/07/2022\n\nMOTIVO DE CONSULTA\nPaciente 55 años de edad que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Cali y consulta de forma espontánea. Se localiza al acompañante en el número 322 152 2452.\n\nVALORACIÓN\nAtendido por el Dr. Daniel Vargas Vargas (Registro médico 30111). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo daniel78@yahoo.es o remitir a la dirección Av 91C N° 56-36 piso 3.",
+  "ground_truth": {
+    "nombres": [
+      "Daniel Martínez Rodríguez",
+      "Daniel Vargas Vargas"
+    ],
+    "documentos": [
+      "747'060.047"
+    ],
+    "edades": [
+      "55 años"
+    ],
+    "ubicaciones": [
+      "Cali",
+      "Tolima"
+    ],
+    "direcciones": [
+      "Av 91C N° 56-36 piso 3"
+    ],
+    "telefonos": [
+      "322 152 2452"
+    ],
+    "emails": [
+      "daniel78@yahoo.es"
+    ],
+    "seguros": [
+      "Sura"
+    ],
+    "fechas_nacimiento": [
+      "5 de febrero de 1980"
+    ],
+    "fechas": [
+      "12/07/2022"
+    ],
+    "numeros_registro": [
+      "Registro médico 30111"
+    ]
+  }
+}

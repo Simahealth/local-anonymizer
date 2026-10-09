@@ -1,0 +1,27 @@
+/* ==========================================================================
+   Atom: Mirror Badge
+   Layer: 2 — Atoms
+   Owner: Design System
+   Estado: active
+
+   Appears on a B-rep scan card when its object is also foregrounded in the
+   primary region (data-selected="true"). Communicates cross-object persistence:
+   same object, different context.
+
+   Extracted from: primitives.css (Layer 4) in Sprint DS-EX-02.
+   Autoridad: DESIGN_SYSTEM_CONSTITUTION.md §3.
+   ========================================================================== */
+
+.primitive-mirror-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-5);
+  font-size: 8px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.05em;
+  color: var(--sima-blue);
+  background: color-mix(in srgb, var(--sima-blue) 8%, var(--surface-primary));
+  border: 1px solid color-mix(in srgb, var(--sima-blue) 20%, transparent);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}

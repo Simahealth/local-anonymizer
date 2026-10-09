@@ -1,0 +1,10 @@
+{
+  "nombre": "ame_sintetico_020",
+  "descripcion": "Nota estilo export 'AME' (plantilla_breve): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n312429\nId Consulta\n8508277\nDiagnóstico\nPACIENTE DE 71 AÑOS CON CUADRO CLINICO COMPATIBLE CON SINDROME DIARREICO AGUDO. SE INICIA MANEJO.",
+  "ground_truth": {
+    "edades": [
+      "71 AÑOS"
+    ]
+  }
+}

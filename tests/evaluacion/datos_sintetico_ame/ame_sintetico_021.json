@@ -1,0 +1,18 @@
+{
+  "nombre": "ame_sintetico_021",
+  "descripcion": "Nota estilo export 'AME' (plantilla_uci_evolucion): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n610929\nId Consulta\n3731249\nDiagnóstico\nINGRESO A CUIDADO INTENSIVO NEONATAL: DR DUVAN FORERO QUIÑONEZ (INTERNISTA) - PACIENTE CAMILO IBARGÜEN BONILLA (RECIEN NACIDO PRETERMINO DE 33 SEMANAS). MADRE DE 36 AÑOS, SIN CONTROL PRENATAL. DIAGNOSTICOS: SINDROME DIARREICO AGUDO, ICTERICIA NEONATAL. EVOLUCION DIA 2 DE VIDA DRA LEIDY ANGULO OYAGA PEDIATRA DE TURNO. PACIENTE HEMODINAMICAMENTE ESTABLE, AFEBRIL, TOLERA VIA ORAL, SIN DIFICULTAD RESPIRATORIA. CONTINUA MANEJO ANTIBIOTICO Y FOTOTERAPIA. ECOCARDIOGRAMA DE CONTROL (15/04/16) SIN CAMBIOS. ",
+  "ground_truth": {
+    "nombres": [
+      "Camilo Ibargüen Bonilla",
+      "DR Duvan Forero Quiñonez",
+      "DRA Leidy Angulo Oyaga"
+    ],
+    "edades": [
+      "36 AÑOS"
+    ],
+    "fechas": [
+      "15/04/16"
+    ]
+  }
+}

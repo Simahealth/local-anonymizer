@@ -1,0 +1,33 @@
+/* Layer 5 — Workspace Framework transitions only.
+   Intent chip → product.css. Layer 4 Patterns → objects.css. (DS-EX-01) */
+.board-region {
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base),
+    box-shadow var(--transition-base),
+    opacity var(--transition-base);
+}
+
+.workspace[data-motion-state="intent-changing"] .board-region {
+  animation: regionSettle 220ms ease-out both;
+}
+
+@keyframes regionSettle {
+  from {
+    opacity: 0.88;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

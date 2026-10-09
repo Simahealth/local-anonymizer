@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_007",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Felipe Muñoz Quintero\ndocumento de identidad 32097220\nFecha de nacimiento: 2017-09-16\nProcedencia: Pereira, Santander\nDirección: Transversal 179 Sur N° 72-85, barrio Ciudad Jardín\nTeléfono: +57 309 2022698   Correo: felipe8@gmail.com\nEPS: Mutual SER\nFecha de ingreso: 1960-09-02\n\nMOTIVO DE CONSULTA\nPaciente de 1 años que ingresa al servicio refiriendo fiebre de tres días de varios días de evolución. Reside en Pereira y consulta de forma espontánea. Se localiza al acompañante en el número +57 309 2022698.\n\nVALORACIÓN\nAtendido por el Dr. Luisa González Moreno (RM 18907). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo felipe8@gmail.com o remitir a la dirección Transversal 179 Sur N° 72-85.",
+  "ground_truth": {
+    "nombres": [
+      "Felipe Muñoz Quintero",
+      "Luisa González Moreno"
+    ],
+    "documentos": [
+      "32097220"
+    ],
+    "edades": [
+      "1 años"
+    ],
+    "ubicaciones": [
+      "Pereira",
+      "Santander"
+    ],
+    "direcciones": [
+      "Transversal 179 Sur N° 72-85"
+    ],
+    "telefonos": [
+      "+57 309 2022698"
+    ],
+    "emails": [
+      "felipe8@gmail.com"
+    ],
+    "seguros": [
+      "Mutual SER"
+    ],
+    "fechas_nacimiento": [
+      "2017-09-16"
+    ],
+    "fechas": [
+      "1960-09-02"
+    ],
+    "numeros_registro": [
+      "RM 18907"
+    ]
+  }
+}

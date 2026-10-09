@@ -1,0 +1,18 @@
+{
+  "nombre": "ame_sintetico_001",
+  "descripcion": "Nota estilo export 'AME' (plantilla_uci_evolucion): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n334083\nId Consulta\n2037872\nDiagnóstico\nINGRESO A CUIDADO INTENSIVO NEONATAL: DR OSCAR CORTÉS JURADO (RESIDENTE DE PEDIATRIA) - PACIENTE CAMILO OYAGA JURADO (RECIEN NACIDO PRETERMINO DE 29 SEMANAS). MADRE DE 28 AÑOS, SIN CONTROL PRENATAL. DIAGNOSTICOS: NEUMONIA CONGENITA, GASTROENTERITIS AGUDA. EVOLUCION DIA 2 DE VIDA DR SANTIAGO FORERO VALENCIA PEDIATRA DE TURNO. PACIENTE HEMODINAMICAMENTE ESTABLE, AFEBRIL, TOLERA VIA ORAL, SIN DIFICULTAD RESPIRATORIA. CONTINUA MANEJO ANTIBIOTICO Y FOTOTERAPIA. ECOCARDIOGRAMA DE CONTROL (14/01/24) SIN CAMBIOS. ",
+  "ground_truth": {
+    "nombres": [
+      "Camilo Oyaga Jurado",
+      "DR Oscar Cortés Jurado",
+      "DR Santiago Forero Valencia"
+    ],
+    "edades": [
+      "28 AÑOS"
+    ],
+    "fechas": [
+      "14/01/24"
+    ]
+  }
+}

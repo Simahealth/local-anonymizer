@@ -1,0 +1,10 @@
+{
+  "nombre": "ame_sintetico_006",
+  "descripcion": "Nota estilo export 'AME' (plantilla_urgencias_narrativa): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n476198\nId Consulta\n7382745\nDiagnóstico\nEnfermedad Actual: Paciente de 9 meses de edad, traído por su madre sustituta, Paola Angulo Valencia, de 26 años; quien refiere cuadro clínico de dos días de evolución consistente en fiebre no cuantificada, decaimiento e irritabilidad. Niega vómito, niega diarrea. Antecedentes: sin importancia. Vacunación completa para la edad. Se ingresa con impresión diagnóstica de desnutricion aguda moderada para manejo intrahospitalario y toma de paraclínicos.",
+  "ground_truth": {
+    "nombres": [
+      "Paola Angulo Valencia"
+    ]
+  }
+}

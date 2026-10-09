@@ -1,0 +1,201 @@
+/**
+ * SelectionGroup — SimaHealth Design System · Layer 3 — Molecule
+ * ─────────────────────────────────────────────────────────────────
+ * A set of always-visible options for quick, single or multi selection.
+ *
+ * USE when:
+ *   — All options fit in a row or wrap naturally (2–8 options)
+ *   — The user needs to see every choice without a reveal gesture
+ *   — The selection filters or scopes content (not navigates to it)
+ *
+ * DO NOT USE when:
+ *   — Options exceed 8 (use Dropdown instead)
+ *   — Options navigate to different screens (use Tab or Nav)
+ *   — The item represents taxonomy or system state (use Tag or StatusBadge)
+ *   — Space is too constrained for even 2 pills (use Dropdown)
+ *
+ * KEY DIFFERENCE FROM TAG (--filter):
+ *   Tag = output component (taxonomy label, system-applied metadata)
+ *   SelectionGroup = input component (user-driven choice, filters content)
+ *   Shape signals this: Tag uses --radius-100 (rect = "label applied"),
+ *   SelectionGroup uses --radius-full (pill = "option to pick").
+ *
+ * MODES:
+ *   data-mode="single"   — exactly one option active (roving tabindex, arrow keys)
+ *   data-mode="multiple" — zero or more active (Tab between items, Space to toggle)
+ *
+ * SIZES:
+ *   data-size="md"   — default, 32px height, used in canvas / main content
+ *   data-size="sm"   — compact, 24px height, used in sidebars / tool panels
+ *
+ * OVERFLOW:
+ *   default                — flex-wrap: wrap
+ *   data-overflow="scroll" — single row, horizontal scroll (hidden scrollbar)
+ *
+ * MARKUP:
+ *   <div class="selection-group" data-mode="single" data-size="md"
+ *        role="group" aria-label="Señal">
+ *     <button class="selection-group__item" type="button"
+ *             aria-pressed="true"  tabindex="0">Todas</button>
+ *     <button class="selection-group__item" type="button"
+ *             aria-pressed="false" tabindex="-1">Alta</button>
+ *     <button class="selection-group__item" type="button"
+ *             aria-pressed="false" tabindex="-1" disabled>Baja</button>
+ *   </div>
+ *
+ * KEYBOARD (managed by selection-group.js):
+ *   Tab               — enter / leave the group (roving tabindex)
+ *   Arrow Left/Right  — move focus within group
+ *   Space / Enter     — toggle or select (native button behavior)
+ *
+ * TOKENS USED (all from Layer 1):
+ *   --surface-secondary, --surface-brand-subtle
+ *   --text-primary, --text-secondary, --text-brand
+ *   --border-subtle, --border-default, --border-brand
+ *   --state-hover-bg, --state-focus-ring, --state-disabled-bg, --state-disabled-text
+ *   --radius-full
+ *   --transition-fast
+ *   --space-4, --space-8, --space-12
+ *   --text-xs, --text-sm
+ *   --weight-regular, --weight-semibold
+ */
+
+/* ── Container ───────────────────────────────────────────────────────────── */
+
+.selection-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4, 4px);
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.selection-group[data-overflow="scroll"] {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge legacy */
+}
+
+.selection-group[data-overflow="scroll"]::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+/* ── Item ─────────────────────────────────────────────────────────────────── */
+
+.selection-group__item {
+  /* Reset */
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  /* Shape — pill signals "option to pick", not "label applied" */
+  border-radius: var(--radius-full, 9999px);
+  border: 1.5px solid var(--border-subtle, #e9ebef);
+
+  /* Default state */
+  background: var(--surface-secondary, #f8f9fc);
+  color: var(--text-secondary, #4b5057);
+  font-weight: var(--weight-regular, 400);
+  line-height: 1;
+
+  /* Motion */
+  transition:
+    background var(--transition-fast, 80ms ease),
+    border-color var(--transition-fast, 80ms ease),
+    color var(--transition-fast, 80ms ease),
+    font-weight 0ms;
+}
+
+/* ── Size: md — default, 32px ────────────────────────────────────────────── */
+
+.selection-group:not([data-size]) .selection-group__item,
+.selection-group[data-size="md"] .selection-group__item {
+  height: 32px;
+  padding: 0 var(--space-12, 12px);
+  font-size: var(--text-sm, 14px);
+}
+
+/* ── Size: sm — compact, 24px ────────────────────────────────────────────── */
+
+.selection-group[data-size="sm"] .selection-group__item {
+  height: 24px;
+  padding: 0 var(--space-8, 8px);
+  font-size: var(--text-xs, 12px);
+}
+
+/* ── State: Hover ────────────────────────────────────────────────────────── */
+
+.selection-group__item:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--state-hover-bg, rgba(215, 50, 171, 0.06));
+  border-color: var(--border-default, #d9dce1);
+  color: var(--text-primary, #0d0f10);
+}
+
+/* ── State: Active (selected) ────────────────────────────────────────────── */
+
+/*
+ * Active state uses subtle-brand: brand-tinted bg + magenta border + dark text.
+ *
+ * Full-brand fill (#d732ab bg + text-inverse text) was considered but rejected:
+ * contrast ratio is 4.04:1, below WCAG AA 4.5:1 for normal text at sm/md sizes.
+ *
+ * This approach passes AA with large margin (dark text on near-white bg)
+ * while still clearly signaling "selected" via the magenta border + tint.
+ *
+ * Product layer can override --sg-active-bg/--sg-active-border/--sg-active-text
+ * to use role-specific colors without touching the DS definition.
+ */
+
+.selection-group__item[aria-pressed="true"] {
+  --sg-active-bg: var(--surface-brand-subtle, #fcf1fd);
+  --sg-active-border: var(--border-brand, #d732ab);
+  --sg-active-text: var(--text-primary, #0d0f10);
+
+  background: var(--sg-active-bg);
+  border-color: var(--sg-active-border);
+  color: var(--sg-active-text);
+  font-weight: var(--weight-semibold, 600);
+}
+
+.selection-group__item[aria-pressed="true"]:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+/* ── State: Focus visible ─────────────────────────────────────────────────── */
+
+.selection-group__item:focus {
+  outline: none;
+}
+
+.selection-group__item:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: 2px;
+}
+
+/* ── State: Disabled ─────────────────────────────────────────────────────── */
+
+.selection-group__item:disabled,
+.selection-group__item[aria-disabled="true"] {
+  background: var(--state-disabled-bg, #f1f3f7);
+  border-color: var(--border-subtle, #e9ebef);
+  color: var(--state-disabled-text, #b9bdc4);
+  font-weight: var(--weight-regular, 400);
+  cursor: not-allowed;
+  pointer-events: none;
+}

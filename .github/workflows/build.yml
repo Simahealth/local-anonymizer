@@ -1,0 +1,110 @@
+name: Pruebas y builds de escritorio
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Dependencias del motor
+        # Sin pywebview: en Linux necesitaría GTK/Qt y las pruebas no lo usan.
+        run: |
+          grep -v pywebview requirements.txt > /tmp/req.txt
+          pip install -r /tmp/req.txt pytest==9.1.1
+      - name: Pruebas del motor (incluye regresión de fugas de PII)
+        run: python -m pytest -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Pruebas y typecheck de la interfaz
+        working-directory: ui
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+
+  build:
+    needs: pruebas
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest      # Apple Silicon (arm64)
+            nombre: macOS-AppleSilicon
+          - os: macos-15-intel    # Intel (x86_64)
+            nombre: macOS-Intel
+          - os: windows-latest
+            nombre: Windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Compilar interfaz
+        working-directory: ui
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Dependencias
+        run: pip install -r requirements.txt pyinstaller==6.22.3
+      - name: PyInstaller
+        run: pyinstaller --noconfirm empaquetado/sima_anonimizador.spec
+
+      # Autoprueba del ejecutable empaquetado: anonimiza los 30 PDFs sintéticos
+      # con el motor tal como quedó dentro del bundle.
+      - name: Autoprueba (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          "dist/SIMA Anonimizador.app/Contents/MacOS/SIMA Anonimizador" --autoprueba tests/evaluacion/pdfs_sintetico_ame "$RUNNER_TEMP/auto"
+          cat "$RUNNER_TEMP/auto/autoprueba.json"
+      - name: Autoprueba (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath "dist\SIMA Anonimizador\SIMA Anonimizador.exe" `
+            -ArgumentList "--autoprueba", "tests\evaluacion\pdfs_sintetico_ame", "$env:RUNNER_TEMP\auto" `
+            -Wait -PassThru
+          Get-Content "$env:RUNNER_TEMP\auto\autoprueba.json"
+          if ($p.ExitCode -ne 0) { exit $p.ExitCode }
+
+      - name: DMG (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p dmg && cp -R "dist/SIMA Anonimizador.app" dmg/ && ln -s /Applications dmg/Aplicaciones
+          hdiutil create -volname "SIMA Anonimizador" -srcfolder dmg -ov -format UDZO \
+            "dist/SIMA-Anonimizador-${{ matrix.nombre }}.dmg"
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DVersion=1.0.0 empaquetado\windows\instalador.iss
+          Compress-Archive -Path "dist\SIMA Anonimizador" -DestinationPath "dist\SIMA-Anonimizador-Windows-portable.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SIMA-Anonimizador-${{ matrix.nombre }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+            dist/*.zip
+          if-no-files-found: error

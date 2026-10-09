@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_038",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Mauricio Castro Gómez\nC.C. 201'474.984\nFecha de nacimiento: 1992-07-18\nProcedencia: Pereira, Santander\nDirección: Avenida 169C # 20-43, barrio Laureles\nTeléfono: (602) 7575963   Correo: mauricio77@gmail.com\nEPS: Coomeva\nFecha de ingreso: 22/12/2017\n\nMOTIVO DE CONSULTA\nPaciente 87 años de edad que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Pereira y consulta de forma espontánea. Se localiza al acompañante en el número (602) 7575963.\n\nVALORACIÓN\nAtendido por el Dr. Valentina Castro Rodríguez (RM 65496). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo mauricio77@gmail.com o remitir a la dirección Avenida 169C # 20-43.",
+  "ground_truth": {
+    "nombres": [
+      "Mauricio Castro Gómez",
+      "Valentina Castro Rodríguez"
+    ],
+    "documentos": [
+      "201'474.984"
+    ],
+    "edades": [
+      "87 años"
+    ],
+    "ubicaciones": [
+      "Pereira",
+      "Santander"
+    ],
+    "direcciones": [
+      "Avenida 169C # 20-43"
+    ],
+    "telefonos": [
+      "(602) 7575963"
+    ],
+    "emails": [
+      "mauricio77@gmail.com"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "1992-07-18"
+    ],
+    "fechas": [
+      "22/12/2017"
+    ],
+    "numeros_registro": [
+      "RM 65496"
+    ]
+  }
+}

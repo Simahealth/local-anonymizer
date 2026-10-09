@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_035",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Iván Cárdenas Ramírez\nCC 63'293.990\nFecha de nacimiento: Febrero 14 de 1981\nProcedencia: Pereira, Antioquia\nDirección: Transversal 81C No. 55-74 apto 756, barrio El Prado\nTeléfono: 305-388-3553   Correo: iván59@outlook.com\nEPS: Sanitas\nFecha de ingreso: 19/07/2017\n\nMOTIVO DE CONSULTA\nPaciente de 6 años que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Pereira y consulta de forma espontánea. Se localiza al acompañante en el número 305-388-3553.\n\nVALORACIÓN\nAtendido por el Dr. Ana Cárdenas Rojas (HC-514991). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo iván59@outlook.com o remitir a la dirección Transversal 81C No. 55-74 apto 756.",
+  "ground_truth": {
+    "nombres": [
+      "Iván Cárdenas Ramírez",
+      "Ana Cárdenas Rojas"
+    ],
+    "documentos": [
+      "63'293.990"
+    ],
+    "edades": [
+      "6 años"
+    ],
+    "ubicaciones": [
+      "Pereira",
+      "Antioquia"
+    ],
+    "direcciones": [
+      "Transversal 81C No. 55-74 apto 756"
+    ],
+    "telefonos": [
+      "305-388-3553"
+    ],
+    "emails": [
+      "iván59@outlook.com"
+    ],
+    "seguros": [
+      "Sanitas"
+    ],
+    "fechas_nacimiento": [
+      "Febrero 14 de 1981"
+    ],
+    "fechas": [
+      "19/07/2017"
+    ],
+    "numeros_registro": [
+      "HC-514991"
+    ]
+  }
+}

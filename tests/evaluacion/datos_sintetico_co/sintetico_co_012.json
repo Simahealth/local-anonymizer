@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_012",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Daniel Moreno Vargas\nCC 813962536\nFecha de nacimiento: 10/09/1992\nProcedencia: Santa Marta, Valle del Cauca\nDirección: Avenida 1A No. 37-27 apto 694, barrio Ciudad Jardín\nTeléfono: 313.957.6076   Correo: daniel95@hotmail.com\nEPS: Sanitas\nFecha de ingreso: 1989-04-27\n\nMOTIVO DE CONSULTA\nPaciente 87 años de edad que ingresa al servicio refiriendo dolor abdominal de varios días de evolución. Reside en Santa Marta y consulta de forma espontánea. Se localiza al acompañante en el número 313.957.6076.\n\nVALORACIÓN\nAtendido por el Dr. Carolina García González (HC-945742). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo daniel95@hotmail.com o remitir a la dirección Avenida 1A No. 37-27 apto 694.",
+  "ground_truth": {
+    "nombres": [
+      "Daniel Moreno Vargas",
+      "Carolina García González"
+    ],
+    "documentos": [
+      "813962536"
+    ],
+    "edades": [
+      "87 años"
+    ],
+    "ubicaciones": [
+      "Santa Marta",
+      "Valle del Cauca"
+    ],
+    "direcciones": [
+      "Avenida 1A No. 37-27 apto 694"
+    ],
+    "telefonos": [
+      "313.957.6076"
+    ],
+    "emails": [
+      "daniel95@hotmail.com"
+    ],
+    "seguros": [
+      "Sanitas"
+    ],
+    "fechas_nacimiento": [
+      "10/09/1992"
+    ],
+    "fechas": [
+      "1989-04-27"
+    ],
+    "numeros_registro": [
+      "HC-945742"
+    ]
+  }
+}

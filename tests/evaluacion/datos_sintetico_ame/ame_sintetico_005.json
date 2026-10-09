@@ -1,0 +1,20 @@
+{
+  "nombre": "ame_sintetico_005",
+  "descripcion": "Nota estilo export 'AME' (plantilla_interconsulta_contacto): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n184495\nId Consulta\n3791163\nDiagnóstico\nSe remite paciente Eliana Ibargüen Segura, identificado con documento 9155446607, afiliado a Emssanar, por cuadro de desnutricion aguda moderada que requiere valoración por especialista. Se logra contactar al acudiente al número 3035822307 quien autoriza el traslado. Valorado por Dr. Robinson Patiño Chaverra, queda pendiente de cupo en la institución receptora. Cualquier novedad reportar al correo chaverra893@outlook.com.",
+  "ground_truth": {
+    "nombres": [
+      "Eliana Ibargüen Segura",
+      "Dr. Robinson Patiño Chaverra"
+    ],
+    "telefonos": [
+      "3035822307"
+    ],
+    "documentos": [
+      "9155446607"
+    ],
+    "emails": [
+      "chaverra893@outlook.com"
+    ]
+  }
+}

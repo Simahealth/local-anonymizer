@@ -1,0 +1,17 @@
+{
+  "nombre": "ame_sintetico_023",
+  "descripcion": "Nota estilo export 'AME' (plantilla_traslado_rural): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n385129\nId Consulta\n1664179\nDiagnóstico\nPACIENTE ELIANA RENTERÍA BONILLA DE 2 AÑOS PROCEDENTE DE VEREDA MICAY, MUNICIPIO DE SANTANDER DE QUILICHAO, TRASLADADO POR CUADRO DE SINDROME DIARREICO AGUDO DE 3 DIAS DE EVOLUCION. VALORADO POR DRA YOLIMA FORERO PATIÑO QUIEN INDICA MANEJO INTRAHOSPITALARIO Y SOLICITA PARACLINICOS DE INGRESO. SE EXPLICA A LA FAMILIA RIESGOS Y BENEFICIOS DEL MANEJO PROPUESTO, ACEPTAN Y FIRMAN CONSENTIMIENTO.",
+  "ground_truth": {
+    "nombres": [
+      "Eliana Rentería Bonilla",
+      "DRA Yolima Forero Patiño"
+    ],
+    "direcciones": [
+      "vereda Micay, municipio de Santander de Quilichao"
+    ],
+    "edades": [
+      "2 AÑOS"
+    ]
+  }
+}

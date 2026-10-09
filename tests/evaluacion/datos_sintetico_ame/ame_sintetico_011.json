@@ -1,0 +1,14 @@
+{
+  "nombre": "ame_sintetico_011",
+  "descripcion": "Nota estilo export 'AME' (plantilla_consulta_control): 3 campos, PII embebida sin etiquetas.",
+  "texto": "Id Cliente\n228809\nId Consulta\n2935310\nDiagnóstico\nCONTROL POR CRISIS ASMATICA. PACIENTE ANDRÉS QUIÑONEZ MAYA VALORADO POR DRA YURANY OYAGA CAICEDO (TP 88941). EVOLUCION SATISFACTORIA, CONTINUA MANEJO AMBULATORIO, SE CITA A NUEVO CONTROL EN 15 DIAS.",
+  "ground_truth": {
+    "nombres": [
+      "Andrés Quiñonez Maya",
+      "DRA Yurany Oyaga Caicedo"
+    ],
+    "numeros_registro": [
+      "TP 88941"
+    ]
+  }
+}

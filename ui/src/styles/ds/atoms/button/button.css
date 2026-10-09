@@ -1,0 +1,360 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════
+ * BUTTON — SimaHealth Design System  ·  Atom  ·  v1.0
+ * ═══════════════════════════════════════════════════════════════════
+ *
+ * Variants:   .btn--primary  (default, no class needed)
+ *             .btn--neutral
+ *             .btn--subtle
+ *
+ * Sizes:      .btn--md  (default, no class needed)
+ *             .btn--sm
+ *
+ * States:     default · :hover · :focus-visible · :disabled
+ *
+ * ── Markup ─────────────────────────────────────────────────────────
+ *
+ *   Basic:
+ *   <button class="btn">Label</button>
+ *   <button class="btn btn--neutral">Label</button>
+ *   <button class="btn btn--subtle btn--sm">Label</button>
+ *
+ *   With icon (start or end):
+ *   <button class="btn btn--neutral">
+ *     <span class="btn__icon" aria-hidden="true"><!-- svg --></span>
+ *     Label
+ *   </button>
+ *
+ *   Disabled (both HTML attr and ARIA work):
+ *   <button class="btn" disabled>Label</button>
+ *   <button class="btn" aria-disabled="true">Label</button>
+ *
+ *   As a link:
+ *   <a class="btn btn--primary" href="/path">Label</a>
+ *
+ * ── Token dependencies (tokens.css) ────────────────────────────────
+ *   --surface-action, --surface-action-hover
+ *   --surface-primary, --surface-tertiary
+ *   --text-primary, --text-inverse, --text-disabled
+ *   --border-strong, --border-default, --border-subtle
+ *   --radius-100, --radius-200
+ *   --font-sans, --weight-regular
+ *   --text-sm (14px), --text-xs (12px)
+ *   --state-focus-ring
+ *   --text-brand  (subtle hover text color)
+ *
+ *   All declarations include fallback values — the component renders
+ *   correctly even without the token file (standalone use).
+ *
+ * ── Theming ────────────────────────────────────────────────────────
+ *   Override component tokens at the usage site, not inside this file.
+ *   Example:
+ *   .my-context .btn { --btn-bg: var(--my-brand-color); }
+ *
+ * ═══════════════════════════════════════════════════════════════════
+ */
+
+/* ─── Component tokens ─────────────────────────────────────────────
+   Declared on .btn so they cascade to all children and can be
+   overridden at any ancestor without touching variant rules.
+   ─────────────────────────────────────────────────────────────────*/
+
+.btn {
+  /* Colors */
+  --btn-bg: var(--surface-action, rgba(0, 2, 2, 0.95));
+  --btn-text: var(--text-inverse, #f8f9fc);
+  --btn-border: var(--border-strong, #7a7f87);
+
+  --btn-bg-hover: var(--surface-action-hover, #2f3338);
+  --btn-text-hover: var(--text-inverse, #f8f9fc);
+  --btn-border-hover: var(--gray-1000, #000202);
+
+  --btn-bg-disabled: var(--surface-tertiary, #f1f3f7);
+  --btn-text-disabled: var(--text-disabled, #b9bdc4);
+  --btn-border-disabled: var(--border-subtle, #e9ebef);
+
+  /* Sizing — medium (default) */
+  --btn-height: 36px;
+  --btn-px: 16px;
+  --btn-py: 8px;
+  --btn-gap: 8px;
+  --btn-radius: var(--radius-200, 8px);
+  --btn-font-size: var(--text-sm, 14px);
+  --btn-font-weight: var(--weight-regular, 400);
+  --btn-min-width: 80px;
+  --btn-icon-size: 16px;
+}
+
+/* ─── Base structure ───────────────────────────────────────────────*/
+
+.btn {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+
+  /* Dimensions */
+  height: var(--btn-height);
+  min-width: var(--btn-min-width);
+  /* Encontrado en QA (auditoría 2026-09-08, label largo dentro de un
+     contenedor flex angosto): sin esto, un padre `display:flex` puede
+     encoger el botón por debajo del ancho de su propio texto (flex-shrink
+     default es 1) -- con `white-space:nowrap` + `overflow:visible`, el
+     texto no se clipea, pero sí se derrama visualmente fuera del fondo
+     del botón. `flex-shrink:0` lo previene: el botón nunca se encoge por
+     debajo de su contenido, sin importar el contenedor. No afecta
+     `.btn--icon` (ancho fijo cuadrado) ni ningún call site existente --
+     un botón encogiéndose por debajo de su label nunca fue un
+     comportamiento buscado en ninguno de los 21 usos actuales. */
+  flex-shrink: 0;
+  padding: var(--btn-py) var(--btn-px);
+
+  /* Visual */
+  border: 1px solid var(--btn-border);
+  border-radius: var(--btn-radius);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+
+  /* Typography */
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  letter-spacing: 0;
+
+  /* Interaction */
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+/* ─── States ──────────────────────────────────────────────────────*/
+
+.btn:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
+  color: var(--btn-text-hover);
+}
+
+.btn:active:not(:disabled):not([aria-disabled="true"]) {
+  opacity: 0.88;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(87, 152, 179, 0.5));
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--btn-bg-disabled);
+  border-color: var(--btn-border-disabled);
+  color: var(--btn-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── Icon slot ───────────────────────────────────────────────────*/
+
+.btn__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  flex-shrink: 0;
+}
+
+.btn__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Material Symbols glyphs (foundations/icons) are text ligatures, not
+   SVGs -- they need an explicit font-size to fill the icon slot instead
+   of inheriting the button's own font-size. */
+.btn__icon .material-symbols-outlined {
+  font-size: var(--btn-icon-size);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VARIANTS
+   Each variant overrides only the component tokens it needs.
+   Base structure and states are inherited from .btn.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Primary — filled, near-black ─────────────────────────────────────
+   .btn defaults are the Primary spec.
+   Explicit class kept for clarity, not required. */
+.btn--primary {
+  /* inherits .btn defaults */
+}
+
+/* Neutral — outlined, white background ────────────────────────────*/
+.btn--neutral {
+  --btn-bg: var(--surface-primary, #ffffff);
+  --btn-text: var(--text-primary, #0d0f10);
+  --btn-border: var(--border-default, #d9dce1);
+
+  --btn-bg-hover: var(--surface-tertiary, #f1f3f7);
+  --btn-text-hover: var(--text-primary, #0d0f10);
+  --btn-border-hover: var(--border-default, #d9dce1);
+}
+
+/* Subtle — ghost, label only ──────────────────────────────────────
+   Magenta text on hover communicates brand affordance without
+   filling the button. Use for low-priority or secondary actions.
+   Disabled stays Ghost too (transparent bg/border, only the text/icon
+   fades to --text-disabled) -- `.btn:disabled` reads --btn-bg-disabled/
+   --btn-border-disabled/--btn-text-disabled from whichever variant is
+   active, and until this override existed Ghost had none of its own,
+   so a disabled Ghost silently fell back to .btn's base (Primary)
+   disabled tokens: filled surface-tertiary bg + border-subtle border
+   -- Ghost's own "never fill, never border" identity broken exactly
+   when disabled. `:disabled`/`[aria-disabled]` already suppress hover/
+   active/pointer-events at the `.btn` level (not:disabled guards,
+   pointer-events:none) -- only the color tokens needed a Ghost-specific
+   value here, same override mechanism the variant already uses for
+   its rest/hover tokens, no new tokens introduced. */
+.btn--subtle {
+  --btn-bg: transparent;
+  --btn-text: var(--text-primary, #0d0f10);
+  --btn-border: transparent;
+
+  --btn-bg-hover: transparent;
+  --btn-text-hover: var(--text-brand, #d732ab);
+  --btn-border-hover: transparent;
+
+  --btn-bg-disabled: transparent;
+  --btn-text-disabled: var(--text-disabled, #b9bdc4);
+  --btn-border-disabled: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SIZES
+   Override only sizing component tokens.
+   Variants and states are orthogonal — all combinations work.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Medium (default) ─────────────────────────────────────────────────
+   No class required. Documented for explicitness. */
+.btn--md {
+  /* inherits .btn sizing defaults */
+}
+
+/* Small ─────────────────────────────────────────────────────────────
+   Note: DS spec (Figma) defined Small text at 10px — corrected to
+   12px for WCAG 1.4.3 compliance (minimum readable size). */
+.btn--sm {
+  --btn-height: 28px;
+  --btn-py: 4px;
+  --btn-font-size: var(--text-xs, 12px);
+  --btn-radius: var(--radius-100, 4px);
+  --btn-gap: 6px;
+}
+
+/* Small Neutral / Subtle — tighter horizontal padding
+   Primary Small keeps 16px px (prominent CTA even at small size) */
+.btn--sm.btn--neutral,
+.btn--sm.btn--subtle {
+  --btn-px: 8px;
+}
+
+/* Large ─────────────────────────────────────────────────────────────
+   CTA principal / formularios. Solo tokens ya existentes en tokens.css
+   (--space-24, --text-base) -- ninguno inventado. */
+.btn--lg {
+  --btn-height: 44px;
+  --btn-px: var(--space-24, 24px);
+  --btn-font-size: var(--text-base, 16px);
+}
+
+/* Icon (solo ícono) ─────────────────────────────────────────────────
+   Cuadrado, comparte --btn-* con el resto de tamaños/variantes/tonos
+   (a diferencia de `.icon-btn`, que es un átomo aparte, siempre Ghost,
+   ver icon-button.css y Button.spec.md §3.1). `width`/`min-width`/
+   `padding` se declaran como propiedades reales (no solo custom
+   properties) para ganar el empate de especificidad contra la regla
+   base `.btn` -- mismo mecanismo que la propia `.btn`/`.btn--sm` usan
+   para sus dimensiones. */
+.btn--icon {
+  width: var(--btn-height);
+  min-width: 0;
+  padding: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TONE — danger/destructive
+   Combina con las 3 variantes (Button siempre emite la clase de
+   variante explícita junto con `.btn--danger`, así que el selector
+   compuesto por variante nunca queda ambiguo). Ningún token nuevo:
+   --color-error-500/600, --text-error, --border-error ya existen en
+   tokens.css. `success`/`warning`/`info` siguen pendientes -- sin
+   evidencia real de uso en botones (ver Button.spec.md §2.2/§6).
+   ═══════════════════════════════════════════════════════════════════ */
+/* Rest state usa --color-error-600, NO --color-error-500: medido contra
+   --text-inverse (blanco) da ~4.36:1 con -500 (falla AA texto normal,
+   14px/400, que exige 4.5:1) vs ~6.34:1 con -600 (pasa con margen).
+   -700 en hover para mantener el mismo salto de intensidad que el resto
+   de variantes al pasar el mouse. */
+.btn--primary.btn--danger {
+  --btn-bg: var(--color-error-600, #c00f0c);
+  --btn-border: var(--color-error-600, #c00f0c);
+  --btn-bg-hover: var(--color-error-700, #900b09);
+  --btn-border-hover: var(--color-error-700, #900b09);
+}
+
+.btn--neutral.btn--danger {
+  --btn-text: var(--text-error, #c00f0c);
+  --btn-border: var(--border-error, #ec221f);
+  --btn-text-hover: var(--text-error, #c00f0c);
+  --btn-border-hover: var(--border-error, #ec221f);
+}
+
+.btn--subtle.btn--danger {
+  --btn-text: var(--text-error, #c00f0c);
+  --btn-text-hover: var(--text-error, #c00f0c);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE — selected (toggle individual, no un grupo -- para grupos usar
+   SelectionGroup). Mismos tokens que ya usa
+   `selection-group__item[aria-pressed="true"]` (selection-group.css) --
+   ningún valor nuevo, mismo tratamiento visual reutilizado.
+   ═══════════════════════════════════════════════════════════════════ */
+.btn[aria-pressed="true"]:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--surface-brand-subtle, #fcf1fd);
+  border-color: var(--border-brand, #d732ab);
+  color: var(--text-primary, #0d0f10);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE — loading
+   Reemplaza el slot de ícono izquierdo por un spinner (mismo slot
+   `.btn__icon`, así que no agrega dimensiones nuevas cuando el botón
+   ya tenía iconLeft). El ancho estable ante texto largo/label sin
+   icon lo resuelve Button.tsx (mide el ancho antes de activar loading
+   y lo fija vía --btn-min-width inline) -- ver Button.spec.md §2.4.
+   `prefers-reduced-motion` ya está resuelto globalmente
+   (framework/motion.css fuerza animation-duration a 1ms), no se repite
+   acá -- mismo patrón que `.card__processing-spinner`.
+
+   NO migrado al componente TSX `Spinner` (2026-09-09, ver
+   atoms/spinner/spinner.css's propio docblock): este ícono hereda
+   `currentColor` del botón (varía por variant/tone/hover/disabled) --
+   el contrato de `tone` de Spinner (3 valores fijos) no modela
+   "heredar del padre". Sí reusa el keyframe canónico de Spinner en vez
+   de declarar el suyo propio (antes `@keyframes btn-spin`, idéntico) --
+   `IconButton`'s propio `.icon-btn__icon--spinning` reusa este mismo
+   keyframe también, ver icon-button.css.
+   ═══════════════════════════════════════════════════════════════════ */
+.btn__icon--spinning {
+  animation: spinner-spin 1s linear infinite;
+}

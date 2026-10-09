@@ -1,0 +1,1119 @@
+/* ============================================================
+   Detail Panel — SimahealthDS Organism
+
+   Sprint 2 (2026-08-11): ported verbatim from
+   SimaHealth/frontend/SimahealthDS/organisms/DetailPanel/detail-panel.css
+   (Estado: FROZEN, Versión 3.1, 2026-08-05) — values, tokens, BEM,
+   states, responsive breakpoints and pseudo-elements preserved exactly
+   as in the baseline. Only addition: `.detail-panel__actions-delete` at
+   the bottom, a narrow BE-owned rule (not part of the frozen organism)
+   kept to preserve the pre-existing, already-approved (Sprint 1)
+   Papelera "Eliminar" button now that it no longer depends on
+   CaseFiche's stylesheet. Everything above that marker is the baseline,
+   unmodified.
+
+   The SHELL (`.backdrop`, `.panel-overlay`, `.panel-header-nav`,
+   `.panel-content`, `.panel-hero`, `.panel-body`, `.panel-block`,
+   `.detail-panel__sticky`) is the carcasa that each actor mounts and
+   that the Runtime opens/closes. The CONTENIDO clínico interno (Alertas
+   → Análisis diferencial → Sugerencia → Acciones) vive bajo su propio
+   namespace, `detail-panel__*`, coherente con el shell.
+
+   Ritmo vertical previo al Hero — única fuente de verdad (M4.4):
+   `.panel-content { padding-top: 24px }`. El header (`.panel-header-
+   nav`, Shell) no aporta margen propio — el organismo no depende de
+   cuánto empuje quien lo precede.
+
+   El Detail Panel NO conoce actores, dominios, pacientes,
+   diagnósticos, programas, CTAs ni lógica de negocio. El contenido es
+   responsabilidad exclusiva del adaptador que arma las
+   DetailPanelProps (core/services/detail-panel-view.js). El
+   comportamiento (open/close/escape/sticky/focus-trap) es del
+   Runtime, vía core/services/detail-panel-controller.js.
+   ============================================================ */
+
+
+/* ── Backdrop ─────────────────────────────────────────────────
+   Capa de oscurecimiento. z-index: 40 (siempre debajo del panel).
+   El Runtime toglea .open vía detailPanel.open() / .close().
+   ─────────────────────────────────────────────────────────── */
+.backdrop {
+  position: fixed; inset: 0;
+  background: rgba(13, 15, 16, 0.06);
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms ease; z-index: var(--z-backdrop, 40);
+}
+.backdrop.open { opacity: 1; pointer-events: auto; }
+
+
+/* ── Panel Overlay ────────────────────────────────────────────
+   Contenedor principal. z-index: 50. Slide-in desde la derecha.
+   ─────────────────────────────────────────────────────────── */
+/* design/react-visual-align, "Shell 16px outer space": `padding:
+   var(--space-16)` is now the SINGLE source of the outer inset on all
+   4 sides -- Shell-owned (this is `.panel-overlay`, not the organism).
+   Supersedes the M4.4/M5 split below (40px/48px on the header,
+   24px/48px/40px on `.panel-content`): both `.panel-header-nav` and
+   `.panel-content` now carry zero outer padding of their own (see
+   their rules below), so nothing doubles this padding. Verified with
+   getBoundingClientRect: panel edge → header icons (top/left/right)
+   and panel edge → `.panel-content` (left/right/bottom) all measure
+   exactly 16px. */
+.panel-overlay {
+  position: fixed; top: 0; right: 0; height: 100vh;
+  width: 55vw; max-width: 55vw; min-width: 720px;
+  padding: var(--space-16);
+  background: var(--surface-primary);
+  border-left: 1px solid var(--border-default);
+  box-shadow: var(--shadow-md);
+  transform: translateX(100%);
+  transition: transform 200ms ease;
+  z-index: var(--z-panel, 50);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.panel-overlay.open { transform: translateX(0); }
+
+/* Header fijo, contenido con scroll propio (no todo el panel).
+   `.panel-overlay` deja de ser el contenedor de scroll — pasa a ser un
+   flex column donde el header no se achica (`.panel-header-nav`,
+   `flex-shrink:0`, ver más abajo) y `.panel-content` es la única
+   región que scrollea (`flex:1; min-height:0; overflow-y:auto`, ver
+   más abajo). El padding que antes vivía unificado en `.panel-overlay`
+   (40px 48px) se reparte entre ambos: el header conserva
+   lateral+superior (sin inferior — el organismo aporta su propio
+   respiro vía `.panel-content{padding-top}`, M4.4 sin cambios); el
+   contenido conserva lateral+inferior, más su padding-top propio
+   intacto. El total visual no cambia.
+   Superseded (design/react-visual-align, "Shell 16px outer space"):
+   see the padding note on `.panel-overlay` above -- neither element
+   below carries its own outer padding anymore. */
+
+/* Con bloque de estado sticky (`.detail-panel__sticky`): padding
+   lateral+inferior a la mitad — el sticky ya aporta su propio respiro
+   visual, el padding completo del panel duplicaría el espacio.
+   `padding-top` de `.panel-content` NO se toca (M4.4, única fuente de
+   verdad, 24px siempre). Valores originales: 40px 48px (28px 24px en
+   ≤1100px) → mitad: 20px 24px / 14px 12px. */
+.panel-overlay:has(.detail-panel__sticky) .panel-header-nav { padding: 20px 24px 0; }
+.panel-overlay:has(.detail-panel__sticky) .panel-content { padding: 24px 24px 20px; }
+@media (max-width: 1100px) {
+  .panel-overlay:has(.detail-panel__sticky) .panel-header-nav { padding: 14px 12px 0; }
+  .panel-overlay:has(.detail-panel__sticky) .panel-content { padding: 24px 12px 14px; }
+}
+
+
+/* ── Header nav — Cerrar / Expandir ──────────────────────────────
+   Navegación del CONTENEDOR, no del organismo: la renderiza
+   core/services/detail-panel-controller.js (`Sima.detailPanelHeader.
+   render()`), antepuesta a `SimaDS.DetailPanel.render()` — nunca el
+   organismo mismo. Vive aquí (junto a `.panel-overlay`/`.backdrop`,
+   ya Shell-adjacent en este archivo) porque es la única hoja de
+   estilos que ambos — Controller de producción y laboratorio de
+   comparación — ya cargan.
+
+   Sin margin-bottom propio (a propósito, M4.4): el Shell compone
+   Header → DetailPanel sin conocer ni compensar ningún margen interno
+   del organismo — el espacio entre el header y el Hero es responsa-
+   bilidad exclusiva de `.panel-content` (ver más abajo), la única
+   fuente de verdad para el ritmo vertical previo al Hero. Si el
+   header no existiera (otro Shell, o ninguno), el organismo seguiría
+   abriendo con el mismo respiro — no depende de que algo lo empuje.
+
+   Iconos: catálogo del DS (Material Symbols), `.icon-btn` (atom ya
+   existente, mismo que usa el toggle del Sidebar) — sin overrides de
+   color/radio/estado.
+
+   `flex-shrink:0`: fijo dentro del flex column de `.panel-overlay`,
+   nunca scrollea con el contenido. Sin padding propio (design/react-
+   visual-align, "Shell 16px outer space") -- `.panel-overlay`'s own
+   `padding: var(--space-16)` now provides the inset on all 4 sides;
+   this row simply sits flush inside that padded box. */
+.panel-header-nav { display: flex; gap: 4px; flex-shrink: 0; }
+.panel-header-nav .material-symbols-outlined { font-size: 16px; color: var(--text-tertiary); }
+/* Tooltip DS hover/focus fix (SidePanel/DetailPanel, Cerrar/Expandir):
+   root cause was this rule above -- it sets `color` directly on the
+   glyph `<span>` itself, unconditionally (no `:hover`), so it always
+   won over any color `.icon-btn`/`.icon-btn:hover` tried to pass down
+   via inheritance, no matter what -- the button's own hover state was
+   never broken (Tooltip.tsx correctly composes onMouseEnter/Leave/
+   Focus/Blur, verified), the icon visually just couldn't react to it.
+   Scoped here (not `icon-button.css`) because the bug itself is scoped
+   here: `IconButton`/`.icon-btn` behave exactly as designed everywhere
+   else in the app (Modal/Toast/ComposerV2/DocumentSidePanel/Sidebar
+   toggle) -- only this file's own resting-color override needed a
+   counterpart for the hover/focus case. Higher specificity than the
+   line above (3 classes + a pseudo-class vs. 2 classes) so it wins on
+   hover/keyboard-focus only -- resting color (`--text-tertiary`) is
+   untouched, same as before this fix. `--text-brand` is the same
+   brand-magenta token Z1Panel's own arrow already uses for this exact
+   pattern (`.esp-z1__metric:hover .esp-z1__cta`, especialista.css) --
+   no new color invented. Wrapping the button in `Tooltip`'s own
+   `.tooltip-wrapper` span doesn't affect any of this: `:hover`/
+   `:focus-visible` still track the real `<button>` element itself,
+   regardless of what wraps it. */
+.panel-header-nav .icon-btn:hover:not(:disabled) .material-symbols-outlined,
+.panel-header-nav .icon-btn:focus-visible .material-symbols-outlined {
+  color: var(--text-brand);
+}
+
+
+/* ── Content ──────────────────────────────────────────────────
+   Wrapper del contenido. El adaptador inyecta sus DetailPanelProps
+   aquí. Usa el ancho completo disponible del panel, dentro del
+   padding del `.panel-overlay` (los mismos márgenes) y de forma
+   responsive por herencia.
+
+   Sin padding propio (design/react-visual-align, "Shell 16px outer
+   space", supersede M4.4): el organismo ya no aporta su propio ritmo
+   vertical/lateral -- `.panel-overlay`'s `padding: var(--space-16)`
+   es la única fuente del espacio exterior en los 4 lados. El
+   organismo nunca añade un segundo margen/padding exterior encima.
+
+   design/react-visual-align, "Ver fuente / SourceDetail": `overflow`
+   moved from `overflow-y:auto` to `hidden` -- `.panel-content` is now
+   purely the horizontal clipping viewport for the CaseDetail/
+   SourceDetail pane track (see below); each pane owns its own vertical
+   scroll independently now, not `.panel-content` itself. `flex:1;
+   min-height:0` unchanged -- still the single flexible region between
+   the fixed header and the panel's bottom edge. */
+.panel-content {
+  max-width: none;
+  flex: 1; min-height: 0; overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Ver fuente / SourceDetail — design/react-visual-align. Two-pane
+   horizontal slider living entirely inside the existing Shell
+   (`.panel-overlay`/`.panel-content`) -- no second overlay, no second
+   backdrop, no second focus-trap/aria-modal/scroll-container/z-index
+   system. `.detail-panel__pane--case` (CaseDetail) is never unmounted
+   while the panel is open, only slid off-screen -- this is what keeps
+   its scroll position intact across a "Ver fuente" round-trip, for
+   free, with no manual scrollTop save/restore needed.
+   ════════════════════════════════════════════════════════════ */
+.detail-panel__pane-track {
+  display: flex;
+  width: 200%;
+  height: 100%;
+  transition: transform var(--transition-base);
+}
+.detail-panel__pane-track--source {
+  transform: translateX(-50%);
+}
+.detail-panel__pane {
+  width: 50%;
+  height: 100%;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+/* The off-screen pane must not be focusable/clickable/announced to
+   screen readers while hidden -- `visibility:hidden` (not just the
+   `transform`) removes it from the tab order and the accessibility
+   tree in every browser natively, no `inert` attribute needed. */
+.detail-panel__pane-track--source .detail-panel__pane--case {
+  visibility: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Layout experiment (this branch) — sticky CTAs / independent
+   content scroll. `.detail-panel__pane--case` stops being the
+   scrolling element itself (overrides the shared `.detail-panel__pane`
+   rule above via equal-specificity source order) and becomes a flex
+   column instead: `.detail-panel__pane-scroll` (Hero + panel-body)
+   grows/scrolls, `.detail-panel__actions-list` (now a real footer,
+   see its own rule further below) stays in flow as the fixed-size
+   second child -- always at the pane's bottom edge, never overlapping
+   the scrolling content above it, whether that content is short or
+   long. `.detail-panel__pane--source` (SourceDetail, no Actions) is
+   untouched, still governed by the shared `.detail-panel__pane` rule.
+   ════════════════════════════════════════════════════════════ */
+.detail-panel__pane--case {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.detail-panel__pane-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* Breathing room before the CTA footer -- belt-and-suspenders: the
+     flex split above already prevents any real overlap, this just
+     keeps the last content block from sitting flush against the
+     footer's top border. */
+  padding-bottom: var(--space-16, 16px);
+}
+
+/* "Ver fuente" -- design/react-visual-align, "ContextualAction DS
+   component": no longer a DetailPanel-specific button/CSS. Evidence
+   findings that carry a navigable source render the DS `context-cta`
+   molecule (molecules/context-cta/context-cta.css) via the
+   `ContextualAction` React component, as the last inline child of
+   `.detail-panel__finding` itself -- same placement the historical
+   vanilla lab used for its own reveal-CTA on this exact element
+   (SimaHealth/frontend/features/case-page/case-page.js
+   `renderEvidenceColumns()`: `data-has-note-cta` directly on
+   `.detail-panel__finding`, CTA appended after the finding text, same
+   span). `.detail-panel__finding` itself carries `data-has-context-cta`
+   (set in DetailPanel.tsx) -- no DetailPanel-owned reveal CSS lives
+   here anymore; hover/focus-within, opacity, motion, spacing and
+   tokens are entirely the DS molecule's contract now. This organism
+   only decides WHERE the action appears, what it does, its label and
+   icon -- never how it looks or reveals. */
+
+/* design/react-visual-align, "SourceDetail refinement" -- same
+   Header→content breathing room CaseDetail already has via
+   `.panel-hero.detail-panel__hero`'s own `margin-top: var(--space-48)`
+   (approved rule, reused verbatim, not re-derived): without it,
+   `.detail-panel__source` sat flush against `.panel-content`'s top
+   edge (16px Shell inset only), unlike Hero. `.detail-panel__pane` has
+   no padding of its own (see pane-track rules above), so this margin
+   is the only source of that respiro for the source pane, exactly
+   mirroring how Hero is the only source for the case pane. */
+.detail-panel__source {
+  margin-top: var(--space-48);
+}
+
+/* SourceDetail content -- explicit role assignment, not inherited from
+   any HTML tag (HTML heading level ≠ typography role, see
+   atoms/text/text.css §6). Uses the full width/padding/scroll already
+   provided by `.panel-overlay`'s 16px Shell inset + this pane's own
+   `overflow-y:auto` -- no new padding introduced. */
+.detail-panel__source-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-4);
+}
+/* H2 role (--text-lg/--weight-semibold/--leading-tight, 20px/600/1.20)
+   -- SourceDetail's own primary heading, deliberately NOT H1 (H1 stays
+   reserved for the case's condition name, Hero's h2, per explicit
+   scope). tabIndex="-1" (set in SourceDetail.tsx) makes it
+   programmatically focusable on open without being in the Tab order. */
+.detail-panel__source-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-8);
+}
+.detail-panel__source-title:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+}
+.detail-panel__source-meta {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-16);
+}
+.detail-panel__source-abstract {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-16);
+}
+/* External link out to the real PubMed page -- distinct from the
+   in-Shell "Ver fuente" navigation (which never opens a new tab); this
+   is the one place SourceDetail deliberately does leave the app,
+   because "referencia o enlace externo" was an explicit, separate ask.
+   Same link-color convention already established by
+   `atoms/text/text.css`'s `.t-body-link` (text-primary -> text-brand
+   on hover) -- reused at BODY's font-size instead of that utility's
+   own 16px, to stay inside the 7-role canon. */
+.detail-panel__source-link {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.detail-panel__source-link:hover {
+  color: var(--text-brand);
+}
+.detail-panel__source-link:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+}
+
+
+/* ── Hero ─────────────────────────────────────────────────────
+   Identidad neutral — no interpreta, no razona, no comunica
+   hipótesis/probabilidad/IA. Sin borde inferior (decisión de
+   producto): el Hero deja de competir visualmente con el resto del
+   panel.
+   design/react-visual-align, "48px section rhythm": `margin-bottom`
+   was `var(--space-20)` -- Hero is the first "sección principal" in
+   the panel's visual sequence (Hero → Análisis diferencial → ...), so
+   it now uses the same --space-48 token as `.panel-body`'s own gap,
+   for one consistent rhythm from the top of the content down.
+   design/react-visual-align, "H1 -> Shell CTA space": `margin-top`
+   added -- the requested relationship was described as "H1 above,
+   Shell CTA below", but the actual DOM/visual order is the reverse
+   (`.panel-header-nav`'s Cerrar/Expandir icons render ABOVE the Hero,
+   verified: 0px gap between them before this change). Implemented as
+   the real adjacent relationship that exists -- 48px between
+   `.panel-header-nav` and the Hero -- since that's what "more room
+   between the H1 and the Shell CTA" means on the actual, current
+   layout. Scoped to the Hero itself (organism content), not to
+   `.panel-header-nav`/`.panel-content`/`.panel-overlay` (Shell) -- the
+   Shell's own padding is untouched. */
+.panel-hero.detail-panel__hero {
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-top: var(--space-48);
+  margin-bottom: var(--space-48);
+}
+/* design/react-visual-align, "canonical DS typography unification"
+   (2026-08-11): the Hero's h2 was the case's single HEADER (identidad
+   principal) per the DS-wide canon -- --text-lg/weight-bold/
+   leading-tight (20px/700/1.2), then the canonical HEADER values
+   (--text-base/weight-semibold/leading-snug, 16px/600/1.35).
+   Superseded (design/react-visual-align, "H1 visual test"): this is a
+   deliberate, explicit ROLE assignment -- H1 (--text-xl/weight-
+   semibold/leading-tight, 24px/600/1.20; see atoms/text/text.css §6
+   for the full canon and the "token name ≠ token value" rule this
+   depends on: --text-xl is used because ITS EFFECTIVE VALUE is 24px
+   today, not because its name matches "H1"). NOT because this element
+   is an `<h2>` -- HTML heading level ≠ typography role, per the same
+   canon doc. Scoped to only the condition name text; `.hero-meta`,
+   every other section title, and every other role in this file are
+   untouched. Anatomy (Hero itself, its position, hero-meta) unchanged
+   -- typography only, and only this one element. */
+.panel-hero.detail-panel__hero h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: normal;
+  line-height: var(--leading-tight);
+}
+/* DetailPanel QA visual fixes task (item 5): explicit typography so
+   "Paciente 009 · Carga manual" reads at the SAME scale/tone as the
+   canon block right below it (`.detail-panel__canon-holder`, also
+   `--text-sm`/`--text-secondary`) -- previously undeclared here, so it
+   fell back to `body`'s own defaults (browser default size, primary
+   color, framework/base.css), a visibly different, heavier system than
+   the rest of the metadata under the title. The title itself (h2,
+   above) is untouched -- still the one primary/bold element in this
+   header. */
+.panel-hero.detail-panel__hero .hero-meta {
+  margin-top: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+
+/* ── Body ─────────────────────────────────────────────────────
+   Contenedor de blocks. Siempre después del hero. Con bloque sticky,
+   el gap sube a 40px (espacio parejo entre secciones — el sticky lo
+   necesita para que su sombra "al despegarse" respire igual que el
+   resto).
+   design/react-visual-align, "48px section rhythm" (supersedes the
+   prior "32px section rhythm" pass): this `gap` IS the rule that
+   governs spacing between main sections (Alerts → Análisis diferencial
+   → Sugerencia → Acciones) -- now the canonical token for 48px
+   (`--space-48`). Doesn't touch the 16px/16px/24px rules inside
+   Análisis diferencial (título→item, item→item, categoría→categoría)
+   -- those live on their own selectors further down, untouched. */
+.panel-body { display: flex; flex-direction: column; gap: var(--space-48); }
+.panel-body:has(.detail-panel__sticky) { gap: 40px; }
+
+
+/* ── Block ────────────────────────────────────────────────────
+   Unidad atómica de contenido. Repetible (1..N). El adaptador
+   controla cantidad, orden y contenido; el organismo solo pinta.
+   ─────────────────────────────────────────────────────────── */
+/* design/react-visual-align, "canonical DS typography unification"
+   (2026-08-11): `.block-label` (h3 "Análisis diferencial"/"Sugerencia")
+   is the TITLE role -- it identifies a `.panel-block` section, not a
+   single value. Was 11px/uppercase/700 (no line-height); now canonical
+   TITLE size/weight (--text-sm/weight-semibold, 14px/600) plus the
+   line-height TITLE requires (--leading-snug).
+   Correction (same day): the first pass left `text-transform:uppercase`,
+   `letter-spacing` and `color:var(--text-tertiary)` in place, calling
+   them "decorative, not part of the 4-role canon" -- wrong. The canon
+   (see card.css's own 4-role definition) ties color to the role
+   (TITLE = --text-primary), and uppercase+letterspacing+tertiary-color
+   is precisely what makes text READ as LABEL regardless of its
+   font-size/weight tokens -- the visual presentation IS the role, not
+   just the numbers. Removed uppercase/letter-spacing, color moved to
+   --text-primary so TITLE is actually perceptible as a title, not a
+   small-caps metadata label. margin-bottom is spacing, still untouched. */
+.panel-block .block-label {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  margin-bottom: 10px;
+}
+
+/* design/react-visual-align, "H3 visual test": "Análisis diferencial"
+   adopts the H3 role (--text-md/weight-semibold/leading-snug, 18px/
+   600/1.35) -- a deliberate, explicit ROLE assignment, not because
+   this element is an `<h3>` (HTML heading level ≠ typography role,
+   see atoms/text/text.css §6). Scoped to `.detail-panel__differential`
+   specifically (the one section wrapping "Análisis diferencial") so
+   "Sugerencia" -- the other consumer of the shared `.block-label`
+   class -- is untouched and stays TITLE (14px). weight/line-height
+   happen to already equal H3's (both TITLE and H3 use --weight-
+   semibold/--leading-snug); only font-size actually changes here. */
+.detail-panel__differential > .block-label {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+/* `.block-value` (leading hypothesis condition + reasoning) is BODY --
+   the value under "Hipótesis mejor soportada". Was --text-md/600 (18px/
+   600, one step too large and too heavy for canonical BODY); now
+   --text-sm/weight-regular/leading-normal (14px/400/1.5). `.muted`'s own
+   literal `font-weight: 400` already matched canonical BODY's weight by
+   coincidence -- tokenized to `var(--weight-regular)` for consistency,
+   same value. Its `color: var(--text-secondary)` is a legitimate
+   contextual color per the canon ("--text-primary o el token semántico
+   correspondiente"), left as-is. */
+.panel-block .block-value       { font-size: var(--text-sm); font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.panel-block .block-value.muted { font-weight: var(--weight-regular); color: var(--text-secondary); }
+
+.panel-block .block-value--alert { color: var(--text-error); display: flex; align-items: center; gap: var(--space-8, 8px); }
+
+/* Con bloque sticky: contenido indentado 16px bajo el título de cada
+   sección. El título (`.block-label`) queda en el borde; todo lo
+   demás dentro de cada `.panel-block` se corre a la derecha. */
+.panel-overlay:has(.detail-panel__sticky) .panel-block > *:not(.block-label) {
+  margin-left: var(--space-16, 16px);
+}
+
+/* Dot de alerta — usado dentro de `.block-value--alert` del bloque
+   sticky (Estado del caso / Estado del tratamiento). */
+.detail-panel__alert-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-error); flex-shrink: 0;
+}
+.detail-panel__alert-dot--warn { background: var(--text-warning); }
+
+
+/* ── Responsive (shell) ──────────────────────────────────────
+   Panel en pantallas ≤ 1100px → ocupa 100vw. Padding: sin override
+   (design/react-visual-align, "Shell 16px outer space") -- el
+   `padding: var(--space-16)` de `.panel-overlay` ya no varía por
+   breakpoint, así que los 16px se mantienen exactos en cualquier
+   ancho de viewport en vez de reducirse como antes.
+   ─────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .panel-overlay { width: 100vw; max-width: 100vw; min-width: 0; }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   Estado del caso (bloque sticky) — capacidad del shell, independiente
+   del contenido clínico: `DetailPanelProps.blocks` puede incluir un
+   bloque `sticky`, pero el organismo solo lee `sticky.nextStep` (ver
+   Sugerencia) y no pinta `situation`/`resolutionText`/`holder`/
+   `targetBy` — el CSS de composición del sticky permanece por si un
+   futuro Shell vuelve a necesitarlo, no porque este organismo lo
+   consuma hoy.
+   ════════════════════════════════════════════════════════════ */
+.detail-panel__sentinel { height: 1px; margin-bottom: calc(-1 * var(--space-40, 40px)); }
+.detail-panel__sticky {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--surface-primary);
+  padding-bottom: var(--space-16, 16px);
+  transition: box-shadow var(--transition-base);
+}
+.detail-panel__sticky.is-stuck { box-shadow: var(--shadow-sm); }
+/* top/height cubren el padding-top de `.panel-content` (24px, M4.4 —
+   única fuente de verdad, constante sin importar breakpoint). Left/
+   right cubren su padding lateral en modo sticky (24px default, 12px
+   en ≤1100px, ver `.panel-overlay:has(.detail-panel__sticky)
+   .panel-content`) — esos sí varían por breakpoint. */
+.detail-panel__sticky::before {
+  content: ''; position: absolute;
+  top: calc(-1 * var(--space-24, 24px)); left: calc(-1 * var(--space-24, 24px));
+  right: calc(-1 * var(--space-24, 24px)); height: var(--space-24, 24px);
+  background: var(--surface-primary);
+}
+@media (max-width: 1100px) {
+  .detail-panel__sticky::before {
+    left: calc(-1 * var(--space-12, 12px));
+    right: calc(-1 * var(--space-12, 12px));
+  }
+}
+
+.detail-panel__status { display: flex; flex-wrap: wrap; gap: var(--space-20, 20px); margin-top: var(--space-12, 12px); }
+.detail-panel__status-left { display: flex; align-items: center; gap: var(--space-8, 8px); flex-wrap: wrap; }
+.detail-panel__status-right { flex: 1; min-width: 200px; }
+.detail-panel__step-label {
+  font-size: 10px; font-weight: var(--weight-bold); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-tertiary); margin-bottom: 3px;
+}
+.detail-panel__step-text { font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--text-primary); line-height: 1.4; }
+
+
+/* ════════════════════════════════════════════════════════════
+   Análisis diferencial — UNA sola unidad visual: hipótesis principal
+   → evidencia que la sostiene → otras hipótesis consideradas. El
+   label del bloque ("Análisis diferencial") queda al borde; todo su
+   contenido se indenta parejo — la indentación, no un color ni un
+   borde nuevo, es lo que comunica "esto es una sola cosa".
+   ════════════════════════════════════════════════════════════ */
+/* design/react-visual-align, "8px indentation rule": was
+   `var(--space-16)` -- normalized to the single, consistent
+   TITLE→content indent (`--space-8`) used everywhere else in this
+   organism now (see the matching rules for Hipótesis/Evidencia/
+   Alternativas/Sugerencia below).
+   design/react-visual-align, "16/16/24 spacing rule": `gap` between
+   the 3 pieces inside (Hipótesis/Evidencia/Alternativas) is CATEGORÍA
+   → SIGUIENTE CATEGORÍA -- moved from --space-16 to --space-24. Each
+   category's own leading/trailing margin that used to add to this gap
+   (`.evidence-support`'s `margin-top`, `.alternatives`'s `margin-top`)
+   is removed below so this `gap` is the sole, exact source of that
+   distance -- verified with getBoundingClientRect. */
+.detail-panel__differential-body {
+  margin-left: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+/* design/react-visual-align, "canonical DS typography unification"
+   (2026-08-11): this eyebrow introduces a whole sub-block (condition +
+   reasoning + contribution rows) -- also reused for "Evidencia" (see
+   EvidenceSupport in DetailPanel.tsx; deuda #8 in the DS
+   DecisionRecord about this class name being reused). Both are TITLE,
+   not LABEL. Was 11px/weight-medium (no line-height); now canonical
+   TITLE (--text-sm/weight-semibold/leading-snug).
+   Correction (same day): uppercase/letter-spacing/tertiary-color were
+   left in place by the first pass ("decorative, not part of the
+   canon") -- wrong, see `.block-label`'s comment above for the full
+   reasoning. Removed uppercase/letter-spacing, color moved to
+   --text-primary. `.hypothesis-label`'s own `font-weight: bold`
+   override is (still) removed -- it's a BODY value now (via
+   `.block-value`, see above), no extra weight on top. */
+.detail-panel__hypothesis-eyebrow {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-4);
+}
+.detail-panel__hypothesis-reasoning { margin-top: var(--space-8); }
+/* design/react-visual-align, "8px indentation rule": TITLE PARENT →
+   FIRST LEVEL CONTENT, applied to "Hipótesis mejor soportada" (label/
+   reasoning/contribution, its 3 direct siblings under the eyebrow)
+   and to "Evidencia" (see `.evidence-support` below, same eyebrow
+   class reused, deuda #8) -- both scoped to their own wrapper so this
+   doesn't reach into unrelated blocks. Internal structure (contribution
+   rows' own columns, findings-chips) is untouched -- only the title→
+   content relationship moves. */
+.detail-panel__hypothesis--leading > *:not(.detail-panel__hypothesis-eyebrow) {
+  margin-left: var(--space-8);
+}
+
+/* Valor vacío de un campo dentro de una capacidad ya presente — distinto
+   de ADR-006 (que rige si la capacidad existe o no). Nunca contenido
+   inventado: representa un campo real del contrato (razonamiento,
+   contribuciones, grupo de evidencia, hipótesis alternativa) cuyo valor
+   el backend todavía no provee. Fuente única de verdad, reutilizada en
+   todos los campos de Análisis diferencial que hoy pueden faltar — ver
+   `emptyValue()` en detail-panel.js y DecisionRecord.md, "¿Por qué
+   Análisis diferencial conserva su anatomía completa aunque el dato
+   esté incompleto?". */
+/* design/react-visual-align, "canonical DS typography unification"
+   follow-up: this had no font-size/weight/line-height of its own,
+   inheriting whatever the containing element happened to set --
+   correct in some contexts (e.g. inside `.block-value.muted`, already
+   BODY) but landing on the browser's unstyled default (16px/1.5) in
+   others (`.detail-panel__contribution`'s empty state,
+   `.detail-panel__findings-chips`' empty groups) where nothing upstream
+   declares a size. "Pendiente de integración" is a VALUE (BODY, per
+   the same role every other empty-value slot in Análisis diferencial
+   already carries) -- made explicit here so it's BODY-compliant
+   regardless of which container it's rendered under. */
+/* design/react-visual-align, "watermark treatment": color moved from
+   --text-tertiary to --text-disabled -- the DS's own next, more muted
+   step on the text-color scale (already the canonical token for
+   "barely-there but still legible" text, see button.css's disabled
+   state, `--btn-text-disabled: var(--text-disabled)`). Role stays
+   BODY (font-size/weight/line-height untouched) -- only color moves,
+   so "Pendiente de integración" reads as a near-watermark annotation,
+   clearly subordinate to the real clinical content around it, without
+   becoming illegible or turning into a LABEL.
+   design/react-visual-align, "tagInfo pattern": this same
+   `--text-disabled` token is the single source of truth for "how
+   tenuous this class of text looks" -- also consumed by
+   `molecules/tag-info/tag-info.css` (the new contextual-annotation
+   pattern).
+   Superseded (design/react-visual-align, "tagInfo pattern" follow-up):
+   the "one icon per instance would be noisy" call above is overridden
+   -- product wants `tagInfo` to be the single, canonical pattern for
+   this class of text everywhere, icon included. `EmptyValue()` in
+   DetailPanel.tsx now renders `.tag-info` directly; this rule has no
+   remaining consumer in DetailPanel.tsx, left here unused/untouched
+   (documented DS vocabulary, same as `.detail-panel__alt*`/
+   `.detail-panel__actions-delete` elsewhere in this file). */
+.detail-panel__empty-value {
+  color: var(--text-disabled);
+  font-style: italic;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+}
+
+/* Análisis del sistema — lista de contribución («Cómo se construye
+   esta hipótesis») → conclusión (dominante). Lista, no tabla: sin
+   bordes, sin grid de spreadsheet. */
+.detail-panel__contribution { display: flex; flex-direction: column; margin-top: 10px; }
+.detail-panel__contribution-row { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; }
+/* design/react-visual-align, "canonical DS typography unification"
+   (2026-08-11): source/weight are row VALUES -- BODY (was --text-sm/600
+   and --text-base/700 respectively; now both canonical --text-sm/
+   weight-regular). `-status` (Completa/Parcial/Pendiente) contextualizes
+   the row rather than being its content -- LABEL (was literal 12px/600,
+   now the canonical token --text-xs at the same 12px, weight-regular);
+   the `--pending` variant's own extra `font-weight: 500` override is
+   dropped so every status shares LABEL's one weight, color-only
+   distinction remains. */
+.detail-panel__contribution-source { min-width: 112px; font-size: var(--text-sm); font-weight: var(--weight-regular); color: var(--text-primary); }
+.detail-panel__contribution-weight { min-width: 34px; font-size: var(--text-sm); font-weight: var(--weight-regular); color: var(--text-primary); }
+.detail-panel__contribution-status { font-size: var(--text-xs); font-weight: var(--weight-regular); line-height: var(--leading-snug); }
+.detail-panel__contribution-status--complete { color: var(--text-success); }
+.detail-panel__contribution-status--partial  { color: var(--text-warning); }
+.detail-panel__contribution-status--pending  { color: var(--text-tertiary); }
+
+.detail-panel__conclusion {
+  font-size: var(--text-md); font-weight: var(--weight-bold); line-height: 1.4;
+  color: var(--text-primary);
+}
+
+/* Evidencia — vive DENTRO de Análisis diferencial, no es su propia
+   `<section class="panel-block">`.
+   design/react-visual-align, "16/16/24 spacing rule": the `margin-top`
+   that used to separate Evidencia from Hipótesis (so it read as "part
+   of the same unit, not a new block") is removed -- that distance is
+   now `.differential-body`'s own `gap` (--space-24, CATEGORÍA →
+   SIGUIENTE CATEGORÍA), and keeping this margin-top on top of it would
+   have added an extra, undocumented amount on top of the exact 24px
+   this rule requires. `display:flex;flex-direction:column;gap:
+   --space-16` is the new TÍTULO→ITEM and ITEM→ITEM source for
+   Evidencia's own content (the eyebrow + `.evidence-composition` +
+   each `.findings-group`, all direct children here) -- see the
+   individual rules below for the redundant margins removed so this
+   `gap` is the only contributor. */
+.detail-panel__evidence-support {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+/* design/react-visual-align, "8px indentation rule": "Evidencia" →
+   its first-level content (`.evidence-composition` and each
+   `.findings-group`, both direct siblings of the eyebrow) -- same
+   TITLE PARENT → FIRST LEVEL CONTENT rule as `.hypothesis--leading`
+   above. Does not reach into each findings-group's own "A favor"/"En
+   contra"/"Pendiente" sub-label → chips relationship -- that's a
+   separate, deeper level not covered by this rule. */
+.detail-panel__evidence-support > *:not(.detail-panel__hypothesis-eyebrow) {
+  margin-left: var(--space-8);
+}
+/* design/react-visual-align, "16/16/24 spacing rule": this eyebrow's
+   own `margin-bottom: var(--space-4)` (declared above, shared with
+   "Hipótesis mejor soportada") is zeroed out specifically in this
+   context -- `.evidence-support`'s `gap` (--space-16) is now the sole
+   TÍTULO→ITEM distance for "Evidencia"; the Hipótesis instance
+   elsewhere is untouched (higher-specificity selector, scoped). */
+.detail-panel__evidence-support > .detail-panel__hypothesis-eyebrow {
+  margin-bottom: 0;
+}
+/* AOW/DetailPanel visual hierarchy task: the count/status summary
+   ("3 a favor · 5 en contra · 4 pendientes") is now a row of DS
+   `Badge` atoms (Badge.tsx, tone=success/error/warning) instead of
+   plain LABEL text -- `Badge`'s own CSS (badge.css) owns their
+   typography/color/spacing now; this wrapper only provides the
+   row layout (`gap: var(--space-4)`, same token the old plain-text
+   version already used, wrapping preserved for narrow widths). The
+   former `.detail-panel__evidence-count*` rules (a bespoke LABEL
+   treatment for the old plain-text version) are removed -- Badge
+   fully replaces them, no longer dead-but-kept DS vocabulary since
+   nothing else in this organism used them. */
+.detail-panel__evidence-composition { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+
+/* design/react-visual-align, "LABEL vs TITLE correction": this class
+   renders "A favor"/"En contra"/"Pendiente" (FINDING_GROUP_LABEL in
+   DetailPanel.tsx) -- a per-group auxiliary tag categorizing the chips
+   below it, not a section title (that's "Evidencia" itself, rendered
+   via the shared `.hypothesis-eyebrow`, untouched here). The prior
+   pass ("canonical DS typography unification", 2026-08-11) misclassified
+   this as TITLE -- corrected to the canonical LABEL role
+   (--text-xs/weight-regular/leading-snug/--text-tertiary), matching
+   this organism's other confirmed LABEL instances
+   (`.contribution-status`, `.evidence-count`) and Card.tsx's canonical
+   `.card__label`, neither of which use uppercase/letter-spacing --
+   removed both so this doesn't visually compete with "Evidencia"
+   (TITLE) above it. `margin-bottom: 5px` (pre-existing, unrelated to
+   the TITLE/LABEL role) is left untouched -- it's this group's own
+   label→chips spacing, not part of the título/item/categoría rule. */
+.detail-panel__evidence-title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  color: var(--text-tertiary);
+  margin-bottom: 5px;
+}
+
+/* design/react-visual-align, "16/16/24 spacing rule": `.findings-group`
+   used to carry `margin-top: var(--space-10)` (with `:first-of-type`
+   zeroing it out) -- removed. `.evidence-support`'s
+   `gap: var(--space-16)` is now the sole ITEM→ITEM distance between
+   findings-groups (and between the count line and the first group),
+   so a per-item margin here would have doubled up with it. */
+.detail-panel__findings-chips { display: flex; flex-wrap: wrap; gap: var(--space-6); margin-top: var(--space-4); }
+
+/* design/react-visual-align, "canonical DS typography unification"
+   follow-up: evidence chip text is a VALUE (BODY) -- font-size was
+   already --text-sm, but line-height was a literal `1.3` (no DS
+   leading token resolves to that ratio) instead of BODY's
+   --leading-normal. Weight was left at the browser default (400),
+   which already equals --weight-regular, so it needed no change.
+
+   design/react-visual-align, "evidence visual cleanup": the pill
+   `background: var(--surface-secondary)` is removed -- findings are no
+   longer chips with a fill, just bulleted lines of text (structure/
+   spacing/typography/content unchanged, no replacement background
+   introduced).
+
+   design/react-visual-align, "ContextualAction inline-flow fix":
+   `display` changed from `inline-flex` to `inline` (dropping
+   `align-items`/`gap`, both flex-only). With a trailing
+   `ContextualAction` inside this element (see DetailPanel.tsx), flex
+   was actively wrong: `.finding` has no `flex-wrap`, so its dot/type/
+   text/CTA are flex ITEMS forced onto one row -- for long finding text
+   that wraps, the text wraps *inside its own flex item* while the CTA
+   sits as an independent sibling item to the right (`align-items:
+   flex-start` pins it to the top), reading as a separate right-aligned
+   column instead of a continuation of the sentence. Plain `inline`
+   puts the dot/type/text/CTA back into normal inline flow, so the CTA
+   wraps as the sentence's own next "word" -- exactly the anatomy a
+   bulleted, wrapping line of text needs. Losing flex's `gap` is
+   compensated per-relationship below (dot's own `margin-right`, and a
+   scoped `.context-cta` override further down) -- same `--space-6`
+   token throughout, not a new value. */
+.detail-panel__finding {
+  display: inline;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  padding: var(--space-4) var(--space-10);
+  line-height: var(--leading-normal);
+}
+/* `inline-block` (was relying on the flex parent to size a plain
+   `inline` box) + `vertical-align: middle` -- the standard technique
+   for a small bullet dot inline with wrapping text, replacing the old
+   flex-specific `margin-top` optical-centering hack (a compensation
+   for `align-items: flex-start`, which no longer applies now that the
+   parent isn't flex). `margin-right` replaces the space the removed
+   flex `gap` used to provide between the dot and the type/text that
+   follows -- same `--space-6` token, not a new value. */
+.detail-panel__finding-dot {
+  display: inline-block;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: var(--space-6);
+}
+.detail-panel__finding--for .detail-panel__finding-dot { background: var(--text-success); }
+.detail-panel__finding--against .detail-panel__finding-dot { background: var(--text-warning); }
+.detail-panel__finding--missing .detail-panel__finding-dot { background: var(--text-tertiary); }
+/* design/react-visual-align, "canonical DS typography unification"
+   follow-up: inherits `.finding`'s size/line-height (BODY, above) --
+   only its own weight needed fixing. `--weight-medium` isn't one of
+   the two canonical weights (BODY is always --weight-regular); moved
+   there without touching size, so it stays inline with the rest of
+   the chip's text instead of becoming its own smaller LABEL-sized
+   element (that would be a size/layout change, out of scope here). */
+.detail-panel__finding-type { color: var(--text-tertiary); font-weight: var(--weight-regular); }
+/* design/react-visual-align, "ContextualAction inline-flow fix":
+   `.context-cta`'s own resting margin (context-cta.css) cancels all 4
+   sides -- correct for a flex-gap container, which `.finding` no
+   longer is. This organism-scoped override restores JUST the left
+   value as a real margin (same `--space-6` `.finding-dot` above also
+   uses, replacing the same removed flex `gap`) so the CTA keeps a
+   visual gap from the sentence it follows; ContextualAction's own
+   CSS/appearance/hover/focus behavior is untouched -- this only
+   overrides ONE longhand in ONE consuming context, per context-
+   cta.css's own documented "a non-flex consumer... can still add its
+   own" contract. */
+.detail-panel__finding .context-cta {
+  margin-left: var(--space-6);
+}
+
+/* Otras hipótesis consideradas -- design/react-visual-align, "remove
+   divider": the 1px `border-top` ("separador sutil") that used to mark
+   the transition into this block is removed, not replaced by another
+   line -- the categoría→categoría vertical space (`.differential-body`'s
+   own --space-24 gap, unchanged) plus this block's own typography
+   (the `tag-info` treatment, see below) are meant to carry that
+   separation on their own now. */
+.detail-panel__alternatives {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+/* design/react-visual-align, "canonical DS typography unification"
+   (2026-08-11): introduces the alternatives block below -- TITLE (was
+   10px/weight-medium, "peso visual reducido a propósito" per the
+   comment above; now canonical --text-sm/weight-semibold/leading-snug).
+   This visibly raises this label's weight relative to the previous
+   deliberately-subdued treatment -- a real tension between that earlier
+   product decision and this sprint's canonical rule, reported rather
+   than silently resolved (see sprint report).
+   Correction (same day): uppercase/letter-spacing/tertiary-color were
+   left in place by the first pass -- wrong, see `.block-label`'s
+   comment above for the full reasoning. Removed uppercase/letter-
+   spacing, color moved to --text-primary -- this is the visual
+   resolution of the "real tension" noted above: TITLE now genuinely
+   reads as a section title, not the deliberately-subdued small-caps
+   treatment it's replacing. */
+/* design/react-visual-align, "16/16/24 spacing rule": `margin-bottom`
+   removed -- `.alternatives`' own `gap: var(--space-16)` is now the
+   sole TÍTULO→ITEM distance to the first `.alt` row. */
+.detail-panel__alternatives-label {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+.detail-panel__alt { font-size: var(--text-sm); }
+/* design/react-visual-align, "16/16/24 spacing rule": was
+   `margin-top: var(--space-8)` on `.alt + .alt` -- removed, same
+   reason as `.findings-group` above: `.alternatives`' `gap` is now the
+   sole ITEM→ITEM distance between rows. */
+/* design/react-visual-align, "8px indentation rule": "Otras hipótesis
+   consideradas" → its first-level content (each `.alt` row, a direct
+   sibling of `.alternatives-label`). Same TITLE PARENT → FIRST LEVEL
+   CONTENT rule as the other blocks -- doesn't touch the vertical
+   rhythm between rows (`.alt + .alt`, above) or their internal
+   label/status/reasoning layout. */
+.detail-panel__alternatives > *:not(.detail-panel__alternatives-label) {
+  margin-left: var(--space-8);
+}
+/* `.alt-label` (discarded hypothesis condition name) is a BODY value --
+   weight moved from --weight-medium to --weight-regular; its
+   `color: var(--text-secondary)` de-emphasis is a legitimate contextual
+   color choice under the canon, left as-is. */
+.detail-panel__alt-label { font-weight: var(--weight-regular); color: var(--text-secondary); }
+.detail-panel__alt-status { color: var(--text-tertiary); margin-left: var(--space-6); }
+.detail-panel__alt-reasoning { color: var(--text-tertiary); margin-top: var(--space-2); }
+
+
+/* ── Sugerencia — un único bloque, nunca en tono imperativo. ── */
+/* design/react-visual-align, "8px indentation rule": "Sugerencia" →
+   its value (`.suggestion-text`, the block's only content). Same
+   TITLE PARENT → FIRST LEVEL CONTENT rule as the other blocks. */
+.detail-panel__suggestion > .detail-panel__suggestion-text { margin-left: var(--space-8); }
+.detail-panel__suggestion-text { font-weight: var(--weight-regular); }
+
+
+/* ── Alertas ── */
+.detail-panel__alerts { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+/* design/react-visual-align, "canonical DS typography unification"
+   follow-up: the `<h3 class="sr-only">Alertas</h3>` (README: the
+   screen-reader-only equivalent of the other sections' visible
+   `.block-label`, since Alertas has no visible heading text) had zero
+   DS typography -- `.sr-only` only clips visually, so it fell through
+   to the browser's unstyled `h3` default. Same TITLE role as every
+   other section heading (`.block-label`), scoped narrowly to this
+   context so the shared `.sr-only` utility itself stays untouched.
+   Purely hygienic: the clipping means this has no visible effect. */
+.detail-panel__alerts h3 {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+
+/* ── Timeline compacto — capacidad del shell, no consumida por el
+   organismo hoy (ver detail-panel.js: 'timeline' llega en las Props
+   sin pintarse). Se conserva por si un futuro contenido vuelve a
+   necesitarla. ── */
+.detail-panel__timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-14, 14px); }
+.detail-panel__timeline-item { display: flex; gap: var(--space-12, 12px); align-items: flex-start; }
+.detail-panel__timeline-marker { display: flex; flex-direction: column; align-items: center; align-self: stretch; flex-shrink: 0; padding-top: var(--space-4, 4px); }
+.detail-panel__timeline-dot { width: var(--space-6); height: var(--space-6); border-radius: 50%; background: var(--text-tertiary); flex-shrink: 0; }
+.detail-panel__timeline-connector { width: 0.5px; height: 32px; background: var(--border-default); margin-top: 4px; }
+.detail-panel__timeline-when { flex: 0 0 84px; font-size: 11px; color: var(--text-tertiary); padding-top: 1px; }
+.detail-panel__timeline-what { flex: 1; font-size: var(--text-sm); color: var(--text-primary); line-height: 1.45; }
+
+
+/* ── Acciones disponibles — slot de CTAs del organismo. Capacidad
+   OPCIONAL por instancia (ADR-006): el adaptador arma este bloque
+   solo si hay CTAs reales/configurados; si no hay acciones, el bloque
+   no aparece. Los botones son atoms del DS (`.btn`) COMPUESTOS
+   dentro. La ejecución (cableado `data-action`) es del Runtime.
+
+   `.detail-panel__actions` (footer con fondo/bleed) se eliminó en
+   M4.4: sin consumidor en el HTML que este organismo genera — el
+   renderer actual pinta Acciones como `.panel-block
+   detail-panel__actions-list`, un `<div>` simple, sin tratamiento de
+   footer. Era CSS muerto (ver DecisionRecord.md, deuda #3),
+   confirmado por grep contra detail-panel.js antes de remover. ── */
+/* design/react-visual-align, "responsive actions wrap": buttons
+   already size to their own content (`.btn` is `display:inline-flex`
+   with no fixed/max-width, just a `min-width` floor -- unchanged,
+   atom untouched). The only missing piece was `flex-wrap` on this
+   container: without it, a row of buttons whose combined content
+   width exceeds the panel's width had nowhere to go but overflow
+   past the panel edge. `flex-wrap: wrap` lets extra buttons fall to
+   a new row instead, with no width/truncation/ellipsis changes to
+   `.btn` itself. */
+.detail-panel__actions-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8, 8px);
+  /* Layout experiment (this branch) -- now a real sticky-at-bottom
+     footer (see `.detail-panel__pane--case`/`-pane-scroll` above), not
+     the last item inside the scrolling `.panel-body`. `flex-shrink: 0`
+     keeps it at its natural height instead of the flex column
+     squeezing it; the top border + padding-top replace the --space-48
+     `.panel-body` gap this block lost by moving out of that container,
+     and double as the visual divider from the scrolling content above
+     it (M4.4 removed the old `.detail-panel__actions` footer treatment
+     for lack of a consumer -- this reintroduces one deliberately, only
+     for this experiment). Background matches the panel itself so the
+     footer reads as opaque, never letting scrolled content show
+     through underneath it. */
+  flex-shrink: 0;
+  padding-top: var(--space-16, 16px);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-primary);
+}
+
+/* Archived case, no active-clinical-action CTA to show (canon SP-91
+   v1) -- same footer container, just text instead of buttons. */
+.detail-panel__actions-list--passive .detail-panel__canon-holder {
+  font-style: italic;
+}
+
+/* Sprint 3 (2026-09-10): each action button is now wrapped with its own
+   `.sr-only` disabled-reason span (`aria-describedby` target) -- the
+   wrapper takes itself out of layout entirely so the flex row above
+   still only ever sizes/wraps around the `.btn` atoms themselves,
+   unchanged from the behavior documented above. */
+.detail-panel__action-item {
+  display: contents;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BE ADDITION — not part of the frozen organism above this line.
+   "Eliminar" (Papelera): pre-existing, already-approved (Sprint 1)
+   functionality that has no equivalent in detail-panel.js/.css.
+   Kept narrowly scoped so DetailPanel.tsx no longer needs
+   case-fiche__actions-delete / CaseFiche's stylesheet at all.
+   Same visual treatment CaseFiche used to give it (pinned right,
+   error-colored text on the existing .btn.btn--subtle atom).
+   ════════════════════════════════════════════════════════════ */
+.detail-panel__actions-delete {
+  margin-left: auto;
+  --btn-text: var(--text-error);
+  --btn-text-hover: var(--text-error);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSABLE · ESTADO — rama experiment/sp91-canon-refactor (SP-91).
+   Not part of the frozen organism above; not a settled Producto
+   decision either. Reuses existing tokens/atoms (Badge, the "system-
+   owned state" member of the badge family -- see Badge.tsx/badge-
+   base.css's own component-tree comment) rather than introducing new
+   visual language -- no new spacing scale, only existing --space-*
+   tokens.
+
+   Moved out of `.panel-body` (this pass): this block now sits directly
+   after Hero in the DOM (DetailPanel.tsx's PanelContent), read as
+   metadata belonging to the hero, not as a section with the panel's
+   normal 48px section rhythm. That requires overriding Hero's own
+   `margin-bottom: var(--space-48)` (see the M4.4 rule above) --
+   scoped to Hero-as-pane-scroll's-direct-child, so Hero's original
+   rule stays valid for any other context, only this exact composition
+   changes.
+
+   Spacing map (all DS tokens, no literals):
+   - header/meta -> this block: `--space-8`, entirely via THIS block's
+     own `margin-top` below (Hero's own margin-bottom is zeroed for
+     this composition immediately below, so there is nothing left to
+     collapse against -- margin-top is the sole source of that gap).
+   - Responsable text <-> state Badge (horizontal gap): `--space-8` via
+     explicit `column-gap`/`row-gap` (not the `gap` shorthand) on
+     `.detail-panel__canon-row`.
+   - Badge's own internal padding: NOT set here -- comes from the Badge
+     atom itself (badge-base.css's `--badge-px`/`--badge-py`, already DS
+     tokens), this block never overrides an atom's own padding.
+   - this block -> `.panel-body` (Análisis diferencial): `--space-48`,
+     via THIS block's own `margin-bottom` below -- same token
+     `.panel-body`'s internal gap already uses, so the rhythm toward
+     content is unchanged, just relocated from Hero to here.
+   - compactness: `.detail-panel__canon-state`'s own `--space-8`
+     column gap keeps the (optional) second row (Solicitud pendiente)
+     close to the Responsable/estado row, not spaced like a full
+     section.
+   ════════════════════════════════════════════════════════════ */
+.detail-panel__pane-scroll > .panel-hero.detail-panel__hero {
+  margin-bottom: 0;
+}
+.detail-panel__canon-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8, 8px);
+  margin-top: var(--space-8, 8px);
+  margin-bottom: var(--space-48, 48px);
+}
+
+.detail-panel__canon-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  /* Explicit column-gap/row-gap (not the `gap` shorthand) per explicit
+     spacing spec for this block -- same --space-8 value on both axes,
+     so wrapping to a second line (name too long to fit the state
+     badge on the same row) keeps the identical DS gap vertically. */
+  column-gap: var(--space-8, 8px);
+  row-gap: var(--space-8, 8px);
+}
+
+.detail-panel__canon-holder {
+  color: var(--text-secondary, currentColor);
+  /* Was `--font-size-sm` -- not a real token in tokens.css (always fell
+     back to its own literal, same 14px value as `--text-sm`, pre-
+     existing DS debt). Switched to the real token while unifying this
+     block's scale with `.hero-meta` below (DetailPanel QA visual fixes
+     task, item 5) -- no visual change, same 14px either way. */
+  font-size: var(--text-sm, 0.875rem);
+}
+
+/* DetailPanel/modales-de-acción polish task: "Responsable:" reads as a
+   label (muted), the actual name as real content (primary) -- was one
+   fused `--text-secondary` span, so the responsable's name had no more
+   visual presence than its own label.
+   Label hierarchy unification task: was `--text-secondary` -- one step
+   too dark, reading closer to body text than to a label. Every muted
+   label in this panel (Responsable/Destinatario/Motivo/etc., this same
+   class) now matches `.detail-panel__finding-type`'s own
+   `--text-tertiary` exactly, so "Literatura (PubMed)" and "Destinatario"
+   read as the same visual family instead of two different grays. */
+.detail-panel__canon-label {
+  color: var(--text-tertiary, currentColor);
+}
+
+.detail-panel__canon-value {
+  color: var(--text-primary, currentColor);
+}
+
+.detail-panel__canon-value-muted {
+  color: var(--text-secondary, currentColor);
+}

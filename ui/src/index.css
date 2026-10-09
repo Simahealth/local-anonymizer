@@ -1,0 +1,13 @@
+/* Punto de entrada global: el Design System completo de SimaHealth, en el
+   mismo orden que el frontend web (ver src/styles/ds/index.css). */
+@import "./styles/ds/index.css";
+
+/* Tema único claro, igual que el frontend web: sin esto, un SO en modo oscuro
+   pinta los controles nativos (scrollbars, selects) en oscuro. */
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+}

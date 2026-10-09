@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_020",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Miguel García Vargas\nCC 8578'226.896\nFecha de nacimiento: 08/03/2020\nProcedencia: Pasto, Huila\nDirección: Cl 98B N° 57-39, barrio Laureles\nTeléfono: 321 448 6102   Correo: miguel34@gmail.com\nEPS: Nueva EPS\nFecha de ingreso: Enero 6 de 2002\n\nMOTIVO DE CONSULTA\nPaciente 77 años de edad que ingresa al servicio refiriendo dolor abdominal de varios días de evolución. Reside en Pasto y consulta de forma espontánea. Se localiza al acompañante en el número 321 448 6102.\n\nVALORACIÓN\nAtendido por el Dr. Andrés Ramírez Martínez (Registro médico 87832). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo miguel34@gmail.com o remitir a la dirección Cl 98B N° 57-39.",
+  "ground_truth": {
+    "nombres": [
+      "Miguel García Vargas",
+      "Andrés Ramírez Martínez"
+    ],
+    "documentos": [
+      "8578'226.896"
+    ],
+    "edades": [
+      "77 años"
+    ],
+    "ubicaciones": [
+      "Pasto",
+      "Huila"
+    ],
+    "direcciones": [
+      "Cl 98B N° 57-39"
+    ],
+    "telefonos": [
+      "321 448 6102"
+    ],
+    "emails": [
+      "miguel34@gmail.com"
+    ],
+    "seguros": [
+      "Nueva EPS"
+    ],
+    "fechas_nacimiento": [
+      "08/03/2020"
+    ],
+    "fechas": [
+      "Enero 6 de 2002"
+    ],
+    "numeros_registro": [
+      "Registro médico 87832"
+    ]
+  }
+}

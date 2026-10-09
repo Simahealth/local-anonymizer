@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.DS_Store
+
+# Builds
+build/
+dist/
+dmg/
+ui/node_modules/
+ui/dist/
+
+# Nunca versionar resultados de anonimización ni documentos reales: las tablas
+# de relación de códigos permiten reidentificar pacientes.
+Lote_*/
+relacion_codigos.*

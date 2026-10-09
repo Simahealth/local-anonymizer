@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Atom: Icon Button
+   Layer: 2 — Atoms
+   Owner: Design System
+   Estado: active
+
+   22×22px icon-only button (default/`md`). Ghost at rest. Formalizado en
+   TSX (2026-09-09) -- `src/components/IconButton/IconButton.tsx` -- y
+   migrado a los 6 consumidores reales que ya armaban este mismo
+   `<button className="icon-btn">` a mano (Modal, DetailPanel ×3,
+   DocumentSidePanel, ComposerV2, ModalNuevoCaso, Toast). Mismas clases,
+   mismo look -- ver el componente para tamaños/tonos/loading nuevos.
+
+   `.sidebar-toggle` (LeftPanel, colapsar/expandir el panel) sigue como
+   alias de este mismo atom -- NO migrado a `IconButton` a propósito:
+   alterna entre 2 identidades visuales completas (`.sidebar-toggle`
+   solo vs `.sidebar-toggle .btn.btn--primary` cuando collapsed), un
+   patrón que ni `Button` ni `IconButton` modelan (los dos emiten
+   siempre una sola identidad visual consistente) -- ver el comentario
+   ya existente en `LeftPanel.tsx` junto a ese botón.
+
+   Extracted from: sidebar.css (Layer 5) in Sprint DS-EX-02.
+   Autoridad: DESIGN_SYSTEM_CONSTITUTION.md §3.
+   ========================================================================== */
+
+/* .sidebar-toggle included as alias — HTML/JS use this class name directly and
+   cannot be changed without a separate HTML migration sprint. */
+.icon-btn,
+.sidebar-toggle {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-200);
+  color: var(--sb-subtle, var(--text-secondary));
+  font-size: var(--text-base);
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  padding: 0;
+}
+
+.icon-btn:hover:not(:disabled),
+.sidebar-toggle:hover {
+  color: var(--sb-text, var(--text-primary));
+}
+
+/* Active/pressed (2026-09-09, IconButton.tsx) -- mismo tratamiento que
+   `.btn:active` (button.css) ya usa: opacity, no un color nuevo. */
+.icon-btn:active:not(:disabled) {
+  opacity: 0.88;
+}
+
+/* Foco — mismo criterio que selection-group.css (molecule): sin anillo
+   en click con mouse, anillo visible en navegación por teclado. Gap de
+   auditoría SP2: el atom no tenía tratamiento de foco propio. */
+.icon-btn:focus,
+.sidebar-toggle:focus {
+  outline: none;
+}
+
+.icon-btn:focus-visible,
+.sidebar-toggle:focus-visible {
+  outline: 2px solid var(--state-focus-ring, rgba(215, 50, 171, 0.35));
+  outline-offset: 2px;
+}
+
+/* Disabled (2026-09-09, IconButton.tsx) -- el atom no tenía tratamiento
+   propio; visualmente idéntico a enabled antes de esto (solo bloqueaba
+   por el `disabled` nativo). Mismo `--text-disabled` que `.btn:disabled`
+   ya usa -- "color muted", no una opacidad genérica. */
+.icon-btn:disabled {
+  color: var(--text-disabled, #b9bdc4);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Modal/Form visual QA task: Google Fonts' own `.material-symbols-
+   outlined` rule (loaded via foundations/icons/icons.css's `@import`)
+   ships its own `font-size: 24px`, same specificity as a bare class
+   selector -- so without this override the icon glyph never actually
+   inherited this button's own `font-size` (16px `md` / 14px `sm` / 20px
+   `lg` below), it always rendered at Google's 24px default regardless
+   of size variant. That's the reported "close icon looks
+   big/non-compliant": at 24px inside a 22px `md` button, the glyph
+   visually overflowed its own hit target. `inherit` makes every size
+   variant (including `sm`/`lg`) finally control the rendered icon size
+   the way its own font-size rule already intended. */
+.icon-btn .material-symbols-outlined,
+.sidebar-toggle .material-symbols-outlined {
+  font-size: inherit;
+}
+
+/* ── Tamaños (2026-09-09, IconButton.tsx `size`) ──────────────────────
+   Sin modificador = `md`, el tamaño histórico (22px/16px) que los 6
+   consumidores migrados ya usaban -- cero cambio visual para ellos. */
+.icon-btn--sm {
+  width: 18px;
+  height: 18px;
+  font-size: var(--text-sm, 14px);
+}
+
+.icon-btn--lg {
+  width: 28px;
+  height: 28px;
+  font-size: var(--text-lg, 20px);
+}
+
+/* ── Tonos (2026-09-09, IconButton.tsx `tone`) ────────────────────────
+   Sin modificador = `neutral`, el único tono que los 6 consumidores
+   migrados usan hoy -- cero cambio visual para ellos. `brand`/`danger`
+   sin consumidor real todavía (ver docs/design-system/index.html →
+   Deuda / On-demand), implementados porque la API los pide y el costo
+   es mínimo: mismos tokens que `Button`'s propio `tone="danger"` y el
+   magenta de marca ya usan en el resto del DS, ningún color nuevo. */
+.icon-btn--brand:hover:not(:disabled) {
+  color: var(--text-brand, #d732ab);
+}
+
+.icon-btn--danger:hover:not(:disabled) {
+  color: var(--text-error, #c00f0c);
+}
+
+/* ── Loading (2026-09-09, IconButton.tsx `loading`) ───────────────────
+   Reusa `spinner-spin`, el keyframe canónico de Spinner
+   (atoms/spinner/spinner.css) -- mismo que `Button`'s propio
+   `.btn__icon--spinning` ya reusa. Ningún keyframe nuevo. NO migrado al
+   componente TSX `Spinner` por el mismo motivo que `Button`: hereda
+   `currentColor`, que el contrato de `tone` de Spinner no modela. */
+.icon-btn__icon--spinning {
+  animation: spinner-spin 1s linear infinite;
+}

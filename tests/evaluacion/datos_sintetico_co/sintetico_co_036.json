@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_036",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Laura Martínez Ospina\ncédula de ciudadanía No. 881'017.363\nFecha de nacimiento: 1990-11-28\nProcedencia: Barranquilla, Cundinamarca\nDirección: Cra 45C N° 20-98 piso 4, barrio Kennedy\nTeléfono: 329-853-1380   Correo: laura83@une.net.co\nEPS: Salud Total\nFecha de ingreso: Febrero 15 de 2010\n\nMOTIVO DE CONSULTA\nPaciente Edad: 19 años que ingresa al servicio refiriendo dolor abdominal de varios días de evolución. Reside en Barranquilla y consulta de forma espontánea. Se localiza al acompañante en el número 329-853-1380.\n\nVALORACIÓN\nAtendido por el Dr. Ana González Rojas (RM 46002). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo laura83@une.net.co o remitir a la dirección Cra 45C N° 20-98 piso 4.",
+  "ground_truth": {
+    "nombres": [
+      "Laura Martínez Ospina",
+      "Ana González Rojas"
+    ],
+    "documentos": [
+      "881'017.363"
+    ],
+    "edades": [
+      "19 años"
+    ],
+    "ubicaciones": [
+      "Barranquilla",
+      "Cundinamarca"
+    ],
+    "direcciones": [
+      "Cra 45C N° 20-98 piso 4"
+    ],
+    "telefonos": [
+      "329-853-1380"
+    ],
+    "emails": [
+      "laura83@une.net.co"
+    ],
+    "seguros": [
+      "Salud Total"
+    ],
+    "fechas_nacimiento": [
+      "1990-11-28"
+    ],
+    "fechas": [
+      "Febrero 15 de 2010"
+    ],
+    "numeros_registro": [
+      "RM 46002"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_001",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Laura Martínez Pérez\nC.C. 28'728.463\nFecha de nacimiento: Enero 26 de 1970\nProcedencia: Villavicencio, Nariño\nDirección: Carrera 9 # 12-28, barrio Manga\nTeléfono: 328 803 8374   Correo: laura58@une.net.co\nEPS: Coomeva\nFecha de ingreso: 1969-05-11\n\nMOTIVO DE CONSULTA\nPaciente 14 años de edad que ingresa al servicio refiriendo mareo de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número 328 803 8374.\n\nVALORACIÓN\nAtendido por el Dr. Sandra Torres Ramírez (HC-900581). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo laura58@une.net.co o remitir a la dirección Carrera 9 # 12-28.",
+  "ground_truth": {
+    "nombres": [
+      "Laura Martínez Pérez",
+      "Sandra Torres Ramírez"
+    ],
+    "documentos": [
+      "28'728.463"
+    ],
+    "edades": [
+      "14 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Carrera 9 # 12-28"
+    ],
+    "telefonos": [
+      "328 803 8374"
+    ],
+    "emails": [
+      "laura58@une.net.co"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "Enero 26 de 1970"
+    ],
+    "fechas": [
+      "1969-05-11"
+    ],
+    "numeros_registro": [
+      "HC-900581"
+    ]
+  }
+}

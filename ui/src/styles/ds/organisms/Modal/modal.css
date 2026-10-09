@@ -1,0 +1,207 @@
+/* ==========================================================================
+   Organism: Modal
+   Layer: 6 — Organisms
+   Owner: Design System
+
+   Centered modal surface, net-new -- no vanilla precedent to port (same
+   rationale as CreateCaseForm's own docblock: this shell didn't exist
+   before). Deliberately does NOT reuse DetailPanel's `.panel-overlay`
+   geometry (fixed right-side slide-in panel, 55vw) -- DetailPanel is a
+   docked side panel; this is a centered, floating dialog. Only DS
+   *values* are shared (tokens, .icon-btn, the icon registry, the
+   Escape/focus-on-open/backdrop-click conventions already established by
+   DetailPanel/CreateCaseForm) -- no geometry classes are reused.
+
+   Chrome only: backdrop, centering, container, header, title, close
+   button, scrollable body. Knows nothing about any consumer's content.
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-24);
+  /* Same dimming tone DetailPanel's own `.backdrop` uses -- not a token
+     today (no backdrop-tint entry exists in tokens.css), so this repeats
+     that literal value rather than inventing a new one. */
+  background: rgba(13, 15, 16, 0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-container {
+  width: 100%;
+  max-width: 560px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-primary);
+  border-radius: var(--radius-100);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  /* Height stays intrinsic to each step's own content (no shared fixed
+     height across steps) -- this only smooths a resize WITHIN one
+     mounted container. Each step in the "Nuevo Caso" flow is its own
+     Modal instance (see Modal.tsx's `{open && (...)}` mount), so
+     switching steps swaps in a brand-new container rather than resizing
+     this one; the entrance animation below is what keeps THAT transition
+     from feeling like an abrupt pop, since height itself can't be
+     interpolated across two unrelated mounted elements. */
+  transition: height var(--transition-slow);
+  animation: modal-container-in var(--transition-slow);
+}
+
+@keyframes modal-container-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-8)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* prefers-reduced-motion is already handled globally (framework/motion.css
+   forces every animation-duration to 1ms), so no separate override here. */
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  flex-shrink: 0;
+  padding: var(--space-16) var(--space-16) 0;
+}
+
+.modal-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* DetailPanel/modales-de-acción polish task: field labels read as
+   labels (muted), not the same weight as their real values -- scoped to
+   `.modal-body` since it's only the action modals that put `<Field>`
+   inside a Modal (grepped: no other Modal consumer uses Field), so this
+   can't leak into LoginPage/Settings/CaseContext's own forms.
+   Label hierarchy unification task: was `--text-secondary` -- switched
+   to `--text-tertiary` to match DetailPanel's own muted-label token
+   (`.detail-panel__canon-label`/`.detail-panel__finding-type`), so
+   "Seguimiento" (ConsultationSentModal) and every other in-modal Field
+   label reads at the same muted level as "Literatura (PubMed)". */
+.modal-body .field__label {
+  color: var(--text-tertiary);
+}
+
+.modal-footer {
+  flex-shrink: 0;
+  padding: var(--space-16);
+}
+
+@media (max-width: 480px) {
+  /* Adaptation of the same component (no separate mobile variant): the
+     overlay's own inset padding shrinks so the container can approach
+     the full viewport width, same idea as DetailPanel's own ≤1100px
+     breakpoint reducing its Shell inset rather than swapping component. */
+  .modal-overlay {
+    padding: var(--space-12);
+  }
+}
+
+/* Opt-in width modifier (2026-08-19, revised the same day 50vw -> 70vw)
+   -- ONLY for the one screen that requests it (Resumen Final, via
+   Modal's `width="wide"` prop). The base `.modal-container` above is
+   completely untouched, so every other screen keeps its exact existing
+   560px width. */
+.modal-container--wide {
+  max-width: 70vw;
+}
+
+@media (max-width: 760px) {
+  /* Same breakpoint value already used elsewhere in this DS (framework/
+     base.css, framework/board.css) for "small viewport" -- reused, not
+     invented. Below it, 70vw would crush the content into an unreadably
+     narrow column, so it falls back to the same 560px every other Modal
+     already uses (not a new number either). */
+  .modal-container--wide {
+    max-width: 560px;
+  }
+}
+
+/* Composiciones sobre Modal (2026-09-09, ClinicalNoteModal; 2026-09-09,
+   TrashView's confirmación de purga). 2 clases genéricas compartidas por
+   cualquier composición de Modal con un párrafo de contexto + un footer
+   de 2 botones (Cancelar/Confirmar o Cancelar/Eliminar) -- Modal's propio
+   `.modal-footer` no define ningún layout, cada consumidor arma el suyo,
+   así que esto es ese layout compartido en vez de repetirlo por consumidor. */
+.modal-description {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+/* AssumeCaseModal's subtexto ("Confirma solo si puedes darle continuidad
+   clínica.") -- one step further muted than `.modal-description`'s own
+   `--text-secondary`, same de-emphasis idea as the canon label/value
+   split elsewhere in this task. */
+.modal-description--muted {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.modal-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+/* Consultation CTA fix task: a generic read-only label/value row for
+   any Modal composition that just needs to DISPLAY a few fields (no
+   form control) -- ConsultationSentModal's "Destinatario"/"Motivo"/
+   "Estado" today. Same muted-label/primary-value split already used
+   everywhere else in this pass (`.modal-body .field__label`,
+   DetailPanel's own `.detail-panel__canon-label/-value`) -- not a
+   `Field`/`<label>` (there's no control to connect to, this is plain
+   text), so it gets its own minimal pair instead of stretching `Field`
+   to a shape it isn't. `.modal-body`'s own `gap` (this file, above)
+   already spaces multiple rows apart -- no margin needed here. */
+.modal-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.modal-field-row__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  /* Label hierarchy unification task: was `--text-secondary` -- now
+     matches the same `--text-tertiary` every other muted label in
+     DetailPanel/its modals uses (see this file's `.modal-body
+     .field__label`, and `.detail-panel__canon-label` in detail-panel.css). */
+  color: var(--text-tertiary);
+}
+.modal-field-row__value {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}

@@ -1,0 +1,495 @@
+/* ============================================================
+   Card — SimahealthDS Organism
+   Versión: 1.1 | Sprint: DS-01 → CaseCard Laboratory (promoción)
+   Fecha: 2026-07-03 | Última extensión: 2026-07-23
+
+   Fuente: descubierto a partir de 6 implementaciones reales:
+     Hospital · Descubrimiento (batch, detect, assign)
+     Hospital · Monitoreo
+     Hospital · Histórico
+     Farma    · Pipeline Activo (.fc-card)
+     Farma    · Riesgo Operacional (.rc-card)
+     Farma    · Trazabilidad (.traza-card)
+
+   2026-07-23: se añade la jerarquía editorial de 4 niveles y los
+   modificadores semánticos (ver secciones al final del archivo),
+   extraídos y validados en CaseCard Laboratory. Ver card.js para
+   la API pública de renderizado y README.md para el contrato
+   completo del organismo.
+
+   Contratos de extensión para actores:
+     --card-accent      : color de acento en recently-moved/focus-visible
+     --card-accent-ring : color del anillo exterior en estado selected
+
+   El Card NO conoce actores, enfermedades, señales,
+   datasets, CTAs ni lógica de dominio.
+   El contenido es responsabilidad exclusiva del actor.
+   ============================================================ */
+
+
+/* ── Shell ────────────────────────────────────────────────────
+   Confirmado en: fc-card, rc-card, traza-card, fig-card
+   ─────────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface-primary);
+  /* border-width (1px) y transition-duration (0.12s) no tienen token
+     en tokens.css — deuda de Design System preexistente, documentada
+     en README.md §Deuda de Design System. No se inventa ni se
+     aproxima con otro token.
+     design/react-visual-align: se quitó el `border-left: 3px solid
+     transparent` que este shell tenía (igual al baseline DS) -- ese
+     3px transparente reservaba espacio para que el acento de
+     selección (línea 55, `.selected`) cambiara solo de color sin
+     desplazar el layout, pero dejaba el borde izquierdo invisible en
+     reposo (color transparente) mientras arriba/derecha/abajo se ven
+     con `var(--border-subtle)` a 1px -- exactamente el bug reportado.
+     Ahora el shorthand de arriba gobierna los 4 lados por igual: mismo
+     color, grosor y radius, continuidad óptica real. Efecto lateral
+     inevitable: el acento de `.selected` (que solo sobreescribe
+     `border-left-color`, nunca tuvo su propio width) ahora se ve a
+     1px en vez de 3px -- sigue funcionando (mismo trigger, mismo
+     color, sigue visible), solo más fino; no se tocó esa regla. */
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-100);
+  padding: var(--space-12) var(--space-14);
+  cursor: pointer;
+  transition: box-shadow 0.12s ease, border-left-color 0.12s ease, border-color 0.6s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* .card.selected:hover tiene especificidad (0,3,0) — gana sobre
+   .card--elevated:hover (0,2,0) y preserva el ring en todos los intents. */
+.card.selected,
+.card.selected:hover {
+  /* rgba(215, 50, 171, 0.10) es el fallback por defecto del anillo de
+     selección: no existe un token para un magenta al 10% de opacidad
+     (--state-focus-ring es el mismo matiz pero al 35%, para focus, no
+     para selection) — deuda de Design System, ver README.md.
+     border-left-color removido (ver comentario en `.card`): el acento
+     de selección ahora se comunica solo con el ring exterior, sin la
+     línea magenta sólida en el margen izquierdo. */
+  box-shadow: 0 0 0 var(--space-2) var(--card-accent-ring, rgba(215, 50, 171, 0.10)), var(--shadow-sm), var(--shadow-md);
+}
+
+/* DetailPanel/modales-de-acción polish task: temporary accent when a
+   local action just moved this case to a different lane -- applied for
+   a few seconds by the caller (App.tsx's `highlightedCaseIds`), then
+   removed, letting the `border-color` transition above fade it back to
+   `.card`'s resting border. Same accent tokens `.selected` already
+   uses (not a new color), all-around border (not just left) so it
+   reads as a distinct "just arrived" ring rather than the selection
+   accent. `prefers-reduced-motion` needs no extra rule here -- framework/
+   motion.css already forces every transition-duration to 1ms globally
+   under that query. */
+.card--recently-moved {
+  border-color: var(--card-accent, var(--sima-magenta));
+  box-shadow: 0 0 0 var(--space-2) var(--card-accent-ring, rgba(215, 50, 171, 0.10)), var(--shadow-sm);
+}
+
+.card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 var(--space-2) var(--card-accent, var(--sima-magenta));
+}
+
+/* Modifier: sombra en reposo (usado por Hospital).
+   Farma no la usa — no incluir en el shell base. */
+.card--elevated {
+  box-shadow: var(--shadow-sm);
+}
+.card--elevated:hover {
+  box-shadow: var(--shadow-md);
+}
+
+
+/* ── Layout slots ─────────────────────────────────────────────
+   Contenedores posicionales. El actor los rellena.
+   ─────────────────────────────────────────────────────────── */
+
+/* Fila superior: título + badge, o badge + fecha.
+   Confirmado en: disc-card-top (3 intents Hospital) */
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+/* Fila inferior: separada del cuerpo con borde sutil.
+   Confirmado en: disc-card-foot (Hospital Descubrimiento batch)
+   border-width (1px) sin token — ver README.md §Deuda de Design System. */
+.card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-top: var(--space-10);
+  padding-top: var(--space-10);
+  border-top: 1px solid var(--border-subtle);
+}
+
+
+/* ── Content slots ────────────────────────────────────────────
+   Clases de contenido. El actor les asigna texto.
+   El card no sabe qué texto va ahí.
+   ─────────────────────────────────────────────────────────── */
+
+/* Etiqueta principal del elemento (condición, excepción, lote).
+   Confirmado en: fc-card-condition, rc-card-condition,
+   traza-card-condition, disc-card-label — 6/6 intents. */
+.card__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-4);
+}
+
+/* Segunda línea descriptiva (responsable, holder, causa, hace).
+   Confirmado en: fc-card-holder, traza-card-responsable,
+   rc-card-causa, disc-card-hace — 5/6 intents.
+   font-size (11px) y line-height (1.4) sin token — ver README.md
+   §Deuda de Design System (no existe escala tipográfica de 11px ni
+   un leading de 1.4 en tokens.css). */
+.card__subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: var(--space-6);
+}
+
+/* Texto de apoyo: acción siguiente, consecuencia, stat adicional.
+   Confirmado en: fc-card-accion, rc-card-accion,
+   disc-card-foot stats — 3/6 intents.
+   font-size (11px) sin token — ver README.md §Deuda de Design System. */
+.card__supporting {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-2);
+}
+
+/* Contexto de ubicación / institución (hospital, servicio).
+   Truncado horizontal — el texto puede ser largo.
+   Confirmado en: fc-card-location, rc-card-location,
+   traza-card-hospital, disc-card-fecha area — 5/6 intents.
+   font-size (11px) sin token — ver README.md §Deuda de Design System. */
+.card__location {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: var(--space-8);
+}
+
+/* Identificador en pie de card. Siempre fuente mono.
+   Confirmado en: fc-card-uid, rc-card-uid,
+   traza-card-uid, refs de paciente Hospital — 5/6 intents.
+   font-size (11px) sin token — ver README.md §Deuda de Design System. */
+.card__uid {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: var(--weight-regular);
+  color: var(--text-tertiary);
+}
+
+/* Métrica protagonista — número grande que es el foco visual.
+   Justificación: requerido para representar Trazabilidad (⏱ XX días).
+   No es especulativo — sin este slot, Trazabilidad no puede migrar.
+   Confirmado en: traza-card-time — 1/6 intents (slot necesario, no especulativo).
+   font-size (17px), letter-spacing (-0.3px) y margin-bottom (7px) sin
+   token — ver README.md §Deuda de Design System (no existe escala de
+   17px, no existe ningún token de letter-spacing en todo el DS, y la
+   escala de espaciado no tiene un paso de 7). */
+.card__metric {
+  font-size: 17px;
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  line-height: var(--leading-tight);
+  margin-bottom: 7px;
+}
+
+/* Contenedor de badge, pill o chip dentro de la card.
+   El badge en sí es un atom (DS); este slot es el wrapper.
+   Confirmado en: signal pill (Pipeline), estado-chip (batch),
+   nuevo-badge (detect) — 3/6 intents. */
+.card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+}
+
+
+/* ── Prioridad de legibilidad ─────────────────────────────────
+   Añadido: 2026-07-15.
+
+   PRINCIPIO (congelado)
+   La Card protege la LEGIBILIDAD de la información, no la POSICIÓN
+   de los elementos. Cuando el espacio disponible es insuficiente:
+   la información de mayor prioridad conserva su legibilidad, la de
+   menor prioridad cede espacio, y el layout se reorganiza solo.
+   Nunca al revés.
+
+   JERARQUÍA
+   1. .card__title      — nunca es el primer sacrificado
+   2. .card__supporting — puede bajar de línea sin afectar al título
+   3. cuerpo            — comportamiento normal
+   4. .card__footer     — el más flexible
+
+   MECANISMO
+   El salto de línea de flexbox ES el mecanismo de prioridad. El
+   tamaño natural (max-content) de cada elemento es su reclamo sobre
+   la fila; el navegador resuelve "¿entra?" contra el ancho real de
+   la card, no contra un umbral declarado aquí.
+
+   Con flex-wrap:wrap y flex-basis:auto (default), el reclamo del
+   título se evalúa entero:
+     · título corto  → título + metadata entran → comparten fila
+       (space-between intacto: título izquierda, metadata derecha)
+     · título largo  → no entran juntos → la metadata baja de línea
+       y el título conserva la fila completa
+
+   El título nunca se comprime para hacerle lugar a la metadata.
+   .card__badge conserva flex-shrink:0 a propósito: la metadata no
+   se achica hasta volverse ilegible — se muda. Cede POSICIÓN, no
+   legibilidad. Eso es el principio, expresado en una declaración.
+
+   POR QUÉ NO HAY BREAKPOINT NI CONTAINER QUERY
+   La card no sabe nada del viewport ni de cuántas columnas hay: solo
+   reacciona a su propio ancho y a su propio contenido. Un @media mide
+   la cosa equivocada (una card de 300px en un board de 4 columnas a
+   1680px está más apretada que una card a 680px de viewport). Un
+   @container mediría lo correcto, pero seguiría exigiendo un umbral
+   en px y no puede estilar a .card a sí misma. Flexbox ya responde
+   la pregunta exacta —"¿el contenido entra en este ancho?"— de forma
+   intrínseca y sin número mágico. Sin viewport, sin breakpoint, sin
+   columnas, sin actor, sin tipo de contenido.
+   ─────────────────────────────────────────────────────────── */
+
+/* Prioridades 1, 2 y 4: la fila cede antes que el contenido.
+   Inerte mientras todo entre en una línea. */
+.card__header,
+.card__footer {
+  flex-wrap: wrap;
+}
+
+/* Protege la legibilidad del título contra sí mismo: un término
+   clínico sin espacios no desborda la card, se parte. Solo actúa
+   sobre palabras que ya desbordarían. */
+.card__title {
+  overflow-wrap: break-word;
+}
+
+
+/* ── Jerarquía editorial ──────────────────────────────────────
+   Añadido: 2026-07-23.
+
+   Vocabulario de 4 niveles editoriales, agnóstico de actor y de
+   dominio. Coexiste con los slots históricos de arriba
+   (.card__subtitle, .card__supporting, .card__location): no los
+   reemplaza, son el vocabulario para nueva composición editorial
+   sobre este organismo (ver README.md §Jerarquía editorial).
+
+   Nivel 1 — Field label   : qué representa el valor de abajo.
+   Nivel 2 — Secondary     : información contextual de apoyo.
+   Nivel 3 — Primary       : información operacional relevante.
+   Nivel 4 — Hero          : lo primero que se debe reconocer.
+
+   Extendido: 2026-08-11 (design/react-visual-align, "3-level typography")
+   -- prueba, sobre este organismo, de una jerarquía tipográfica canónica
+   de 3 roles (HEADER/LABEL/BODY) antes de un posible rollout transversal.
+   Superseded el mismo día por la jerarquía canónica DS-wide de 4 roles
+   (ver siguiente nota) -- se documenta igual porque el diff real de card.css
+   pasó por este estado intermedio.
+
+   Extendido de nuevo: 2026-08-11 (design/react-visual-align, "canonical DS
+   typography unification") -- la jerarquía de 3 roles anterior queda
+   reemplazada por el canon DS-wide de 4 roles HEADER/TITLE/LABEL/BODY:
+     HEADER = .card__title.card__hero (--text-base / --weight-semibold /
+              --leading-snug / --text-primary) -- `.card__hero` volvió a
+              combinarse con `.card__title` en Card.tsx porque HEADER
+              (16px) y TITLE (14px) ya no pueden compartir una sola clase;
+              `.card__hero` se ajustó de --weight-bold/--leading-tight a
+              --weight-semibold/--leading-snug para coincidir con el canon.
+     TITLE  = .card__title (--text-sm / --weight-semibold / --leading-snug
+              / --text-primary), sin cambios -- ya coincidía exactamente.
+              "Antecedentes" se reclasificó de LABEL a TITLE (introduce un
+              bloque de contenido, no un valor simple) y ahora usa esta
+              clase en vez de `.card__label`.
+     LABEL  = .card__label (--text-xs / --weight-regular / --leading-snug
+              / --text-tertiary) -- font-weight volvió de --weight-semibold
+              (el canon de 3 roles de esta misma sesión) a --weight-regular
+              (el canon vigente de 4 roles es explícito: "el peso canónico
+              de LABEL es --weight-normal", nunca semibold). Sigue usándose
+              para "Convicción" y "Fecha de remisión" (nombre de campo con
+              un solo valor).
+     BODY   = .card__primary (--text-sm / --weight-regular / --leading-normal
+              / --text-primary), sin cambios -- ya coincidía exactamente.
+   `.card__secondary` conserva su propia regla CSS (vocabulario DS válido)
+   pero sigue sin uso en Card.tsx (Antecedentes/Fecha de remisión usan
+   `.card__primary`, ver Card.tsx). Los modificadores `card__value--bold/
+   --danger/--warning` (Política de color de Convicción) NO son parte de
+   este sistema de 4 roles -- son una capa semántica preexistente y
+   aprobada por separado, encima de BODY, y no se tocaron. */
+.card__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--text-tertiary);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-2);
+}
+
+.card__secondary {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.card__primary {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+}
+
+.card__hero {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-snug);
+}
+
+/* Envoltorio de espaciado para un par label+valor. No es un nivel
+   editorial — solo separa un campo del siguiente. */
+.card__field {
+  margin-bottom: var(--space-8);
+}
+
+/* Variante con separador superior: usada cuando un campo agrupa una
+   entidad completa (persona + institución) y necesita distinguirse
+   del campo anterior sin ser un .card__footer (posición y layout
+   distintos). Mismo lenguaje visual (borde sutil superior).
+   border-width (1px) sin token — ver README.md §Deuda de Design System. */
+.card__field--separated {
+  margin-top: var(--space-8);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border-subtle);
+}
+
+
+/* ── Modificadores semánticos ─────────────────────────────────
+   Añadido: 2026-07-23.
+
+   NO son un quinto nivel editorial: son un modificador de color (y, en
+   un único caso documentado, de peso) sobre un nivel ya existente. Uso
+   permitido ÚNICAMENTE en los campos "Convicción" y "Tiempo restante /
+   Días restantes" (ver README.md §Política de color). Ningún otro campo
+   puede introducir color o peso semántico con estas clases -- en
+   particular, la condición vive únicamente en el header (card__hero,
+   ya el nivel editorial más fuerte) y no necesita ni usa este
+   modificador. */
+.card__value--warning {
+  color: var(--color-warning-600);
+}
+
+/* --color-danger-600 no existe en tokens.css. --color-error-600 es
+   el mismo rojo (#c00f0c) que el resto del sistema ya usa para el
+   semantic "error/danger" (--text-error, --border-error, .chip.red
+   en product.css) — no es una sustitución aproximada, es el nombre
+   real que este DS le da al rojo de urgencia. Ver README.md §Deuda
+   de Design System. */
+.card__value--danger {
+  color: var(--color-error-600);
+}
+
+.card__value--bold {
+  font-weight: var(--weight-bold);
+}
+
+/* Añadido: 2026-08-11 (design/react-visual-align). Multiline clamp for any
+   card__primary/card__secondary value whose source text can run long --
+   currently used on "Antecedentes" (context.background). It's a layout
+   mechanism, not a color/weight modifier, so it composes with either
+   editorial level. 4 is a content constraint of the field, not a
+   spacing/sizing token -- there is no line-count token in tokens.css, nor
+   should there be one. */
+.card__value--clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+
+/* ── Variante "procesando en background" ─────────────────────
+   Añadido: 2026-08-19 (Nuevo Caso -> Card.tsx's `variant: "processing"`).
+   Composición del shell existente, no una geometría nueva: mismo
+   .card.card--elevated, mismos slots .card__header/.card__badge/
+   .card__label/.card__title.card__hero -- lo de abajo son SOLO los
+   slots/modificadores que esa variante necesita y el resto de Card no
+   tenía todavía. ────────────────────────────────────────────── */
+
+/* Fondo apenas distinto de un Card normal: hint de magenta Sima, no un
+   rosa evidente. --surface-brand-subtle ya es un token DS existente y
+   consumido (selection-group.css lo usa para su propio estado "activo")
+   -- no se crea ningún color nuevo. */
+.card--processing {
+  background: var(--surface-brand-subtle);
+}
+
+/* Agrupa el icono de etapa + el título a la izquierda del header, misma
+   receta que .card__badge (inline-flex/align-items/gap) ya usa a la
+   derecha -- así .card__header sigue siendo exactamente 2 hijos y su
+   `justify-content: space-between` reparte el espacio como siempre. */
+.card__header-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.card__processing-icon {
+  flex-shrink: 0;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  transition: color 0.12s ease;
+}
+
+/* Spinner magenta Sima -- formalizado (2026-09-09) como el átomo DS
+   `Spinner` (`src/components/Spinner/Spinner.tsx`, `size="sm"
+   tone="brand"` -- ver `styles/ds/atoms/spinner/spinner.css`). La regla
+   propia que este archivo tenía para `.card__processing-spinner`
+   (font-size/color/animation + su propio `@keyframes
+   card-processing-spin`) se eliminó -- ya no hace falta, `Spinner`
+   provee exactamente el mismo tratamiento visual vía sus propias
+   clases (`.spinner--sm`/`.spinner--brand`); `className=
+   "card__processing-spinner"` se sigue pasando solo para que
+   Card.test.tsx pueda seguir seleccionando el nodo, no aporta estilos
+   propios. */
+.card__processing-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+/* prefers-reduced-motion ya está resuelto globalmente (framework/
+   motion.css fuerza animation-duration a 1ms) -- no se repite acá. */
+
+/* Una sola línea siempre, sin importar cuánto varíe el texto entre
+   etapas (p.ej. "Anonimizando historias clínicas" vs "Análisis
+   diferencial") -- así la Card nunca cambia de alto por un wrap
+   inesperado. Misma receta que .card__location ya usa para su propio
+   texto de una sola línea. */
+.card__processing-status-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}

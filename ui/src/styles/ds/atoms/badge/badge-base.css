@@ -1,0 +1,85 @@
+/**
+ * Badge Base — SimaHealth Design System · Atom · Badge Family
+ * ─────────────────────────────────────────────────────────────
+ * Shared tokens + structure inherited by all badge-family types.
+ * Not used directly in markup.
+ *
+ * Component tree:
+ *   .badge         → generic tone (pill) -- src/components/Badge/Badge.tsx
+ *   .status-badge  → pipeline states (pill, icon required) -- superseded
+ *                     by `.badge`'s generic tones, kept for reference
+ *                     (no real consumer today, see badge.css's own docblock)
+ *   .tag           → taxonomy / metadata (rect, dismissible at M) --
+ *                     src/components/Tag/Tag.tsx
+ *   .metric-chip   → numeric evidence (rect, tooltip) -- no TSX wrapper,
+ *                     see Chip.tsx's docblock for why
+ *
+ * `Chip` (src/components/Chip/Chip.tsx) reuses `.tag`/`.tag--filter` for
+ * its interactive form -- it doesn't need its own entry here.
+ */
+
+.badge,
+.status-badge,
+.tag,
+.metric-chip {
+  /* ── Component tokens ─────────────────────────────────── */
+  --badge-bg: var(--surface-tertiary, #f1f3f7);
+  --badge-text: var(--text-secondary, #4b5057);
+  --badge-border: transparent;
+  --badge-border-width: 1px;
+  --badge-px: var(--space-8, 8px);
+  --badge-py: var(--space-3, 3px);
+  --badge-gap: var(--space-4, 4px);
+  --badge-font-size: var(--text-xs, 12px);
+  --badge-font-weight: var(--weight-regular, 400);
+  --badge-radius: var(--radius-full, 9999px);
+  --badge-icon-size: 12px;
+
+  /* ── Structure ────────────────────────────────────────── */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--badge-gap);
+  padding: var(--badge-py) var(--badge-px);
+  border-radius: var(--badge-radius);
+  border: var(--badge-border-width) solid var(--badge-border);
+  background: var(--badge-bg);
+  color: var(--badge-text);
+
+  /* ── Typography ───────────────────────────────────────── */
+  font-family: var(--font-sans, "DM Sans", system-ui, sans-serif);
+  font-size: var(--badge-font-size);
+  font-weight: var(--badge-font-weight);
+  line-height: 1.4;
+  white-space: nowrap;
+  letter-spacing: 0;
+  text-decoration: none;
+  vertical-align: middle;
+
+  /* ── Overflow ─────────────────────────────────────────── */
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Shared icon slot ─────────────────────────────────────── */
+.status-badge__icon,
+.tag__icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: var(--badge-icon-size);
+  height: var(--badge-icon-size);
+}
+
+.status-badge__icon svg,
+.tag__icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* forced-colors / high-contrast mode */
+  forced-color-adjust: none;
+}

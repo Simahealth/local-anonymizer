@@ -1,0 +1,1122 @@
+/*
+ * Primitives — Operational Visual Cognition Layer v1
+ *
+ * Visual system for the primitive shell and its content zones.
+ * Actor-agnostic. No role-specific colors. No hardcoded layouts.
+ *
+ * Four axes — each independently controlled:
+ *   data-representation: A | B | C          visual rendering mode
+ *   data-density:        high | medium | low  information exposure (slot gating via JS)
+ *   data-emphasis:       primary | context | ambient | muted    intent hierarchy
+ *   data-tier:           A | B | C           grid footprint — in spatial-grid.css
+ *
+ * Compression principle:
+ *   A → full presence, full information, actionable
+ *   B → contextual presence, essential information, supporting
+ *   C → ambient trace, minimal information, reference only
+ *
+ * Trust principle:
+ *   Provenance remains visible at every representation level.
+ *   At C it becomes a dot. It never disappears.
+ */
+
+/* ==========================================================================
+   BASE SHELL
+   ========================================================================== */
+
+.primitive-shell {
+  display: grid;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-200);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   REPRESENTATION VARIANTS
+   A — foreground operational card
+   B — contextual supporting strip (default)
+   C — ambient reference node
+   ========================================================================== */
+
+/* Representation A — primary foreground presence */
+.primitive-shell[data-representation="A"] {
+  gap: var(--space-14);
+  padding: var(--space-20) var(--space-20) var(--space-18);
+  border-color: var(--border-default);
+}
+
+/* Representation B — contextual (default visual weight, inherited from base) */
+.primitive-shell[data-representation="B"] {
+  gap: var(--space-8);
+  padding: var(--space-12);
+}
+
+/*
+ * Representation C — ambient reference node.
+ * Transparent background: C-rep floats, it is not behind a surface.
+ * Dashed border signals "ambient trace, not an operational object".
+ */
+.primitive-shell[data-representation="C"] {
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-10);
+  border-style: dashed;
+  background: transparent;
+}
+
+/* ==========================================================================
+   EMPHASIS — intent-driven visual hierarchy
+   Calibrated for 3 perceptual planes:
+     primary  → foreground operational (visible border + shadow)
+     context  → midground supporting (slightly stepped-back surface)
+     ambient  → background trace (opacity reduced)
+     muted    → near-invisible reference (strong opacity reduction + dashed)
+   ========================================================================== */
+
+/* primary — foregrounded by active intent */
+.primitive-shell[data-emphasis="primary"] {
+  border-color: color-mix(in srgb, var(--sima-blue) 35%, var(--border-default));
+  box-shadow: var(--shadow-sm);
+}
+
+/* context — supporting active intent, one step back */
+.primitive-shell[data-emphasis="context"] {
+  background: var(--surface-secondary);
+}
+
+/* ambient — present but clearly secondary */
+.primitive-shell[data-emphasis="ambient"] {
+  opacity: 0.62;
+}
+
+/* muted — near-invisible reference trace */
+.primitive-shell[data-emphasis="muted"] {
+  opacity: 0.38;
+  border-style: dashed;
+}
+
+/* ==========================================================================
+   OPERATIONAL STATE VARIANTS
+   attended — action acknowledged: fades to non-interactive, no pointer events
+   pending  — awaiting action: pulsing left border draws the eye without shouting
+   ========================================================================== */
+
+/*
+ * attended — action acknowledged.
+ * Distinct from ready/pending/blocked: the object is done, exiting the
+ * active interaction surface. Visual treatment communicates "completed and
+ * stepping back" — not an error, not still active, not waiting.
+ *
+ * Signals:
+ *   opacity: 0.45        — steps back from foreground without disappearing
+ *   transition           — makes the change feel intentional, not a glitch
+ *   border-color         — collapses emphasis border to neutral (the object
+ *                          is no longer demanding attention)
+ *   border-left          — subtle cool-blue trace: "this was acted upon"
+ *   pointer-events:none  — closes the interaction loop; button can't re-fire
+ */
+.primitive-shell[data-operational-state="attended"] {
+  opacity: 0.45;
+  pointer-events: none;
+  transition:
+    opacity 200ms ease-out,
+    border-color 200ms ease-out;
+  border-color: var(--border-subtle);
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: color-mix(in srgb, var(--sima-blue) 28%, transparent);
+}
+
+.primitive-shell[data-operational-state="pending"] {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--sima-blue);
+  animation: pending-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pending-pulse {
+  0%,
+  100% {
+    border-left-color: var(--sima-blue);
+  }
+  50% {
+    border-left-color: color-mix(in srgb, var(--sima-blue) 30%, transparent);
+  }
+}
+
+/*
+ * S7.6 — Operational hierarchy refinements.
+ *
+ * Goal: each state communicates its semantic role through contrast, spacing,
+ * and border treatment — without animation.
+ *
+ * Hierarchy (visual weight, highest to lowest):
+ *   blocked   → urgent    : amber glow shadow signals active operational risk
+ *   selected  → navigational: blue left border + tint = "this is the foreground focus"
+ *   pending   → waiting   : blue pulse (existing) — "expecting user action soon"
+ *   attended  → historical: opacity 0.45 (existing) — "loop closed, stepping back"
+ *   unknown   → uncertain : dashed border — "data gap, not system error"
+ *
+ * Note: blocked and selected can coexist (a selected candidate can also be blocked).
+ * In that case blocked takes visual precedence via amber shadow + amber dot.
+ */
+
+/*
+ * blocked — urgent operational state.
+ * The full visual rule (border + shadow + padding) lives in the "OPERATIONAL STATE
+ * on shell level" section further below — that section sets padding-aware border-left.
+ * A duplicate rule here was previously responsible for the box-shadow only; it has
+ * been removed (S10-C.3) and the box-shadow is now explicit in the consolidated rule.
+ */
+
+/* unknown — uncertain: dashed border communicates data gap, not system error */
+.primitive-shell[data-operational-state="unknown"] {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+/*
+ * B-rep candidate shells are interactive — cursor: pointer signals selectability
+ * before any click occurs. Reinforces the navigational affordance of the left panel.
+ * Attended shells override via pointer-events: none on the shell itself.
+ */
+.primitive-shell[data-primitive="candidate"][data-representation="B"] {
+  cursor: pointer;
+}
+
+/*
+ * S6.4 — Selected B-rep candidate (left panel selection system).
+ *
+ * A selected candidate is the object currently foregrounded in the primary region.
+ * The left panel B-rep card persists — it shows the user WHERE the selected item
+ * sits in the ranked list, and confirms the selection state.
+ *
+ * Visual contract (selection hierarchy: selected > attended > pending > blocked > unknown):
+ *   border-left  — full-weight blue: "this object is currently foreground"
+ *   background   — soft blue tint: distinguishes from emphasis:primary (which uses border only)
+ *   box-shadow   — none additional (primary region A-rep card carries the dominant signal)
+ *
+ * Note: attended overrides selected via CSS specificity and pointer-events — an attended
+ * candidate cannot be re-selected (pointer-events: none on the shell).
+ */
+.primitive-shell[data-primitive="candidate"][data-representation="B"][data-selected="true"] {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--sima-blue);
+  background: color-mix(in srgb, var(--sima-blue) 8%, var(--surface-primary));
+}
+
+/* ==========================================================================
+   EMPTY PRIMITIVE — explicit operational state when a region has no content
+   ========================================================================== */
+
+/*
+ * B4.5-2: raised from 0.4 to 0.7.
+ *
+ * Empty states are NOT disabled UI — they are real operational messages.
+ * A clinical user must be able to read "Sin candidatos activos" without
+ * squinting. opacity: 0.4 was causing legibility failure in primary region.
+ *
+ * Tone contract:
+ *   0.7   — clearly de-emphasized vs real content (contrast ratio preserved)
+ *   dashed border — communicates "intentionally empty, not broken"
+ *   pointer-events: none — not actionable (confirmed empty, not interactive)
+ *
+ * Visual review required: verify de-emphasis without legibility loss.
+ */
+.primitive-shell[data-primitive="empty"] {
+  border-style: dashed;
+  background: transparent;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   TITLE ZONE
+   ========================================================================== */
+
+.primitive-title {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.primitive-type-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 14px;
+}
+
+/*
+ * Type label — implicit orientation, not a category shout.
+ * No uppercase: the object type reads naturally, not as a UI label.
+ * Smaller, lighter — it contextualises without competing with the title.
+ */
+.primitive-type-label {
+  color: var(--text-tertiary);
+  font-size: 8px;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.01em;
+}
+
+/* .primitive-mirror-badge → atoms/badge/mirror-badge.css (DS-EX-02) */
+
+/*
+ * Title hierarchy — creates clear cognitive entry points.
+ * B-rep: 16px/semibold — scannable but not shouting
+ * A-rep: 20px/semibold — dominant foreground presence
+ * C-rep: 12px — ambient, fits compact node
+ * Weight: always semibold (600) — titles must read as titles
+ */
+.primitive-title h4 {
+  margin: 0;
+  font-size: var(--text-base); /* 16px — B-rep: was 14px (text-sm) */
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.primitive-shell[data-representation="A"] .primitive-title h4 {
+  font-size: var(--text-lg); /* 20px — A-rep: was 18px (text-md) */
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.primitive-shell[data-representation="C"] .primitive-title h4 {
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Title row — for inline header with status badge */
+.primitive-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.primitive-title-row h4 {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   OPERATIONAL STATUS SYSTEM
+   ========================================================================== */
+
+.primitive-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-shrink: 0;
+}
+
+.primitive-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--surface-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.primitive-status-dot[data-state="ready"] {
+  background: var(--sima-blue);
+  border-color: transparent;
+}
+
+/*
+ * B4-7: semantic correction.
+ * blocked = operational obstruction → amber (more urgent).
+ * pending = awaiting / in queue → neutral-dim (less urgent than blocked).
+ * Previous version had these inverted: pending was amber, blocked was gray.
+ */
+.primitive-status-dot[data-state="pending"] {
+  background: var(--border-default);
+  border-color: transparent;
+}
+
+.primitive-status-dot[data-state="blocked"] {
+  background: var(--color-warning-600);
+  border-color: transparent;
+}
+
+.primitive-status-dot[data-state="validating"] {
+  background: color-mix(
+    in srgb,
+    var(--sima-blue) 60%,
+    var(--color-warning-600)
+  );
+  border-color: transparent;
+}
+
+/* attended — action acknowledged: subtle cool-blue trace, not a celebration */
+.primitive-status-dot[data-state="attended"] {
+  background: color-mix(in srgb, var(--sima-blue) 35%, var(--surface-tertiary));
+  border-color: color-mix(in srgb, var(--sima-blue) 25%, transparent);
+}
+
+.primitive-status-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--text-tertiary);
+  letter-spacing: 0.01em;
+  /* No uppercase: operational state reads naturally, not as a UI label */
+}
+
+/* ==========================================================================
+   SLOT CONTENT STYLES
+   ========================================================================== */
+
+.primitive-slot p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+}
+
+.primitive-shell[data-representation="A"] .primitive-slot p {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* Slot label (used in provenance, references) */
+.primitive-slot small {
+  display: block;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+}
+
+/* ==========================================================================
+   METADATA TOKENS
+   ========================================================================== */
+
+/* Token row — layout container only.
+   Visual styling of items now handled by atoms/badge/.tag */
+.primitive-token-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* Migration alias: plain <span> inside token-row (pre-badge system).
+   New code should use <span class="tag"> explicitly. */
+.primitive-token-row span:not([class]) {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+}
+
+.primitive-shell[data-representation="C"] .primitive-token-row {
+  display: none; /* Metadata tokens not shown at rep C — too much cognitive weight */
+}
+
+/* ==========================================================================
+   CONFIDENCE VISUALIZATION
+   ========================================================================== */
+
+.primitive-confidence {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-8);
+  padding-top: var(--space-4);
+}
+
+.primitive-confidence-track {
+  position: relative;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--surface-tertiary);
+  overflow: visible; /* allows threshold marker to bleed above/below */
+}
+
+/* Threshold marker — position set via --confidence-threshold CSS custom property
+   injected by the renderer from source data. Hidden when property is not set. */
+.primitive-confidence-track::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: var(--confidence-threshold);
+  width: 2px;
+  background: color-mix(in srgb, var(--text-primary) 40%, transparent);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.primitive-confidence-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--surface-brand);
+  transition: width var(--duration-motion, 180ms) ease;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.primitive-confidence-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.primitive-confidence-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   PROVENANCE / TRUST SYSTEM
+   Provenance survives all representation levels.
+   At A: full source list. At B: compact first source. At C: trust dot only.
+   ========================================================================== */
+
+.primitive-prov-full {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.primitive-prov-compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.primitive-prov {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+/* Trust dot — the minimal trust signal at rep C */
+.primitive-trust-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--surface-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.primitive-trust-dot[data-trust="validated"] {
+  background: var(--sima-blue);
+  border-color: transparent;
+}
+
+/* documented — formally documented, not externally validated.
+   Was amber (color-warning-600) — creates semantic collision with urgent/blocked states.
+   Corrected to neutral gray: amber is reserved exclusively for urgency/blockage. */
+.primitive-trust-dot[data-trust="documented"] {
+  background: var(--border-default);
+  border-color: transparent;
+}
+
+.primitive-trust-dot[data-trust="signal"] {
+  background: var(--border-default);
+  border-color: transparent;
+}
+
+/* ==========================================================================
+   GRAPH ZONE (slot--graph)
+   Only visible in representation A via representationContracts.
+   ========================================================================== */
+
+.primitive-slot--graph {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-2);
+}
+
+/* ==========================================================================
+   ACTION ZONE
+   Only visible in representation A + density high.
+   ========================================================================== */
+
+.primitive-action-row {
+  display: flex;
+  gap: var(--space-8);
+  align-items: center;
+  padding-top: var(--space-2);
+}
+
+/*
+ * Action button — operational command, not SaaS CTA.
+ * Standalone class (.primitive-action-btn) → atoms/button/action-btn.css (DS-EX-02).
+ * .primitive-shell button contextual override stays here as Pattern-level styling.
+ */
+/* .primitive-action-btn → atoms/button/action-btn.css (DS-EX-02) */
+
+.primitive-shell button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 28px;
+  padding: var(--space-3) var(--space-8);
+  border: 1px solid transparent;
+  border-radius: var(--radius-100);
+  background: transparent;
+  color: color-mix(in srgb, var(--sima-blue) 80%, var(--text-secondary));
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.primitive-shell button::after {
+  content: "→";
+  font-size: var(--text-xs);
+  opacity: 0.6;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.primitive-shell button:hover {
+  background: color-mix(in srgb, var(--sima-blue) 5%, var(--surface-primary));
+  border-color: color-mix(in srgb, var(--sima-blue) 20%, var(--border-subtle));
+  color: var(--sima-blue);
+}
+
+.primitive-shell button:hover::after {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.primitive-shell button:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+}
+
+/*
+ * Attended completion marker — replaces CTA button when state is "attended".
+ *
+ * Semantic: the action was received. The candidate is exiting the interactive
+ * surface. This is NOT a disabled button — it is a terminal state label.
+ *
+ * Styling mirrors button layout (same padding, same font size) so the
+ * action zone height does not collapse, preserving the card's spatial stability.
+ * Color is cool-blue at low opacity — the same hue as the attended border
+ * trace, reinforcing the semantic link.
+ */
+/*
+ * S7.4 — Outcome-aware attended completion slot.
+ *
+ * Two-line structure:
+ *   __ack     — "Acción registrada" (acknowledgment of receipt)
+ *   __outcome — outcomeLabel from taxonomy (consequence statement)
+ *
+ * Visual contract:
+ *   - Column layout, not inline: the consequence deserves its own line.
+ *   - __ack is the primary acknowledgment: cool blue, medium weight.
+ *   - __outcome is a secondary system statement: tertiary text, regular weight.
+ *   - NO icons, NO checkmarks, NO success green — this reads as operational state, not alert.
+ *   - Horizontal padding matches the button so the attended slot occupies the same space.
+ *   - The consequence reads: "this process is now in motion" — not "you did it!"
+ */
+.primitive-action-done {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-height: 28px;
+  padding: var(--space-3) var(--space-8);
+  cursor: default;
+}
+
+.primitive-action-done__ack {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: color-mix(in srgb, var(--sima-blue) 55%, var(--text-tertiary));
+  letter-spacing: 0.01em;
+}
+
+/*
+ * __outcome — operational consequence statement.
+ * Reads as a system belief, not a user-facing success message.
+ * Subdued: text-tertiary, regular weight, slightly smaller.
+ */
+.primitive-action-done__outcome {
+  font-size: 11px;
+  font-weight: var(--weight-regular);
+  color: var(--text-tertiary);
+  letter-spacing: 0.005em;
+}
+
+/* ==========================================================================
+   REFERENCES ZONE
+   ========================================================================== */
+
+.primitive-ref-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.primitive-ref-list span {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  padding: var(--space-2) var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+}
+
+/* ==========================================================================
+   REPRESENTATION C — ambient reference compression
+   Ultra-compact form. Everything non-essential is hidden.
+   ========================================================================== */
+
+.primitive-shell[data-representation="C"] .primitive-slot--summary p {
+  display: none;
+}
+
+.primitive-shell[data-representation="C"] .primitive-slot--metadata {
+  display: none;
+}
+
+/* At C, provenance becomes the trust dot only — handled by the renderer.
+   No additional CSS suppression needed since the renderer produces the dot. */
+
+/* ==========================================================================
+   INFORMATION DENSITY modifiers
+   (slot visibility is handled by JS/density-contracts — CSS reinforces)
+   ========================================================================== */
+
+.primitive-shell[data-density="low"] .primitive-slot p {
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   SELECTED STATE — cross-object persistence marker
+   Applied to the B-rep scan-list item whose object is active in primary.
+   In scan-list context (border stripped), the inset shadow becomes the signal.
+   In card context, the shadow adds left-edge depth.
+   ========================================================================== */
+
+.primitive-shell[data-selected="true"] {
+  box-shadow: inset 3px 0 0
+    color-mix(in srgb, var(--sima-blue) 45%, transparent);
+  background: color-mix(in srgb, var(--sima-blue) 3%, var(--surface-primary));
+}
+
+/* ==========================================================================
+   OPERATIONAL STATE on shell level
+   ========================================================================== */
+
+/*
+ * Blocked — urgent: amber left accent + subtle amber glow.
+ *
+ * S10-C.3 consolidation: a duplicate rule existed earlier in this file
+ * (removed) that set border-left-width/style/color longhand + box-shadow,
+ * but that rule was overridden by this shorthand border-left (same specificity,
+ * later position). Only the box-shadow survived from it — which was unintentional
+ * fragility. Both properties are now explicit here.
+ *
+ * border-left opacity: B/C-rep gets 70% to soften the signal in scan context;
+ * A-rep gets 100% (full presence, declared in the representation-specific rule).
+ * box-shadow: outer amber glow at 18% — signals active operational risk without
+ * colliding with the selected or lineage-active inset shadows (different shadow type).
+ */
+.primitive-shell[data-operational-state="blocked"] {
+  border-left: 2px solid
+    color-mix(in srgb, var(--color-warning-600) 70%, transparent);
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--color-warning-600) 18%, transparent);
+  padding-left: calc(var(--space-12) - 2px);
+}
+
+.primitive-shell[data-representation="A"][data-operational-state="blocked"] {
+  border-left: 3px solid var(--color-warning-600);
+  padding-left: calc(var(--space-16) - 3px);
+  /* box-shadow preserved from base rule above (not overridden here) */
+}
+
+/* ==========================================================================
+   PRIMITIVE TYPE ROW — SPREAD VARIANT
+   Places a secondary signal (confidence badge, threshold delta) right-aligned.
+   Used by the candidate renderer across all representations.
+   ========================================================================== */
+
+.primitive-type-row--spread {
+  justify-content: space-between;
+}
+
+/* Confidence value in the title type-row (B/C only — at A it lives in graph slot).
+   B: 16px matches h4 scan weight — the number dominates the type row.
+   C: compressed to 12px/medium — ambient trace, not a shout. */
+.primitive-shell[data-representation="C"] .primitive-confidence-value {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   CANDIDATE PRIMITIVE — SIGNAL IDENTITY SYSTEM
+   ========================================================================== */
+
+/*
+ * Threshold delta annotation — A-rep type row, right side.
+ * Shows how far above/below the diagnostic threshold this candidate sits.
+ * "+1% sobre umbral" — the signal strength in operational language.
+ */
+.candidate-threshold-delta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: color-mix(in srgb, var(--sima-blue) 75%, var(--text-tertiary));
+  white-space: nowrap;
+}
+
+.candidate-threshold-delta--below {
+  color: var(--color-warning-600);
+}
+
+/*
+ * Candidate symptoms — diagnostic signals detected by the AI model.
+ * Shown in the graph slot at A-rep below the confidence bar.
+ * These are the evidence behind the confidence score — not decorative chips.
+ * Styling: muted (not metadata noise), bordered (distinct from value tokens),
+ * separated from the bar by a hairline rule.
+ */
+/* Symptoms row — layout + separator only.
+   Visual chip style now handled by atoms/badge/.tag.tag--outlined */
+.candidate-symptoms {
+  margin-top: var(--space-8);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   D11C PATIENT CARD — Operational Narrative (approved v5)
+
+   Current Position → Next Step as single narrative unit.
+   Treatment A: both lines equal visual weight.
+   Arrow inherits same color as narrative text — not muted.
+
+   LOW utility (Pharma, EPS, Hospital):
+     pos-l (Large, text-base/semibold) — narrative is the primary anchor
+   HIGH utility (PCP, Specialist, Patient, PatientOrg):
+     pos-m (Medium, text-sm/semibold) — name is the primary anchor
+
+   Finding 02: type label not rendered (handled in renderer, no CSS needed)
+   Finding 04: border-left collapsed to subtle for LOW utility narrative shells
+   ========================================================================== */
+
+/* Narrative line — Medium · HIGH utility */
+.pos-m {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+/* Narrative line — Large · LOW utility (primary anchor, no name) */
+.pos-l {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+/* Identity trace — LOW utility. De-emphasized: traceability only, not content. */
+.id-lo {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+/*
+ * Finding 04 — Remove colored left borders from LOW utility narrative shells.
+ * Urgency is communicated through status dot + status label only.
+ * Applies to all operational states: pending pulse animation also removed.
+ */
+.primitive-shell[data-actor-utility="low"][data-operational-state] {
+  border-left-color: var(--border-subtle) !important;
+  box-shadow: none !important;
+}
+
+.primitive-shell[data-actor-utility="low"][data-operational-state="blocked"] {
+  border-left-color: var(--border-subtle) !important;
+  padding-left: var(--space-12);
+}
+
+.primitive-shell[data-actor-utility="low"][data-operational-state="pending"] {
+  border-left-color: var(--border-subtle) !important;
+  animation: none !important;
+}
+
+/*
+ * Zone separators — identity zone / narrative zone / traceability zone.
+ * Rendered via CSS border-top on slot wrappers rather than injected HTML elements.
+ * This keeps the renderer output clean and lets the DS shell control spacing.
+ */
+.primitive-shell[data-actor-utility="low"] .primitive-slot--summary {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-8);
+}
+
+.primitive-shell[data-actor-utility="low"] .primitive-slot--metadata {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-8);
+}
+
+/* Migration alias: plain <span> in symptoms (pre-badge system) */
+.candidate-symptoms span:not([class]) {
+  background: transparent;
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   D11C CORRECTIONS — C01 Priority Reason · C02 Affordance · C03 Metadata Audit
+   ========================================================================== */
+
+/*
+ * C01 — Priority Reason line.
+ * Answers "why this card first?" — operational fact from workflow state.
+ * Amber signals actionable urgency. Absent when no reason is present.
+ * Rendered in the title zone, subordinate to the narrative.
+ */
+.prio-reason {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-warning-600);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+/*
+ * C02 — Open Context Affordance (Option B).
+ * B-rep LOW utility scan cards only. Quiet at rest.
+ * On hover/focus: › reveals at top-right, bg shifts to secondary.
+ * Communicates: inspectable → openable → navigable.
+ * No buttons. No CTA rows. No layout changes.
+ *
+ * Selected cards excluded — they are already the open context.
+ * Attended cards are inert (pointer-events: none) — hover never fires.
+ */
+.primitive-shell[data-actor-utility="low"][data-representation="B"] {
+  position: relative;
+  transition: background 140ms ease;
+}
+
+.primitive-shell[data-actor-utility="low"][data-representation="B"]::after {
+  content: "›";
+  position: absolute;
+  top: var(--space-10);
+  right: var(--space-12);
+  font-size: var(--text-base);
+  color: var(--sima-blue);
+  opacity: 0;
+  transition: opacity 140ms ease;
+  pointer-events: none;
+}
+
+.primitive-shell[data-actor-utility="low"][data-representation="B"]:not(
+    [data-selected="true"]
+  ):hover,
+.primitive-shell[data-actor-utility="low"][data-representation="B"]:not(
+    [data-selected="true"]
+  ):focus-within {
+  background: var(--surface-secondary);
+}
+
+.primitive-shell[data-actor-utility="low"][data-representation="B"]:not(
+    [data-selected="true"]
+  ):hover::after,
+.primitive-shell[data-actor-utility="low"][data-representation="B"]:not(
+    [data-selected="true"]
+  ):focus-within::after {
+  opacity: 1;
+}
+
+/*
+ * C03 — Metadata Audit: provenance slot removed at B-rep LOW utility.
+ * After label removal, the trust dot is orphaned — no surrounding context,
+ * no label, no semantic anchoring. It communicates nothing actionable:
+ * no state, priority, ownership, urgency, or traceability signal remains.
+ * Entire slot hidden. Provenance remains at A-rep (full context surface).
+ */
+.primitive-shell[data-actor-utility="low"][data-representation="B"]
+  .primitive-slot--provenance {
+  display: none;
+}
+
+/* ==========================================================================
+   TRUST INTEGRATION
+   Trust state influences the perception of the object, not just labels.
+   ========================================================================== */
+
+/*
+ * Trust = "signal" — model output is not externally validated.
+ * The provenance slot gets a subtle amber left accent: "read this carefully".
+ * Not alarming — operational and silent.
+ */
+.primitive-shell[data-trust-state="signal"] .primitive-slot--provenance {
+  padding-left: var(--space-10);
+  border-left: 2px solid
+    color-mix(in srgb, var(--color-warning-600) 40%, transparent);
+  margin-top: var(--space-2);
+}
+
+/*
+ * C-rep trust dot — the ONLY trust signal at ambient representation.
+ * Slightly larger than at B/A so it reads as a real indicator, not a decoration.
+ * The trust dot IS the trust system at C. It must not disappear.
+ */
+.primitive-shell[data-representation="C"] .primitive-trust-dot {
+  width: 10px;
+  height: 10px;
+}
+
+/* ==========================================================================
+   S8 — OPERATIONAL LINEAGE SURFACE
+   ========================================================================== */
+
+/*
+ * Lineage state label — appears inside the attended completion slot when a
+ * downstream process belief is confirmed.
+ *
+ * Semantic: "this process is now in motion" — not a celebration or success
+ * message. Reads as operational fact: warm gray, smaller than outcome line,
+ * no decoration. The text is deterministic (from taxonomy), not generated.
+ *
+ * Placement: below __outcome inside .primitive-action-done.
+ * Visibility: only at A-rep (rendered conditionally by the renderer).
+ */
+.primitive-lineage-state {
+  display: block;
+  font-size: 10px;
+  font-weight: var(--weight-regular);
+  color: color-mix(
+    in srgb,
+    var(--text-tertiary) 80%,
+    var(--color-warning-600) 20%
+  );
+  letter-spacing: 0.01em;
+  margin-top: var(--space-2);
+  font-style: italic;
+}
+
+/* S9.4 — Lineage-active visual hierarchy
+ * Shells where an upstream operational consequence is in motion (but not yet
+ * attended locally) get a subtle inset left border. This distinguishes
+ * "downstream-aware" shells from unrelated ones without adding noise to
+ * already-attended or explicitly blocked/pending shells.
+ */
+.primitive-shell[data-lineage-active="true"]:not(
+    [data-operational-state="attended"]
+  ) {
+  box-shadow: inset 3px 0 0
+    color-mix(in srgb, var(--sima-blue) 18%, var(--text-tertiary) 15%);
+}
+
+/* D6 — Primary + lineage-active compound shadow
+ * The S9.4 rule above has specificity 0,2,0 which overrides the emphasis:primary
+ * rule (0,1,0) that sets var(--shadow-sm). When a primary shell is also lineage-
+ * active, both shadows must coexist: the elevation shadow preserves hierarchy,
+ * the inset indicator communicates cross-primitive state.
+ * This rule has specificity 0,3,0 so it wins and restores both values.
+ */
+.primitive-shell[data-emphasis="primary"][data-lineage-active="true"]:not(
+    [data-operational-state="attended"]
+  ) {
+  box-shadow:
+    var(--shadow-sm),
+    inset 3px 0 0
+      color-mix(in srgb, var(--sima-blue) 18%, var(--text-tertiary) 15%);
+}
+
+/*
+ * S10-C.3 — Selected + lineage-active compound shadow.
+ *
+ * Specificity audit:
+ *   [data-lineage-active="true"]:not([data-operational-state="attended"]) → 0,2,0
+ *   [data-selected="true"]                                                 → 0,1,0
+ *   [data-selected="true"][data-lineage-active="true"]:not([...attended])  → 0,3,0 ← this rule
+ *
+ * When a selected B-rep shell is also lineage-active (e.g., the promoted primary
+ * candidate on scan surface who has a downstream lineage consequence active),
+ * the selection signal — explicit user navigation — takes visual precedence over
+ * the cross-primitive lineage indicator. The selection inset shadow (45% blue) is
+ * more saturated than the lineage inset (18% blue+gray); preserving it ensures
+ * the user's selected context is not washed out by the ambient lineage signal.
+ *
+ * The selected background tint (3% blue) is unaffected — both signals still read.
+ */
+.primitive-shell[data-selected="true"][data-lineage-active="true"]:not(
+    [data-operational-state="attended"]
+  ) {
+  box-shadow: inset 3px 0 0
+    color-mix(in srgb, var(--sima-blue) 45%, transparent);
+}
+
+/*
+ * S10 backlog #2 — Blocked + lineage-active shadow recovery.
+ *
+ * Problem: the lineage-active compound rules (D6 at 0,3,0 and S10-C.3 at 0,3,0)
+ * override the blocked rule (0,1,0), erasing the amber outer glow that signals
+ * active operational risk. The border-left survives (different property), but the
+ * box-shadow is a single declaration — whoever wins specificity owns the whole value.
+ *
+ * Fix: two compound rules at 0,3,0, placed AFTER D6 and S10-C.3 so source-order
+ * wins the tie. Each restores all needed shadow layers atomically:
+ *
+ *   primary + blocked + lineage-active (0,3,0):
+ *     elevation  → var(--shadow-sm)          structural hierarchy
+ *     amber glow → 0 0 0 1px amber-18%       blocked urgency (takes visual precedence)
+ *     lineage    → inset 3px 0 0 blue-18%    cross-primitive awareness
+ *
+ *   selected + blocked + lineage-active (0,3,0):
+ *     amber glow → 0 0 0 1px amber-18%       blocked urgency
+ *     selection  → inset 3px 0 0 blue-45%    explicit user navigation (more saturated than lineage)
+ *
+ * Design decision: blocked urgency (amber) is preserved alongside the selection/
+ * lineage inset — these use different shadow directions (outer vs inset) and do not
+ * visually cancel. A blocked-selected shell reads amber ring + blue inset border
+ * simultaneously, which is intentional and correct.
+ */
+.primitive-shell[data-emphasis="primary"][data-operational-state="blocked"][data-lineage-active="true"] {
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 1px color-mix(in srgb, var(--color-warning-600) 18%, transparent),
+    inset 3px 0 0
+      color-mix(in srgb, var(--sima-blue) 18%, var(--text-tertiary) 15%);
+}
+
+.primitive-shell[data-selected="true"][data-operational-state="blocked"][data-lineage-active="true"] {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-warning-600) 18%, transparent),
+    inset 3px 0 0 color-mix(in srgb, var(--sima-blue) 45%, transparent);
+}

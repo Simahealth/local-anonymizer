@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_039",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Felipe González Castro\ndocumento de identidad 28.463.709\nFecha de nacimiento: 2007-05-20\nProcedencia: Cartagena, Cundinamarca\nDirección: Calle 159 # 77-49, barrio Laureles\nTeléfono: 601 7893063   Correo: felipe87@hotmail.com\nEPS: Coosalud\nFecha de ingreso: Abril 18 de 1989\n\nMOTIVO DE CONSULTA\nPaciente 10 años de edad que ingresa al servicio refiriendo astenia y adinamia de varios días de evolución. Reside en Cartagena y consulta de forma espontánea. Se localiza al acompañante en el número 601 7893063.\n\nVALORACIÓN\nAtendido por el Dr. Patricia Quintero González (RM 58213). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo felipe87@hotmail.com o remitir a la dirección Calle 159 # 77-49.",
+  "ground_truth": {
+    "nombres": [
+      "Felipe González Castro",
+      "Patricia Quintero González"
+    ],
+    "documentos": [
+      "28.463.709"
+    ],
+    "edades": [
+      "10 años"
+    ],
+    "ubicaciones": [
+      "Cartagena",
+      "Cundinamarca"
+    ],
+    "direcciones": [
+      "Calle 159 # 77-49"
+    ],
+    "telefonos": [
+      "601 7893063"
+    ],
+    "emails": [
+      "felipe87@hotmail.com"
+    ],
+    "seguros": [
+      "Coosalud"
+    ],
+    "fechas_nacimiento": [
+      "2007-05-20"
+    ],
+    "fechas": [
+      "Abril 18 de 1989"
+    ],
+    "numeros_registro": [
+      "RM 58213"
+    ]
+  }
+}

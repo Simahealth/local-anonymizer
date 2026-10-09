@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_026",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Catalina López López\ncédula de ciudadanía No. 3934040683\nFecha de nacimiento: Mayo 28 de 1975\nProcedencia: Cali, Atlántico\nDirección: Transversal 118A No. 86-2, barrio Cabecera\nTeléfono: 319.601.8975   Correo: catalina89@outlook.com\nEPS: Coosalud\nFecha de ingreso: 1963-08-28\n\nMOTIVO DE CONSULTA\nPaciente de 75 años que ingresa al servicio refiriendo dolor torácico de varios días de evolución. Reside en Cali y consulta de forma espontánea. Se localiza al acompañante en el número 319.601.8975.\n\nVALORACIÓN\nAtendido por el Dr. Felipe Rodríguez Moreno (RM 57049). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo catalina89@outlook.com o remitir a la dirección Transversal 118A No. 86-2.",
+  "ground_truth": {
+    "nombres": [
+      "Catalina López López",
+      "Felipe Rodríguez Moreno"
+    ],
+    "documentos": [
+      "3934040683"
+    ],
+    "edades": [
+      "75 años"
+    ],
+    "ubicaciones": [
+      "Cali",
+      "Atlántico"
+    ],
+    "direcciones": [
+      "Transversal 118A No. 86-2"
+    ],
+    "telefonos": [
+      "319.601.8975"
+    ],
+    "emails": [
+      "catalina89@outlook.com"
+    ],
+    "seguros": [
+      "Coosalud"
+    ],
+    "fechas_nacimiento": [
+      "Mayo 28 de 1975"
+    ],
+    "fechas": [
+      "1963-08-28"
+    ],
+    "numeros_registro": [
+      "RM 57049"
+    ]
+  }
+}

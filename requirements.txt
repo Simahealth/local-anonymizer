@@ -1,0 +1,11 @@
+# Motor de anonimización
+presidio-analyzer==2.2.364
+spacy==3.8.16
+es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl
+tldextract==5.4.0
+pymupdf==1.28.2
+reportlab==5.0.1
+openpyxl==3.1.5
+
+# App de escritorio (WKWebView en macOS, WebView2 en Windows)
+pywebview==6.2.1

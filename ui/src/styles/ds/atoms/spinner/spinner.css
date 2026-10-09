@@ -1,0 +1,90 @@
+/**
+ * Spinner — SimaHealth Design System · Atom
+ * ─────────────────────────────────────────────────────────────
+ * Formaliza (2026-09-09) el ícono `progress_activity` rotando -- un
+ * patrón que existía 7 VECES en el repo antes de esto, cada una con su
+ * propio `@keyframes` byte-idéntico (mismo `rotate(0deg) -> rotate(360deg)`):
+ * `mpc-spin`, `milestone-progress-spin`, `ad-spin`, `tri-spin`,
+ * `man-spin`, `btn-spin`, `card-processing-spin`. Este archivo define el
+ * ÚNICO keyframe canónico (`spinner-spin`); los otros 6 ya no declaran
+ * el suyo propio -- ver el comentario en cada uno de esos archivos.
+ *
+ * `Spinner.tsx` (componente real) se migró donde el spinner es un
+ * ícono-solo standalone con tono/tamaño estático (Card, ModalTriage,
+ * MilestoneProgress -- este último vía el tamaño `xs`, ver abajo).
+ * Donde NO se migró a `<Spinner>` -- documentado explícitamente en cada
+ * caso, no un olvido:
+ *   - `Button`/`IconButton`: su spinner hereda `currentColor` del botón
+ *     (varía por variante/tono/hover/disabled) -- el contrato de `tone`
+ *     de este átomo (3 valores fijos) no modela "heredar del padre".
+ *   - `ModalProgresoCarga`/`ModalAnonimizacion`/`ModalAnalisisDiferencial`:
+ *     el ícono no es SIEMPRE un spinner -- es un slot de 4 estados
+ *     (pending/processing/success/error) que cambia de glifo Y de color
+ *     según el estado; el spin es solo uno de esos 4 casos, no un
+ *     spinner independiente que tenga sentido extraer a su propio
+ *     componente sin fragmentar ese slot compartido.
+ * Los 5 casos de arriba SÍ reusan el keyframe canónico -- solo no pasan
+ * por el componente TSX.
+ *
+ * `prefers-reduced-motion`: sin media query propia -- `framework/
+ * motion.css` ya fuerza `animation-duration: 1ms !important` global
+ * (`*, *::before, *::after`), así que este spinner (y los 6 anteriores)
+ * ya lo respetan sin código adicional.
+ */
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.spinner .material-symbols-outlined {
+  display: block;
+  animation: spinner-spin 1s linear infinite;
+}
+
+@keyframes spinner-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Tamaños ───────────────────────────────────────────────────────── */
+/* `xs` (2026-09-10, agregado para MilestoneProgress): 12px --
+   `--text-xs`, el mismo valor exacto que `--space-12` (el diámetro del
+   dot que este spinner debe llenar) ya usa -- ninguna medida nueva, es
+   la lectura "tipográfica" del mismo 12px que el dot ya tenía
+   aprobado. */
+.spinner--xs .material-symbols-outlined {
+  font-size: var(--text-xs, 12px);
+}
+
+.spinner--sm .material-symbols-outlined {
+  font-size: var(--text-sm, 14px);
+}
+
+.spinner--md .material-symbols-outlined {
+  font-size: var(--text-lg, 20px);
+}
+
+.spinner--lg .material-symbols-outlined {
+  font-size: var(--text-2xl, 32px);
+}
+
+/* ── Tonos ─────────────────────────────────────────────────────────── */
+.spinner--neutral {
+  color: var(--text-secondary, #4b5057);
+}
+
+.spinner--brand {
+  color: var(--text-brand, #d732ab);
+}
+
+.spinner--inverse {
+  color: var(--text-inverse, #f8f9fc);
+}

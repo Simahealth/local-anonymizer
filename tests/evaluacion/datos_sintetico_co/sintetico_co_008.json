@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_008",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Sebastián Gómez Rodríguez\nC.C. 319'321.646\nFecha de nacimiento: 1958-06-05\nProcedencia: Bucaramanga, Atlántico\nDirección: Avenida 172 Sur No. 39-59 piso 2, barrio El Prado\nTeléfono: 321-222-9110   Correo: sebastián28@une.net.co\nEPS: Coomeva\nFecha de ingreso: Mayo 12 de 1970\n\nMOTIVO DE CONSULTA\nPaciente Edad: 92 años que ingresa al servicio refiriendo edema en miembros inferiores de varios días de evolución. Reside en Bucaramanga y consulta de forma espontánea. Se localiza al acompañante en el número 321-222-9110.\n\nVALORACIÓN\nAtendido por el Dr. Mauricio Ospina Castro (RM 49651). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo sebastián28@une.net.co o remitir a la dirección Avenida 172 Sur No. 39-59 piso 2.",
+  "ground_truth": {
+    "nombres": [
+      "Sebastián Gómez Rodríguez",
+      "Mauricio Ospina Castro"
+    ],
+    "documentos": [
+      "319'321.646"
+    ],
+    "edades": [
+      "92 años"
+    ],
+    "ubicaciones": [
+      "Bucaramanga",
+      "Atlántico"
+    ],
+    "direcciones": [
+      "Avenida 172 Sur No. 39-59 piso 2"
+    ],
+    "telefonos": [
+      "321-222-9110"
+    ],
+    "emails": [
+      "sebastián28@une.net.co"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "1958-06-05"
+    ],
+    "fechas": [
+      "Mayo 12 de 1970"
+    ],
+    "numeros_registro": [
+      "RM 49651"
+    ]
+  }
+}

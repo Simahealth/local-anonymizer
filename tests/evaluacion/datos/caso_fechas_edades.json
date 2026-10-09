@@ -1,0 +1,10 @@
+{
+  "nombre": "caso_fechas_edades",
+  "descripcion": "Fechas en varios formatos, edades y fecha de nacimiento.",
+  "texto": "Resumen de atención\n\nPaciente de 67 años de edad. Fecha de nacimiento: 03/05/1958. Ingresa el 22 de febrero de 2024 por cuadro de dolor torácico. Egreso programado para el 2024-02-25. Control ambulatorio en 15 días. Antecedente quirúrgico de hace 12 años. El menor de 8 años fue remitido el 10 de marzo de 2023.\n",
+  "ground_truth": {
+    "edades": ["67 años", "8 años"],
+    "fechas_nacimiento": ["03/05/1958"],
+    "fechas": ["22 de febrero de 2024", "2024-02-25", "10 de marzo de 2023"]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_045",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Diana García Ospina\nidentificado con C.C. 2.196.963.451\nFecha de nacimiento: 23 de agosto de 1961\nProcedencia: Santa Marta, Valle del Cauca\nDirección: Transversal 144 N° 34-34 apto 557, barrio Kennedy\nTeléfono: 313 305 7514   Correo: diana10@yahoo.es\nEPS: Nueva EPS\nFecha de ingreso: 22 de junio de 1958\n\nMOTIVO DE CONSULTA\nPaciente de 4 años que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Santa Marta y consulta de forma espontánea. Se localiza al acompañante en el número 313 305 7514.\n\nVALORACIÓN\nAtendido por el Dr. Óscar Moreno Castro (HC-414527). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo diana10@yahoo.es o remitir a la dirección Transversal 144 N° 34-34 apto 557.",
+  "ground_truth": {
+    "nombres": [
+      "Diana García Ospina",
+      "Óscar Moreno Castro"
+    ],
+    "documentos": [
+      "2.196.963.451"
+    ],
+    "edades": [
+      "4 años"
+    ],
+    "ubicaciones": [
+      "Santa Marta",
+      "Valle del Cauca"
+    ],
+    "direcciones": [
+      "Transversal 144 N° 34-34 apto 557"
+    ],
+    "telefonos": [
+      "313 305 7514"
+    ],
+    "emails": [
+      "diana10@yahoo.es"
+    ],
+    "seguros": [
+      "Nueva EPS"
+    ],
+    "fechas_nacimiento": [
+      "23 de agosto de 1961"
+    ],
+    "fechas": [
+      "22 de junio de 1958"
+    ],
+    "numeros_registro": [
+      "HC-414527"
+    ]
+  }
+}

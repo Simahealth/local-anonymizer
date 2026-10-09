@@ -1,0 +1,15 @@
+{
+  "nombre": "caso_direcciones",
+  "descripcion": "Direcciones con nomenclatura colombiana en varios formatos y abreviaturas.",
+  "texto": "Direcciones de residencia registradas:\n\nPaciente uno: Calle 45 # 23-15.\nPaciente dos: Carrera 7 No. 12-34.\nPaciente tres: Avenida 68 # 45-67.\nPaciente cuatro: Diagonal 25 # 30-40 Sur.\nPaciente cinco: Transversal 15 A # 20-30.\nPaciente seis: Cra 50 # 6-28.\n",
+  "ground_truth": {
+    "direcciones": [
+      "Calle 45 # 23-15",
+      "Carrera 7 No. 12-34",
+      "Avenida 68 # 45-67",
+      "Diagonal 25 # 30-40 Sur",
+      "Transversal 15 A # 20-30",
+      "Cra 50 # 6-28"
+    ]
+  }
+}

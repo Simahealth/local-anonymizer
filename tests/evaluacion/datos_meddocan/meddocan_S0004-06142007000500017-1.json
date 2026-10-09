@@ -1,0 +1,42 @@
+{
+  "nombre": "meddocan_S0004-06142007000500017-1",
+  "descripcion": "MEDDOCAN dev · S0004-06142007000500017-1 (corpus español, conjunto neutral)",
+  "texto": "Datos del paciente.\nNombre: Juan.\nApellidos: Casado Casado.\nNHC: 5347986.\nNASS: 28 23748589 45.\nDomicilio: Calle puente cesures, 16.\nLocalidad/ Provincia: Madrid.\nCP: 28029.\nDatos asistenciales.\nFecha de nacimiento: 26/11/1947.\nPaís: España.\nEdad: 67 años Sexo: H.\nFecha de Ingreso: 21/05/2015.\nMédico:  NºCol: 28 28.\nInforme clínico del paciente: Paciente varón de 67 años, sin antecedentes de interés, que acude a consulta de urología por primera vez, derivado por su médico de atención primaria, por síntomas de prostatismo. En el examen físico se encuentra una próstata de consistencia adenomatosa y de tamaño aumentado (III/IV). En la ecografia transrectal se observa un parénquima heterogéneo, con calcificaciones aisladas en lóbulo derecho, sin objetivarse imágenes hipoecoicas y con un volumen prostático de 101,7 c.c. En los análisis, elevación de PSA (13,08 ng/ml.). Se indica realización de biopsia prostática transrectal.\nEl resultado de la anatomía patológica fue informado como nevus azul prostático. Se describe un parénquima prostático con inflamación crónica y reacción granulomatosa de tipo cuerpo extraño, con presencia de gránulos intracitoplásmicos y melanocitos fusiformes dendríticos.. No hay evidencia de malignidad en ninguna de las muestras.\nRemitido por: Pablo Garrido Abad Servicio de Urología Hospital La Princesa Diego de León, 28006 Madrird. (España). pgabad@hotmail.com\n",
+  "ground_truth": {
+    "emails": [
+      "pgabad@hotmail.com"
+    ],
+    "ubicaciones": [
+      "España",
+      "Madrird",
+      "28006",
+      "Hospital La Princesa Diego de León",
+      "28029",
+      "Madrid"
+    ],
+    "nombres": [
+      "Pablo Garrido Abad",
+      "Casado Casado",
+      "Juan"
+    ],
+    "edades": [
+      "67 años"
+    ],
+    "numeros_registro": [
+      "28 28"
+    ],
+    "fechas": [
+      "21/05/2015",
+      "26/11/1947"
+    ],
+    "direcciones": [
+      "Calle puente cesures, 16"
+    ],
+    "seguros": [
+      "28 23748589 45"
+    ],
+    "documentos": [
+      "5347986"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_028",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Andrés García Ramírez\nC.C. 196961971\nFecha de nacimiento: Noviembre 8 de 1958\nProcedencia: Cartagena, Nariño\nDirección: Carrera 173 Sur N° 87-34 apto 491, barrio El Poblado\nTeléfono: 307-141-9843   Correo: andrés72@outlook.com\nEPS: Mutual SER\nFecha de ingreso: 23/05/2002\n\nMOTIVO DE CONSULTA\nPaciente de 2 años que ingresa al servicio refiriendo lumbalgia de varios días de evolución. Reside en Cartagena y consulta de forma espontánea. Se localiza al acompañante en el número 307-141-9843.\n\nVALORACIÓN\nAtendido por el Dr. Catalina Moreno Cárdenas (Registro médico 15943). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo andrés72@outlook.com o remitir a la dirección Carrera 173 Sur N° 87-34 apto 491.",
+  "ground_truth": {
+    "nombres": [
+      "Andrés García Ramírez",
+      "Catalina Moreno Cárdenas"
+    ],
+    "documentos": [
+      "196961971"
+    ],
+    "edades": [
+      "2 años"
+    ],
+    "ubicaciones": [
+      "Cartagena",
+      "Nariño"
+    ],
+    "direcciones": [
+      "Carrera 173 Sur N° 87-34 apto 491"
+    ],
+    "telefonos": [
+      "307-141-9843"
+    ],
+    "emails": [
+      "andrés72@outlook.com"
+    ],
+    "seguros": [
+      "Mutual SER"
+    ],
+    "fechas_nacimiento": [
+      "Noviembre 8 de 1958"
+    ],
+    "fechas": [
+      "23/05/2002"
+    ],
+    "numeros_registro": [
+      "Registro médico 15943"
+    ]
+  }
+}

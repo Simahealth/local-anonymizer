@@ -1,0 +1,55 @@
+/* ============================================================
+   Design System — carga unificada, MISMO ORDEN que
+   frontend/actors/especialista/index.html (paridad de diseño exacta,
+   ver el plan). Archivos copiados tal cual desde SimahealthDS/ y
+   assets/css/ -- no modificados, solo reorganizados en un solo punto
+   de entrada para que Vite los bundlee.
+   ============================================================ */
+
+/* Tokens */
+@import "./tokens.css";
+
+/* Foundations */
+@import "./foundations/icons/icons.css";
+
+/* Atoms */
+@import "./atoms/text/text.css";
+@import "./atoms/field/field.css";
+@import "./atoms/spinner/spinner.css";
+@import "./atoms/button/button.css";
+@import "./atoms/button/action-btn.css";
+@import "./atoms/button/icon-button.css";
+@import "./atoms/badge/badge-base.css";
+@import "./atoms/badge/badge.css";
+@import "./atoms/badge/status-badge.css";
+@import "./atoms/badge/tag.css";
+@import "./atoms/badge/metric-chip.css";
+@import "./atoms/badge/mirror-badge.css";
+
+/* Framework / Patterns */
+@import "./framework/base.css";
+@import "./framework/product.css";
+@import "./framework/board.css";
+@import "./framework/primitives.css";
+@import "./framework/motion.css";
+
+/* Molecules */
+@import "./molecules/selection-group/selection-group.css";
+@import "./molecules/tag-info/tag-info.css";
+@import "./molecules/context-cta/context-cta.css";
+@import "./molecules/category-nav/category-nav.css";
+@import "./molecules/dropdown-menu/dropdown-menu.css";
+@import "./molecules/search-input/search-input.css";
+@import "./molecules/tooltip/tooltip.css";
+
+/* Organisms (oficiales, sin modificar) */
+@import "./organisms/LeftPanel/left-panel.css";
+@import "./organisms/Card/card.css";
+@import "./organisms/DetailPanel/detail-panel.css";
+/* Modal: net-new organism, no vanilla precedent (see modal.css header). */
+@import "./organisms/Modal/modal.css";
+@import "./organisms/Toast/toast.css";
+@import "./organisms/Disclosure/disclosure.css";
+
+/* Actor-local (Especialista) */
+@import "./actor/especialista.css";

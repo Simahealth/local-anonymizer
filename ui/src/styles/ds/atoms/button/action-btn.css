@@ -1,0 +1,61 @@
+/* ==========================================================================
+   Atom: Action Button
+   Layer: 2 — Atoms
+   Owner: Design System
+   Estado: active
+
+   Compact inline action button (28px min-height) with ghost resting state
+   and directional arrow affordance. Used for operational commands embedded
+   inside operational-object and signal-card Patterns.
+
+   Note: .primitive-shell button uses identical declarations as a contextual
+   Layer 4 override — that rule stays in primitives.css and is NOT this Atom.
+   The standalone class is the canonical Atom reference.
+
+   Extracted from: primitives.css (Layer 4) in Sprint DS-EX-02.
+   Autoridad: DESIGN_SYSTEM_CONSTITUTION.md §3.
+   ========================================================================== */
+
+.primitive-action-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 28px;
+  padding: var(--space-3) var(--space-8);
+  border: 1px solid transparent;
+  border-radius: var(--radius-100);
+  background: transparent;
+  color: color-mix(in srgb, var(--sima-blue) 80%, var(--text-secondary));
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.primitive-action-btn::after {
+  content: "→";
+  font-size: var(--text-xs);
+  opacity: 0.6;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.primitive-action-btn:hover {
+  background: color-mix(in srgb, var(--sima-blue) 5%, var(--surface-primary));
+  border-color: color-mix(in srgb, var(--sima-blue) 20%, var(--border-subtle));
+  color: var(--sima-blue);
+}
+
+.primitive-action-btn:hover::after {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.primitive-action-btn:focus-visible {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+}

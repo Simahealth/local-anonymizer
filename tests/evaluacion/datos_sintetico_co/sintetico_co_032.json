@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_032",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Sandra Martínez Castro\nCC 263'894.795\nFecha de nacimiento: 28 de diciembre de 1956\nProcedencia: Medellín, Cundinamarca\nDirección: Manzana 4 Casa 24, Suba, barrio Manga\nTeléfono: 3286530541   Correo: sandra53@outlook.com\nEPS: Famisanar\nFecha de ingreso: 20/05/1995\n\nMOTIVO DE CONSULTA\nPaciente de 61 años que ingresa al servicio refiriendo lumbalgia de varios días de evolución. Reside en Medellín y consulta de forma espontánea. Se localiza al acompañante en el número 3286530541.\n\nVALORACIÓN\nAtendido por el Dr. Mauricio Castro Torres (HC-705991). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo sandra53@outlook.com o remitir a la dirección Manzana 4 Casa 24, Suba.",
+  "ground_truth": {
+    "nombres": [
+      "Sandra Martínez Castro",
+      "Mauricio Castro Torres"
+    ],
+    "documentos": [
+      "263'894.795"
+    ],
+    "edades": [
+      "61 años"
+    ],
+    "ubicaciones": [
+      "Medellín",
+      "Cundinamarca"
+    ],
+    "direcciones": [
+      "Manzana 4 Casa 24, Suba"
+    ],
+    "telefonos": [
+      "3286530541"
+    ],
+    "emails": [
+      "sandra53@outlook.com"
+    ],
+    "seguros": [
+      "Famisanar"
+    ],
+    "fechas_nacimiento": [
+      "28 de diciembre de 1956"
+    ],
+    "fechas": [
+      "20/05/1995"
+    ],
+    "numeros_registro": [
+      "HC-705991"
+    ]
+  }
+}

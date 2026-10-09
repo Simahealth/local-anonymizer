@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_031",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Paula Gómez Ospina\ndocumento de identidad 74287863\nFecha de nacimiento: 15/09/2005\nProcedencia: Villavicencio, Cundinamarca\nDirección: Transversal 114 N° 11-42, barrio Cabecera\nTeléfono: 329.645.5706   Correo: paula77@une.net.co\nEPS: Coomeva\nFecha de ingreso: 1964-12-26\n\nMOTIVO DE CONSULTA\nPaciente 55 años de edad que ingresa al servicio refiriendo tos seca de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número 329.645.5706.\n\nVALORACIÓN\nAtendido por el Dr. Camilo Jiménez Pérez (Registro médico 69186). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo paula77@une.net.co o remitir a la dirección Transversal 114 N° 11-42.",
+  "ground_truth": {
+    "nombres": [
+      "Paula Gómez Ospina",
+      "Camilo Jiménez Pérez"
+    ],
+    "documentos": [
+      "74287863"
+    ],
+    "edades": [
+      "55 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Cundinamarca"
+    ],
+    "direcciones": [
+      "Transversal 114 N° 11-42"
+    ],
+    "telefonos": [
+      "329.645.5706"
+    ],
+    "emails": [
+      "paula77@une.net.co"
+    ],
+    "seguros": [
+      "Coomeva"
+    ],
+    "fechas_nacimiento": [
+      "15/09/2005"
+    ],
+    "fechas": [
+      "1964-12-26"
+    ],
+    "numeros_registro": [
+      "Registro médico 69186"
+    ]
+  }
+}

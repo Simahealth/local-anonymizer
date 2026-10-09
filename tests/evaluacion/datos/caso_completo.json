@@ -1,0 +1,17 @@
+{
+  "nombre": "caso_completo",
+  "descripcion": "Historia clínica estándar con todas las categorías de PII presentes.",
+  "texto": "HISTORIA CLÍNICA\n\nPaciente: María Fernanda Gómez Restrepo\nIdentificación: CC 1018456723\nEdad: 34 años\nFecha de nacimiento: 12 de marzo de 1990\nTeléfono: 3104567890\nCorreo electrónico: maria.gomez@gmail.com\nDirección: Calle 45 # 23-15, Bogotá\nEPS: Sanitas\nFecha de atención: 15 de enero de 2024\n\nMotivo de consulta: Paciente femenina de 34 años residente en Medellín consulta por cefalea de tres días de evolución. Refiere antecedente de hipertensión arterial en manejo. Fue atendida por el Dr. Carlos Andrés Pérez quien indica manejo sintomático.\n",
+  "ground_truth": {
+    "nombres": ["María Fernanda Gómez Restrepo", "Carlos Andrés Pérez"],
+    "documentos": ["1018456723"],
+    "telefonos": ["3104567890"],
+    "emails": ["maria.gomez@gmail.com"],
+    "direcciones": ["Calle 45 # 23-15"],
+    "seguros": ["Sanitas"],
+    "ubicaciones": ["Bogotá", "Medellín"],
+    "edades": ["34 años"],
+    "fechas_nacimiento": ["12 de marzo de 1990"],
+    "fechas": ["15 de enero de 2024"]
+  }
+}

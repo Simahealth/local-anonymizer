@@ -1,0 +1,42 @@
+{
+  "nombre": "sintetico_co_010",
+  "descripcion": "Historia clínica sintética colombiana (valores aleatorios, no vistos).",
+  "texto": "HISTORIA CLÍNICA\nPaciente: Mauricio García Gómez\ndocumento de identidad 325'567.963\nFecha de nacimiento: 2010-01-13\nProcedencia: Villavicencio, Cundinamarca\nDirección: Av 105C # 96-20 piso 4, barrio Laureles\nTeléfono: 325 790 7400   Correo: mauricio35@hotmail.com\nEPS: Sanitas\nFecha de ingreso: 7 de agosto de 1994\n\nMOTIVO DE CONSULTA\nPaciente 32 años de edad que ingresa al servicio refiriendo fiebre de tres días de varios días de evolución. Reside en Villavicencio y consulta de forma espontánea. Se localiza al acompañante en el número 325 790 7400.\n\nVALORACIÓN\nAtendido por el Dr. Camilo Rojas Gómez (HC-960394). Se solicitan paraclínicos y se deja control en consulta externa. Cualquier novedad notificar al correo mauricio35@hotmail.com o remitir a la dirección Av 105C # 96-20 piso 4.",
+  "ground_truth": {
+    "nombres": [
+      "Mauricio García Gómez",
+      "Camilo Rojas Gómez"
+    ],
+    "documentos": [
+      "325'567.963"
+    ],
+    "edades": [
+      "32 años"
+    ],
+    "ubicaciones": [
+      "Villavicencio",
+      "Cundinamarca"
+    ],
+    "direcciones": [
+      "Av 105C # 96-20 piso 4"
+    ],
+    "telefonos": [
+      "325 790 7400"
+    ],
+    "emails": [
+      "mauricio35@hotmail.com"
+    ],
+    "seguros": [
+      "Sanitas"
+    ],
+    "fechas_nacimiento": [
+      "2010-01-13"
+    ],
+    "fechas": [
+      "7 de agosto de 1994"
+    ],
+    "numeros_registro": [
+      "HC-960394"
+    ]
+  }
+}
