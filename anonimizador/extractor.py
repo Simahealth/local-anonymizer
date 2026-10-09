@@ -5,6 +5,12 @@ from pathlib import Path
 import pymupdf as fitz
 
 
+# Separador de páginas en el texto extraído. Se conserva a lo largo de todo el
+# pipeline: el visor de revisión y el PDF anonimizado respetan las páginas del
+# documento original.
+SALTO_PAGINA = "\f"
+
+
 class PDFProtegido(Exception):
     """El PDF está cifrado con contraseña de apertura."""
 
@@ -30,7 +36,7 @@ class ExtractorPDF:
             raise PDFProtegido(str(ruta_pdf))
         paginas = [self._texto_pagina(page) for page in doc]
         doc.close()
-        return self._limpiar("\n".join(paginas))
+        return self._limpiar(f"\n{SALTO_PAGINA}\n".join(paginas))
 
     def _texto_pagina(self, page) -> str:
         """Devuelve el texto de una página con los bloques en orden de lectura."""
@@ -114,7 +120,7 @@ class ExtractorPDF:
         """
         salida: list[str] = []
         for linea in texto.split("\n"):
-            linea = linea.rstrip()
+            linea = linea.rstrip(" \t")  # no .rstrip(): se comería SALTO_PAGINA
             empieza_min = bool(linea) and bool(re.match(rf"[{self._LETRA_MIN}]", linea))
             if salida and empieza_min and re.search(rf"[{self._LETRA_MIN}]-$", salida[-1]):
                 salida[-1] = salida[-1][:-1] + linea  # guion de corte: une sin espacio
@@ -157,14 +163,14 @@ class ExtractorPDF:
         if not texto:
             return texto
         texto = unicodedata.normalize("NFKC", texto)
-        texto = re.sub(r"[\x00-\x08\x0b-\x0c\x0e-\x1f\x7f]", "", texto)
+        texto = re.sub(r"[\x00-\x08\x0b\x0e-\x1f\x7f]", "", texto)  # \x0c = SALTO_PAGINA
         texto = self._separar_digito_letra(texto)
         texto = self._separar_etiquetas_pegadas(texto)
         texto = texto.replace("\r\n", "\n").replace("\r", "\n")
         texto = self._reflujo(texto)
         texto = re.sub(r"\n{3,}", "\n\n", texto)
         texto = re.sub(r"[ \t]+$", "", texto, flags=re.MULTILINE)
-        return texto.strip()
+        return texto.strip(" \t\n")  # conserva SALTO_PAGINA aunque la 1ª página esté vacía
 
     def _separar_etiquetas_pegadas(self, texto: str) -> str:
         """Inserta un espacio antes de una etiqueta de campo fundida con la palabra previa.

@@ -442,6 +442,35 @@ export const DS_ICONS = [
     semantic: "HospitalWorkspace: sección \"Usuarios\" (nav + título de sección).",
     status: "approved",
   },
+  // --- SIMA Anonimizador (app de escritorio) ---
+  {
+    name: "zoom_in",
+    glyph: "zoom_in",
+    source: "material-symbols-outlined",
+    semantic: "Anonimizador: visor de revisión, acercar.",
+    status: "approved",
+  },
+  {
+    name: "zoom_out",
+    glyph: "zoom_out",
+    source: "material-symbols-outlined",
+    semantic: "Anonimizador: visor de revisión, alejar.",
+    status: "approved",
+  },
+  {
+    name: "open_in_new",
+    glyph: "open_in_new",
+    source: "material-symbols-outlined",
+    semantic: "Anonimizador: abrir el PDF original en el visor del sistema.",
+    status: "approved",
+  },
+  {
+    name: "rate_review",
+    glyph: "rate_review",
+    source: "material-symbols-outlined",
+    semantic: "Anonimizador: sección \"Revisión\" (nav).",
+    status: "approved",
+  },
 ] as const satisfies readonly DSIcon[];
 
 /** Union of every registered icon's `name` -- use this instead of `string`

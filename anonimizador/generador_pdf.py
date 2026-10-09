@@ -3,6 +3,8 @@ from pathlib import Path
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+from .extractor import SALTO_PAGINA
+
 
 class GeneradorPDF:
     """
@@ -36,14 +38,21 @@ class GeneradorPDF:
         c.setFont(self.FUENTE, self.TAMANO_FUENTE)
         y = alto - self.MARGEN_Y
 
-        for linea in texto.splitlines():
-            for segmento in self._ajustar_linea(c, linea):
-                if y < self.MARGEN_Y:
-                    c.showPage()
-                    c.setFont(self.FUENTE, self.TAMANO_FUENTE)
-                    y = alto - self.MARGEN_Y
-                c.drawString(self.MARGEN_X, y, segmento)
-                y -= self.ALTO_LINEA
+        # Una página nueva por cada página del original (SALTO_PAGINA), además de
+        # las que haga falta si una página no cabe.
+        for n, pagina in enumerate(texto.split(SALTO_PAGINA)):
+            if n > 0:
+                c.showPage()
+                c.setFont(self.FUENTE, self.TAMANO_FUENTE)
+                y = alto - self.MARGEN_Y
+            for linea in pagina.strip("\n").split("\n"):
+                for segmento in self._ajustar_linea(c, linea):
+                    if y < self.MARGEN_Y:
+                        c.showPage()
+                        c.setFont(self.FUENTE, self.TAMANO_FUENTE)
+                        y = alto - self.MARGEN_Y
+                    c.drawString(self.MARGEN_X, y, segmento)
+                    y -= self.ALTO_LINEA
 
         c.save()
         return ruta

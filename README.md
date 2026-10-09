@@ -1,24 +1,56 @@
 # SIMA Anonimizador (escritorio)
 
 Aplicación de escritorio para **macOS y Windows** que anonimiza historias
-clínicas en PDF (español, Colombia) por lotes:
+clínicas en PDF (español, Colombia) por lotes de hasta decenas de miles:
 
-1. Se cargan muchos PDF (arrastrando archivos o carpetas, o con el selector).
+1. Se cargan los PDF (arrastrando archivos o carpetas completas, o con el selector).
 2. Cada documento se anonimiza **en el equipo**: ningún dato sale a internet.
 3. Cada documento recibe un código aleatorio (`HC-7F3A9C21`) que pasa a ser el
    nombre de su PDF anonimizado.
 4. Se genera una **tabla de relación** (Excel y CSV) entre el nombre original de
    cada archivo y su código.
+5. En **Revisión**, un visor tipo lector PDF permite corregir cada documento:
+   seleccionar texto para ocultarlo, ver el original de lo ocultado y revertirlo.
 
 ```
 <destino>/Lote_2026-10-09_143015/
-    anonimizados/HC-7F3A9C21.pdf …
-    relacion_codigos.xlsx
-    relacion_codigos.csv
+    anonimizados/HC-7F3A9C21.pdf …   ← lo único que se comparte
+    relacion_codigos.xlsx / .csv      ← sensible: reidentifica
+    lote.sqlite                       ← sensible: cola del lote + textos originales
 ```
 
-> La tabla de relación permite reidentificar a los pacientes: guárdala aparte y
-> no la compartas junto con los PDFs anonimizados.
+> La tabla de relación y `lote.sqlite` permiten reidentificar a los pacientes:
+> guárdalos aparte y comparte solo la carpeta `anonimizados/`.
+
+## Lotes grandes (50 000 historias)
+
+- **Persistente y reanudable:** `lote.sqlite` es la cola del lote. Cada
+  documento se confirma apenas termina; se puede pausar, cerrar la app (o que se
+  cierre sola) y reanudar desde el Historial sin reprocesar nada.
+- **Secuencial y con memoria acotada:** un documento a la vez. Los textos
+  largos se analizan por fragmentos cuyo tamaño depende de la RAM libre; si la
+  memoria del sistema baja de 500 MB el lote espera; el modelo de spaCy se
+  recarga cuando el proceso crece (su vocabulario interno nunca se libera) o
+  cada 5 000 documentos. Ver `anonimizador/memoria.py`.
+- **La interfaz nunca recibe listas completas:** selección, progreso y lista de
+  revisión se piden por páginas / resúmenes.
+- Medido en un MacBook (Apple Silicon) con 10 020 PDF: ~4 000 documentos/min,
+  memoria del proceso estable en ~300 MB (ver "Prueba de escala").
+
+## Revisión
+
+Lista paginada de documentos (búsqueda por código o nombre, filtros por
+revisados / sin revisar / errores) | visor por páginas | datos ocultados.
+
+- **Modo Revisión:** texto original con lo ocultado resaltado por categoría.
+- **Modo Resultado:** como queda el PDF (`[NOMBRE]`, `[DOCUMENTO]`…).
+- **Seleccionar texto → Ocultar** como una categoría, en ese punto o en todas
+  sus apariciones del documento.
+- **Clic en algo ocultado →** texto original, cambiar categoría o "Mostrar (no
+  es dato personal)"; lo revertido queda subrayado y se puede volver a ocultar.
+- Cada cambio se guarda al instante y regenera el PDF del documento. "Revisado y
+  siguiente" lleva el control de avance; la tabla de relación incluye la columna
+  *Revisado* al actualizarla.
 
 La interfaz usa el Design System de SimaHealth (tokens, `SidebarShell`,
 `Button`, `Badge`, `Toast`, patrón de progreso de `ModalAnonimizacion`), copiado
@@ -27,8 +59,10 @@ de `fronEnd_Simahealth` sin modificar, con las fuentes empaquetadas en local.
 ## Arquitectura
 
 ```
-anonimizador/        Motor (Python): extracción PDF → detección de PII → reemplazo → PDF
-  lote.py            Lote: códigos, procesamiento, tabla de relación (xlsx/csv)
+anonimizador/        Motor (Python): extracción PDF → detección de PII → tramos → PDF
+  lote.py            Lote: crear/reanudar, procesar, revisión, tabla de relación
+  almacen.py         lote.sqlite: cola persistente, textos y tramos
+  memoria.py         Fragmentos, espera y reciclaje del modelo según la RAM
 escritorio/          App de escritorio (pywebview): ventana nativa + API para la interfaz
 ui/                  Interfaz (React + Vite + TS) con el DS de SimaHealth
 empaquetado/         PyInstaller (.spec), íconos, instalador de Windows (Inno Setup)
@@ -39,7 +73,7 @@ tests/               pytest del motor y del lote; tests/evaluacion: métricas y 
 - **Motor:** derivado de `sima-anonimizador` (Presidio + spaCy `es_core_news_md`
   y reconocedores colombianos), **sin** el fallback a WatsonX: todo es local.
 - La interfaz llama a Python vía `window.pywebview.api` y consulta el avance
-  del lote cada 400 ms. En `npm run dev` (navegador) usa un simulador.
+  del lote cada 500 ms. En `npm run dev` (navegador) usa un simulador.
 
 ## Desarrollo
 

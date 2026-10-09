@@ -1,13 +1,15 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { App } from "./App";
 import { ToastProvider } from "./components/Toast/ToastProvider";
 
 // Flujo completo contra el simulador (src/api/simulador.ts): sin pywebview,
-// `obtenerApi()` cae al simulador en modo desarrollo/pruebas.
+// `obtenerApi()` cae al simulador en modo desarrollo/pruebas. Un solo test
+// largo porque el simulador es un singleton con estado (el lote del paso 1 es
+// el que se revisa en el paso 2).
 describe("App", () => {
-  it("carga documentos, anonimiza el lote y muestra la relación de códigos", async () => {
+  it("anonimiza un lote y lo corrige en Revisión", async () => {
     const user = userEvent.setup();
     render(
       <ToastProvider>
@@ -15,22 +17,61 @@ describe("App", () => {
       </ToastProvider>,
     );
 
-    await user.click(await screen.findByRole("button", { name: /Arrastra historias clínicas/ }));
-    expect(await screen.findByRole("list", { name: "Documentos a anonimizar" })).toBeInTheDocument();
-    expect(screen.getAllByRole("listitem")).toHaveLength(5);
+    // 1. Cargar y anonimizar.
+    await user.click(await screen.findByRole("button", { name: "Agregar archivos" }));
+    const lista = await screen.findByRole("list", { name: "Documentos a anonimizar" });
+    expect(within(lista).getAllByRole("listitem")).toHaveLength(5);
 
-    const iniciar = await screen.findByRole("button", { name: /Anonimizar 5 documentos/ }, { timeout: 3000 });
-    await user.click(iniciar);
+    await user.click(await screen.findByRole("button", { name: /Anonimizar 5 documentos/ }, { timeout: 3000 }));
     expect(await screen.findByRole("progressbar")).toBeInTheDocument();
+    await screen.findByText("datos personales ocultados", {}, { timeout: 10000 });
+    expect(await screen.findByRole("table")).toHaveTextContent(/no tiene texto seleccionable/);
+    expect(screen.getByText(/permiten volver a identificar a cada paciente/)).toBeInTheDocument();
 
-    const tabla = await screen.findByRole("table", {}, { timeout: 10000 });
-    const filas = within(tabla).getAllByRole("row").slice(1);
-    expect(filas).toHaveLength(5);
-    for (const fila of filas) {
-      expect(within(fila).getByText(/^HC-[2-9A-HJKMNP-Z]{8}$/)).toBeInTheDocument();
-    }
-    // El simulador marca como error los archivos "escaneados".
-    expect(within(tabla).getByText(/no tiene texto seleccionable/)).toBeInTheDocument();
-    expect(screen.getByText(/permite volver a identificar a cada paciente/)).toBeInTheDocument();
-  }, 20000);
+    // 2. Revisar: abre el primer documento completado en el visor.
+    await user.click(screen.getByRole("button", { name: "Revisar documentos" }));
+    const pagina1 = await screen.findByRole("article", { name: "Página 1 de 2" });
+    const nombre = within(pagina1).getByText("Laura Martínez Ospina");
+    expect(nombre.tagName).toBe("MARK");
+
+    // Seleccionar "Rosalba" (no detectado) y ocultarlo en todo el documento.
+    const segmento = within(pagina1).getByText(/Rosalba/);
+    const nodo = segmento.firstChild!;
+    const i = nodo.textContent!.indexOf("Rosalba");
+    const rango = document.createRange();
+    rango.setStart(nodo, i);
+    rango.setEnd(nodo, i + "Rosalba".length);
+    window.getSelection()!.removeAllRanges();
+    window.getSelection()!.addRange(rango);
+    fireEvent.mouseUp(pagina1);
+    const barra = await screen.findByRole("dialog", { name: "Ocultar selección" });
+    expect(within(barra).getByText("“Rosalba”")).toBeInTheDocument();
+    await user.click(within(barra).getByRole("button", { name: "Ocultar" }));
+    // Aparece en las dos páginas → dos tramos (marcas) en el visor, y en el panel.
+    const marcasRosalba = () =>
+      [...document.querySelectorAll(".rev-pagina mark")].filter((m) => m.textContent === "Rosalba");
+    await waitFor(() => expect(marcasRosalba()).toHaveLength(2));
+    expect(within(screen.getByRole("complementary", { name: /Datos ocultados/ })).getAllByText("Rosalba")).toHaveLength(2);
+
+    // Revertir un tramo: el nombre del paciente queda visible.
+    await user.click(within(screen.getByRole("article", { name: "Página 1 de 2" })).getByText("Laura Martínez Ospina"));
+    const popover = await screen.findByRole("dialog", { name: "Dato ocultado" });
+    await user.click(within(popover).getByRole("button", { name: /Mostrar/ }));
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole("article", { name: "Página 1 de 2" })).getByText("Laura Martínez Ospina"),
+      ).toHaveClass("rev-tramo--revertido"),
+    );
+
+    // Modo Resultado: etiquetas como en el PDF anonimizado.
+    await user.click(screen.getByRole("button", { name: "Resultado" }));
+    expect(screen.getAllByText("[DOCUMENTO]").length).toBeGreaterThan(0);
+
+    // Marcar revisado y pasar al siguiente.
+    const codigoActual = () => document.querySelector(".rev__doc-meta .anz-codigo")?.textContent;
+    const antes = codigoActual();
+    await user.click(screen.getByRole("button", { name: "Revisado y siguiente" }));
+    await waitFor(() => expect(codigoActual()).not.toBe(antes));
+    expect(await screen.findByText(/1 de 4 revisados/)).toBeInTheDocument();
+  }, 30000);
 });

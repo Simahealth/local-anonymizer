@@ -8,78 +8,44 @@ identificar al paciente, así que se guarda aparte, fuera de la carpeta de PDFs.
 Estructura de salida, una carpeta por lote:
 
     <destino>/Lote_2026-10-09_143015/
-        anonimizados/HC-7F3A9C21.pdf …
-        relacion_codigos.xlsx
-        relacion_codigos.csv
+        anonimizados/HC-7F3A9C21.pdf …     ← lo único que se comparte
+        relacion_codigos.xlsx / .csv        ← sensible: reidentifica
+        lote.sqlite                         ← sensible: cola + textos originales
+
+El estado vive en `lote.sqlite` (ver almacen.py): el lote se puede pausar,
+cerrar la app y reanudar, y cada documento se puede revisar y corregir después.
 """
 
 import csv
+import re
 import secrets
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Iterable
 
-from .detector import DetectorPII
-from .extractor import ExtractorPDF, PDFProtegido
+from .almacen import Almacen, TramoGuardado
+from .detector import ETIQUETAS_PII, DetectorPII
+from .extractor import SALTO_PAGINA, ExtractorPDF, PDFProtegido
 from .generador_pdf import GeneradorPDF
-from .reemplazador import Reemplazador
+from .memoria import GestorMemoria, fragmentar
+from .reemplazador import Reemplazador, Tramo, _patron_literal, aplicar
 
 # Alfabeto sin caracteres ambiguos (0/O, 1/I/L) para códigos fáciles de transcribir.
 _ALFABETO = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
 _LARGO_CODIGO = 8
 
-# Nombres legibles de las categorías para la tabla de relación.
-NOMBRES_CATEGORIA = {
-    "nombres": "Nombres",
-    "documentos": "Documentos",
-    "telefonos": "Teléfonos",
-    "fechas_nacimiento": "Fechas de nacimiento",
-    "direcciones": "Direcciones",
-    "emails": "Correos",
-    "fechas": "Fechas",
-    "edades": "Edades",
-    "ubicaciones": "Ubicaciones",
-    "seguros": "EPS / seguros",
-    "numeros_registro": "Números de registro",
-}
-
 COLUMNAS_RELACION = [
-    "Código", "Archivo original", "Archivo anonimizado", "Estado",
-    "Datos anonimizados", "Detalle", "Observación", "Fecha de proceso",
+    "Código", "Archivo original", "Ruta original", "Archivo anonimizado", "Estado",
+    "Datos anonimizados", "Revisado", "Observación", "Fecha de proceso",
 ]
+_ESTADOS_RELACION = {
+    "completado": "Anonimizado", "error": "Error", "pendiente": "Pendiente", "procesando": "Pendiente",
+}
 
 
 class ErrorDocumento(Exception):
     """Error esperado de un documento (sin texto, dañado…): se reporta sin traza."""
-
-
-@dataclass
-class ResultadoDocumento:
-    codigo: str
-    archivo_original: str
-    ruta_original: str
-    archivo_anonimizado: str = ""
-    estado: str = "pendiente"  # pendiente | procesando | completado | error
-    pii_por_categoria: dict[str, int] = field(default_factory=dict)
-    error: str = ""
-    fecha: str = ""
-
-    @property
-    def total_pii(self) -> int:
-        return sum(self.pii_por_categoria.values())
-
-    def a_dict(self) -> dict:
-        return {
-            "codigo": self.codigo,
-            "archivoOriginal": self.archivo_original,
-            "rutaOriginal": self.ruta_original,
-            "archivoAnonimizado": self.archivo_anonimizado,
-            "estado": self.estado,
-            "piiPorCategoria": self.pii_por_categoria,
-            "totalPii": self.total_pii,
-            "error": self.error,
-        }
 
 
 def generar_codigo(usados: set[str]) -> str:
@@ -93,55 +59,109 @@ def generar_codigo(usados: set[str]) -> str:
             return codigo
 
 
+def _ahora() -> str:
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 class Anonimizador:
-    """Pipeline completo para un documento. Construirlo carga spaCy (unos
-    segundos): crear uno solo y reutilizarlo para todo el lote."""
+    """Pipeline completo para un documento. Construirlo carga spaCy (alrededor
+    de un segundo): crear uno solo y reutilizarlo para todo el lote."""
 
     def __init__(self):
         self._extractor = ExtractorPDF()
         self._detector = DetectorPII()
         self._reemplazador = Reemplazador()
 
-    def anonimizar_texto(self, texto: str) -> tuple[str, dict[str, set[str]]]:
-        pii = self._detector.detectar(texto)
-        return self._reemplazador.reemplazar(texto, pii), pii
+    def recargar(self) -> None:
+        """Descarta el modelo y lo vuelve a cargar (libera el vocabulario que
+        spaCy acumula en lotes largos; ver memoria.py)."""
+        self._detector = None
+        self._detector = DetectorPII()
 
-    def anonimizar_pdf(self, origen: Path, destino: Path) -> dict[str, int]:
-        """Anonimiza `origen` y escribe el PDF en `destino`. Retorna el conteo de PII."""
+    def detectar_tramos(self, texto: str, tamano_fragmento: int = 200_000) -> list[Tramo]:
+        """Tramos a ocultar. Los textos largos se analizan por fragmentos: los
+        valores detectados en cualquiera de ellos se buscan luego en el texto
+        completo, así un nombre visto en la página 1 se oculta también en la 80."""
+        pii: dict[str, set[str]] = {cat: set() for cat in ETIQUETAS_PII}
+        for _, fragmento in fragmentar(texto, tamano_fragmento):
+            for cat, valores in self._detector.detectar(fragmento).items():
+                pii[cat] |= valores
+        return self._reemplazador.calcular_tramos(texto, pii)
+
+    def anonimizar_texto(self, texto: str) -> tuple[str, list[Tramo]]:
+        tramos = self.detectar_tramos(texto)
+        return aplicar(texto, tramos), tramos
+
+    def extraer(self, origen: Path) -> str:
         try:
             texto = self._extractor.extraer(origen)
         except PDFProtegido as e:
             raise ErrorDocumento("El PDF está protegido con contraseña.") from e
         except Exception as e:
             raise ErrorDocumento(f"No se pudo leer el PDF ({e.__class__.__name__}).") from e
-        if not texto or len(texto.strip()) < 10:
+        if not texto or len(texto.replace(SALTO_PAGINA, "").strip()) < 10:
             raise ErrorDocumento(
-                "El PDF no tiene texto seleccionable (¿es un escaneo?). "
-                "Pásalo primero por OCR."
+                "El PDF no tiene texto seleccionable (¿es un escaneo?). Pásalo primero por OCR."
             )
-        anonimizado, pii = self.anonimizar_texto(texto)
-        GeneradorPDF(destino.parent).generar(destino.stem, anonimizado)
-        return {cat: len(vals) for cat, vals in pii.items() if vals}
+        return texto
+
+    def anonimizar_pdf(self, origen: Path, destino: Path) -> list[Tramo]:
+        """Anonimiza `origen` y escribe el PDF en `destino`. Retorna los tramos ocultados."""
+        texto = self.extraer(origen)
+        tramos = self.detectar_tramos(texto)
+        escribir_pdf(destino, texto, tramos)
+        return tramos
+
+
+def escribir_pdf(destino: Path, texto: str, tramos: Iterable[Tramo]) -> None:
+    GeneradorPDF(destino.parent).generar(destino.stem, aplicar(texto, list(tramos)))
+
+
+@dataclass
+class EventoDocumento:
+    """Lo que la interfaz necesita saber de un documento recién procesado."""
+
+    codigo: str
+    nombre: str
+    estado: str
+    total_pii: int = 0
+    error: str = ""
+
+    def a_dict(self) -> dict:
+        return {"codigo": self.codigo, "nombre": self.nombre, "estado": self.estado,
+                "totalPii": self.total_pii, "error": self.error}
 
 
 class Lote:
-    """Un lote de documentos y su carpeta de salida."""
+    """Un lote de documentos, su carpeta de salida y su almacén."""
 
-    def __init__(self, rutas: Iterable[str | Path], carpeta_destino: str | Path):
-        momento = datetime.now()
-        self.carpeta = self._carpeta_libre(
-            Path(carpeta_destino) / f"Lote_{momento:%Y-%m-%d_%H%M%S}"
-        )
+    def __init__(self, carpeta: Path):
+        self.carpeta = Path(carpeta)
         self.carpeta_pdfs = self.carpeta / "anonimizados"
+        self.almacen = Almacen(self.carpeta)
+
+    # ------------------------------------------------------------------ #
+    # Creación / apertura
+    # ------------------------------------------------------------------ #
+
+    @classmethod
+    def crear(cls, rutas: Iterable[str | Path], carpeta_destino: str | Path) -> "Lote":
+        momento = datetime.now()
+        carpeta = cls._carpeta_libre(Path(carpeta_destino) / f"Lote_{momento:%Y-%m-%d_%H%M%S}")
+        carpeta.mkdir(parents=True)
+        lote = cls(carpeta)
         usados: set[str] = set()
-        self.documentos = [
-            ResultadoDocumento(
-                codigo=generar_codigo(usados),
-                archivo_original=Path(r).name,
-                ruta_original=str(Path(r)),
-            )
-            for r in rutas
-        ]
+        lote.almacen.agregar_documentos(
+            [(generar_codigo(usados), Path(r).name, str(Path(r))) for r in rutas]
+        )
+        lote.almacen.fijar_meta("creado", momento.isoformat(timespec="seconds"))
+        return lote
+
+    @classmethod
+    def abrir(cls, carpeta: str | Path) -> "Lote":
+        if not Almacen.existe(Path(carpeta)):
+            raise FileNotFoundError(f"No hay un lote en {carpeta}")
+        return cls(Path(carpeta))
 
     @staticmethod
     def _carpeta_libre(carpeta: Path) -> Path:
@@ -151,84 +171,216 @@ class Lote:
             n += 1
         return candidata
 
+    # ------------------------------------------------------------------ #
+    # Procesamiento
+    # ------------------------------------------------------------------ #
+
     def procesar(
         self,
         anonimizador: Anonimizador,
-        al_avanzar: Callable[[ResultadoDocumento], None] = lambda _: None,
+        al_avanzar: Callable[[EventoDocumento], None] = lambda _: None,
         cancelado: Callable[[], bool] = lambda: False,
+        memoria: GestorMemoria | None = None,
     ) -> None:
-        """Procesa los documentos en orden. Un error en un documento no detiene
-        el lote: queda marcado y se sigue con el siguiente."""
+        """Procesa los pendientes en orden, de a uno, confirmando cada documento
+        en el almacén apenas termina. Un error en un documento no detiene el
+        lote. Si `cancelado()` se vuelve True, se detiene tras el documento en
+        curso y el resto queda pendiente para reanudar."""
+        memoria = memoria or GestorMemoria()
         self.carpeta_pdfs.mkdir(parents=True, exist_ok=True)
-        for doc in self.documentos:
+        self.almacen.reiniciar_interrumpidos()
+
+        while not cancelado():
+            memoria.esperar_memoria(cancelado)
             if cancelado():
                 break
-            doc.estado = "procesando"
-            al_avanzar(doc)
+            doc = self.almacen.siguiente_pendiente()
+            if doc is None:
+                break
+            self.almacen.marcar_procesando(doc["id"])
+            al_avanzar(EventoDocumento(doc["codigo"], doc["nombre_original"], "procesando"))
             try:
-                destino = self.carpeta_pdfs / f"{doc.codigo}.pdf"
-                doc.pii_por_categoria = anonimizador.anonimizar_pdf(Path(doc.ruta_original), destino)
-                doc.archivo_anonimizado = destino.name
-                doc.estado = "completado"
+                texto = anonimizador.extraer(Path(doc["ruta_original"]))
+                tramos = anonimizador.detectar_tramos(texto, memoria.tamano_fragmento())
+                escribir_pdf(self.carpeta_pdfs / f"{doc['codigo']}.pdf", texto, tramos)
+                self.almacen.guardar_resultado(
+                    doc["id"], texto, [(t.inicio, t.fin, t.categoria) for t in tramos],
+                    texto.count(SALTO_PAGINA) + 1, _ahora(),
+                )
+                evento = EventoDocumento(doc["codigo"], doc["nombre_original"], "completado", len(tramos))
             except ErrorDocumento as e:
-                doc.estado, doc.error = "error", str(e)
+                self.almacen.guardar_error(doc["id"], str(e), _ahora())
+                evento = EventoDocumento(doc["codigo"], doc["nombre_original"], "error", error=str(e))
             except Exception as e:  # noqa: BLE001 — un documento raro no tumba el lote
-                doc.estado, doc.error = "error", f"Error inesperado: {e.__class__.__name__}: {e}"
-            doc.fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            al_avanzar(doc)
+                mensaje = f"Error inesperado: {e.__class__.__name__}: {e}"
+                self.almacen.guardar_error(doc["id"], mensaje, _ahora())
+                evento = EventoDocumento(doc["codigo"], doc["nombre_original"], "error", error=mensaje)
+            al_avanzar(evento)
+
+            memoria.documento_procesado()
+            if memoria.debe_reciclar():
+                anonimizador.recargar()
+                memoria.reciclado()
+
         self.escribir_relacion()
 
     # ------------------------------------------------------------------ #
-    # Tabla de relación
+    # Tabla de relación (en streaming: 50 000 filas sin cargarlas en memoria)
     # ------------------------------------------------------------------ #
 
-    def _filas(self) -> list[list]:
-        estados = {"completado": "Anonimizado", "error": "Error", "pendiente": "Cancelado",
-                   "procesando": "Cancelado"}
-        filas = []
-        for d in self.documentos:
-            detalle = "; ".join(
-                f"{NOMBRES_CATEGORIA.get(cat, cat)}: {n}" for cat, n in d.pii_por_categoria.items()
-            )
-            filas.append([
-                d.codigo, d.archivo_original, d.archivo_anonimizado, estados[d.estado],
-                d.total_pii if d.estado == "completado" else "", detalle, d.error, d.fecha,
-            ])
-        return filas
+    def _filas(self) -> Iterable[list]:
+        for d in self.almacen.iterar_documentos():
+            completado = d["estado"] == "completado"
+            yield [
+                d["codigo"], d["nombre_original"], d["ruta_original"],
+                f"{d['codigo']}.pdf" if completado else "",
+                _ESTADOS_RELACION[d["estado"]],
+                d["total_pii"] if completado else "",
+                ("Sí" if d["revisado"] else "No") if completado else "",
+                d["error"], d["procesado_en"],
+            ]
 
     def escribir_relacion(self) -> tuple[Path, Path]:
-        self.carpeta.mkdir(parents=True, exist_ok=True)
-        filas = self._filas()
-
         ruta_csv = self.carpeta / "relacion_codigos.csv"
         # utf-8-sig: Excel abre bien las tildes; ';' es el separador que espera
         # Excel con configuración regional en español.
         with open(ruta_csv, "w", newline="", encoding="utf-8-sig") as f:
             escritor = csv.writer(f, delimiter=";")
             escritor.writerow(COLUMNAS_RELACION)
-            escritor.writerows(filas)
+            escritor.writerows(self._filas())
 
         ruta_xlsx = self.carpeta / "relacion_codigos.xlsx"
-        self._escribir_xlsx(ruta_xlsx, filas)
+        self._escribir_xlsx(ruta_xlsx)
         return ruta_xlsx, ruta_csv
 
-    @staticmethod
-    def _escribir_xlsx(ruta: Path, filas: list[list]) -> None:
+    def _escribir_xlsx(self, ruta: Path) -> None:
         from openpyxl import Workbook
+        from openpyxl.cell import WriteOnlyCell
         from openpyxl.styles import Font, PatternFill
 
-        libro = Workbook()
-        hoja = libro.active
-        hoja.title = "Relación de códigos"
-        hoja.append(COLUMNAS_RELACION)
-        for celda in hoja[1]:
-            celda.font = Font(bold=True, color="FFFFFF")
-            celda.fill = PatternFill("solid", fgColor="0D0F10")
-        for fila in filas:
-            hoja.append(fila)
-        anchos = [16, 48, 22, 14, 18, 60, 50, 20]
-        for i, ancho in enumerate(anchos):
+        libro = Workbook(write_only=True)  # escribe fila a fila, memoria constante
+        hoja = libro.create_sheet("Relación de códigos")
+        for i, ancho in enumerate([16, 44, 60, 22, 14, 18, 10, 50, 20]):
             hoja.column_dimensions[chr(ord("A") + i)].width = ancho
         hoja.freeze_panes = "A2"
-        hoja.auto_filter.ref = hoja.dimensions
+        encabezado = []
+        for titulo in COLUMNAS_RELACION:
+            celda = WriteOnlyCell(hoja, value=titulo)
+            celda.font = Font(bold=True, color="FFFFFF")
+            celda.fill = PatternFill("solid", fgColor="0D0F10")
+            encabezado.append(celda)
+        hoja.append(encabezado)
+        for fila in self._filas():
+            hoja.append(fila)
         libro.save(ruta)
+
+    # ------------------------------------------------------------------ #
+    # Revisión
+    # ------------------------------------------------------------------ #
+
+    def _doc(self, codigo: str):
+        doc = self.almacen.documento(codigo)
+        if doc is None:
+            raise KeyError(codigo)
+        return doc
+
+    def regenerar_pdf(self, codigo: str) -> None:
+        doc = self._doc(codigo)
+        activos = [Tramo(t.inicio, t.fin, t.categoria) for t in self.almacen.tramos(doc["id"]) if t.activo]
+        escribir_pdf(self.carpeta_pdfs / f"{codigo}.pdf", self.almacen.texto(doc["id"]), activos)
+
+    def ocultar(self, codigo: str, inicio: int, fin: int, categoria: str, todas: bool) -> int:
+        """Oculta texto[inicio:fin] (y, si `todas`, cada otra aparición de ese
+        texto en el documento). Los tramos existentes que se solapen se absorben
+        en el nuevo. Retorna cuántos tramos se agregaron."""
+        if categoria not in ETIQUETAS_PII:
+            raise ValueError(f"Categoría desconocida: {categoria}")
+        doc = self._doc(codigo)
+        texto = self.almacen.texto(doc["id"])
+        # Sin espacios en los bordes de la selección.
+        while inicio < fin and texto[inicio].isspace():
+            inicio += 1
+        while fin > inicio and texto[fin - 1].isspace():
+            fin -= 1
+        if inicio >= fin:
+            return 0
+
+        rangos = [(inicio, fin)]
+        if todas:
+            fragmento = texto[inicio:fin]
+            rangos += [(m.start(), m.end()) for m in
+                       re.finditer(_patron_literal(fragmento), texto, flags=re.IGNORECASE)]
+
+        existentes = self.almacen.tramos(doc["id"])
+        eliminar: set[int] = set()
+        nuevos: list[tuple[int, int, str]] = []
+        for ini, fn in sorted(set(rangos)):
+            # Absorbe tramos existentes solapados (activos o revertidos).
+            for t in existentes:
+                if t.inicio < fn and ini < t.fin:
+                    eliminar.add(t.id)
+                    ini, fn = min(ini, t.inicio), max(fn, t.fin)
+            if nuevos and ini < nuevos[-1][1]:
+                nuevos[-1] = (nuevos[-1][0], max(fn, nuevos[-1][1]), categoria)
+            else:
+                nuevos.append((ini, fn, categoria))
+        self.almacen.reemplazar_tramos(doc["id"], sorted(eliminar), nuevos)
+        self.regenerar_pdf(codigo)
+        return len(nuevos)
+
+    def actualizar_tramo(
+        self, codigo: str, tramo_id: int, activo: bool | None = None, categoria: str | None = None
+    ) -> None:
+        if categoria is not None and categoria not in ETIQUETAS_PII:
+            raise ValueError(f"Categoría desconocida: {categoria}")
+        doc = self._doc(codigo)
+        self.almacen.actualizar_tramo(doc["id"], tramo_id, activo, categoria)
+        self.regenerar_pdf(codigo)
+
+    def marcar_revisado(self, codigo: str, revisado: bool) -> None:
+        self.almacen.marcar_revisado(self._doc(codigo)["id"], revisado)
+
+    def documento_revision(self, codigo: str) -> dict:
+        """Texto original + tramos, con offsets en unidades UTF-16 (las de
+        JavaScript): un emoji o símbolo fuera del plano básico ocupa 1 code
+        point en Python pero 2 unidades en JS."""
+        doc = self._doc(codigo)
+        texto = self.almacen.texto(doc["id"])
+        a_js = mapa_utf16(texto)
+        return {
+            "codigo": doc["codigo"],
+            "nombreOriginal": doc["nombre_original"],
+            "rutaOriginal": doc["ruta_original"],
+            "estado": doc["estado"],
+            "error": doc["error"],
+            "revisado": bool(doc["revisado"]),
+            "texto": texto,
+            "tramos": [_tramo_js(t, a_js) for t in self.almacen.tramos(doc["id"])],
+        }
+
+
+def _tramo_js(t: TramoGuardado, a_js: Callable[[int], int]) -> dict:
+    return {"id": t.id, "inicio": a_js(t.inicio), "fin": a_js(t.fin),
+            "categoria": t.categoria, "origen": t.origen, "activo": t.activo}
+
+
+def mapa_utf16(texto: str) -> Callable[[int], int]:
+    """Offset en code points (Python) → offset en unidades UTF-16 (JS)."""
+    if all(ord(c) <= 0xFFFF for c in texto):
+        return lambda i: i
+    acumulado = [0]
+    for c in texto:
+        acumulado.append(acumulado[-1] + (2 if ord(c) > 0xFFFF else 1))
+    return lambda i: acumulado[i]
+
+
+def desde_utf16(texto: str, offset_js: int) -> int:
+    """Offset en unidades UTF-16 (JS) → offset en code points (Python)."""
+    if all(ord(c) <= 0xFFFF for c in texto):
+        return offset_js
+    unidades = 0
+    for i, c in enumerate(texto):
+        if unidades >= offset_js:
+            return i
+        unidades += 2 if ord(c) > 0xFFFF else 1
+    return len(texto)

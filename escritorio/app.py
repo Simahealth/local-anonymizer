@@ -30,35 +30,33 @@ def raiz_recursos() -> Path:
     return Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
 
 
-def al_soltar(ventana: webview.Window, evento: dict) -> None:
+def al_soltar(ventana: webview.Window, api: ApiEscritorio, evento: dict) -> None:
     """Archivos/carpetas arrastrados a la ventana. El navegador no expone rutas
-    del disco; pywebview sí (`pywebviewFullPath`). Se reenvían a la interfaz
-    como un evento `sima:archivos` con los PDF encontrados."""
+    del disco; pywebview sí (`pywebviewFullPath`). Se agregan a la selección en
+    Python y la interfaz recibe solo el resumen (evento `sima:seleccion`): con
+    carpetas de miles de PDF no se manda la lista entera a JavaScript."""
     rutas = [
         f["pywebviewFullPath"]
         for f in evento.get("dataTransfer", {}).get("files", [])
         if f.get("pywebviewFullPath")
     ]
-    archivos = pdfs_en(rutas)
+    ventana.evaluate_js("window.dispatchEvent(new CustomEvent('sima:buscando'))")
+    resumen = api.agregar_rutas(rutas)
     ventana.evaluate_js(
-        f"window.dispatchEvent(new CustomEvent('sima:archivos', {{detail: {json.dumps(archivos)}}}))"
+        f"window.dispatchEvent(new CustomEvent('sima:seleccion', {{detail: {json.dumps(resumen)}}}))"
     )
 
 
 def autoprueba(origen: str, salida: str) -> int:
     from anonimizador.lote import Anonimizador, Lote
 
-    lote = Lote([a["ruta"] for a in pdfs_en([origen])], salida)
+    lote = Lote.crear([a["ruta"] for a in pdfs_en([origen])], salida)
     lote.procesar(Anonimizador())
-    estados = [d.estado for d in lote.documentos]
-    resumen = {
-        "total": len(estados),
-        "completados": estados.count("completado"),
-        "errores": [d.error for d in lote.documentos if d.error],
-        "carpeta": str(lote.carpeta),
-    }
+    c = lote.almacen.contadores()
+    _, errores = lote.almacen.listar(0, 50, "errores")
+    resumen = {**c, "mensajesError": [f["error"] for f in errores], "carpeta": str(lote.carpeta)}
     Path(salida, "autoprueba.json").write_text(json.dumps(resumen, ensure_ascii=False, indent=2))
-    return 0 if resumen["total"] and resumen["completados"] == resumen["total"] else 1
+    return 0 if c["total"] and c["completados"] == c["total"] else 1
 
 
 def main() -> None:
@@ -69,10 +67,11 @@ def main() -> None:
     dev = "--dev" in sys.argv
     url = URL_DEV if dev else str(raiz_recursos() / "ui" / "dist" / "index.html")
 
+    api = ApiEscritorio()
     ventana = webview.create_window(
         NOMBRE_APP,
         url,
-        js_api=ApiEscritorio(),
+        js_api=api,
         width=1180,
         height=800,
         min_size=(900, 640),
@@ -81,7 +80,7 @@ def main() -> None:
 
     def al_cargar():
         ventana.dom.document.events.drop += DOMEventHandler(
-            lambda e: al_soltar(ventana, e), prevent_default=True
+            lambda e: al_soltar(ventana, api, e), prevent_default=True
         )
 
     ventana.events.loaded += al_cargar

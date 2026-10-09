@@ -22,3 +22,30 @@ export const NOMBRES_CATEGORIA: Record<string, string> = {
   seguros: "EPS / seguros",
   numeros_registro: "Números de registro",
 };
+
+export function formatearDuracion(segundos: number): string {
+  if (segundos < 60) return "menos de un minuto";
+  const min = Math.round(segundos / 60);
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  return `${h} h ${min % 60} min`;
+}
+
+export function formatearMb(mb: number): string {
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1).replace(".", ",")} GB` : `${mb} MB`;
+}
+
+/** Etiqueta con la que cada categoría aparece en el PDF anonimizado. */
+export const ETIQUETAS: Record<string, string> = {
+  nombres: "[NOMBRE]",
+  documentos: "[DOCUMENTO]",
+  telefonos: "[TELEFONO]",
+  fechas_nacimiento: "[FECHA_NAC]",
+  direcciones: "[DIRECCION]",
+  emails: "[EMAIL]",
+  fechas: "[FECHA]",
+  edades: "[EDAD]",
+  ubicaciones: "[UBICACION]",
+  seguros: "[SEGURO]",
+  numeros_registro: "[NUM_REGISTRO]",
+};

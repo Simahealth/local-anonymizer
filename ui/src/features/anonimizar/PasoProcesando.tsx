@@ -1,14 +1,15 @@
 /**
  * Progreso del lote. Mismo lenguaje visual que `ModalAnonimizacion` del
  * frontend web (texto explicativo fijo, barra de progreso, filas con los 4
- * íconos de estado del DS: hourglass_top / progress_activity / check_circle /
- * error) -- aquí en la página en vez de en un modal, porque el lote puede ser
- * largo y es la única tarea de la app. Clases `man-*` de modalAnonimizacion.css.
+ * íconos de estado del DS) -- aquí en la página, porque el lote puede durar
+ * horas. Con lotes de miles de documentos no se lista todo: solo el documento
+ * en curso y los últimos procesados, más velocidad, tiempo restante y memoria.
  */
-import { useEffect, useRef } from "react";
-import type { EstadoDocumento, EstadoLote } from "../../api/escritorio";
+import type { EstadoDocumento, EstadoLote, EventoDocumento } from "../../api/escritorio";
+import { Badge } from "../../components/Badge/Badge";
 import { Button } from "../../components/Button/Button";
 import { getIconGlyph, type IconName } from "../../styles/ds/foundations/icons/icons";
+import { formatearDuracion, formatearMb } from "./formato";
 import "../../styles/modalAnonimizacion.css";
 
 const ICONO: Record<EstadoDocumento, IconName> = {
@@ -26,28 +27,38 @@ const CLASE: Record<EstadoDocumento, string> = {
   error: "error",
 };
 
-const ETIQUETA: Record<EstadoDocumento, string> = {
-  pendiente: "pendiente",
-  procesando: "procesando",
-  completado: "completado",
-  error: "con error",
-};
-
 const EXPLICACION =
-  "Protegemos la identidad y privacidad de los pacientes. La anonimización elimina los datos que pueden identificar a una persona, como nombres, documentos, direcciones o teléfonos. Todo el proceso ocurre en este equipo: ningún documento sale de él.";
+  "Protegemos la identidad y privacidad de los pacientes. La anonimización elimina los datos que pueden identificar a una persona, como nombres, documentos, direcciones o teléfonos. Todo ocurre en este equipo y el avance se guarda después de cada documento.";
 
-export function PasoProcesando({ lote, onCancelar }: { lote: EstadoLote; onCancelar: () => void }) {
-  const docs = lote.documentos;
-  const terminados = docs.filter((d) => d.estado === "completado" || d.estado === "error").length;
-  const errores = docs.filter((d) => d.estado === "error").length;
-  const porcentaje = docs.length ? Math.round((terminados / docs.length) * 100) : 0;
-  const actual = docs.find((d) => d.estado === "procesando");
-  const filaActual = useRef<HTMLLIElement>(null);
+function Fila({ evento }: { evento: EventoDocumento }) {
+  return (
+    <li
+      className={`man-file-row man-file-row--${CLASE[evento.estado]}`}
+      aria-label={`${evento.nombre}: ${evento.estado}`}
+    >
+      <span
+        className={
+          "material-symbols-outlined man-file-row__icon" +
+          (evento.estado === "procesando" ? " man-file-row__icon--spin" : "")
+        }
+        aria-hidden="true"
+      >
+        {getIconGlyph(ICONO[evento.estado])}
+      </span>
+      <span className="man-file-row__name" title={evento.error || undefined}>
+        {evento.nombre}
+      </span>
+      {evento.estado === "completado" && <span className="anz-codigo">{evento.codigo}</span>}
+      {evento.estado === "error" && <span className="anz-fila-error">con error</span>}
+    </li>
+  );
+}
 
-  // Mantiene a la vista el documento en proceso en lotes largos.
-  useEffect(() => {
-    filaActual.current?.scrollIntoView({ block: "nearest" });
-  }, [actual?.codigo]);
+export function PasoProcesando({ lote, onPausar }: { lote: EstadoLote; onPausar: () => void }) {
+  const c = lote.contadores;
+  const terminados = c.completados + c.errores;
+  const porcentaje = c.total ? (terminados / c.total) * 100 : 0;
+  const m = lote.memoria;
 
   return (
     <div className="anz-seccion">
@@ -62,51 +73,73 @@ export function PasoProcesando({ lote, onCancelar }: { lote: EstadoLote; onCance
               className="man-progress__track"
               role="progressbar"
               aria-valuemin={0}
-              aria-valuemax={docs.length}
+              aria-valuemax={c.total}
               aria-valuenow={terminados}
-              aria-valuetext={
-                errores > 0
-                  ? `${terminados} de ${docs.length}, ${errores} con error`
-                  : `${terminados} de ${docs.length}`
-              }
+              aria-valuetext={`${terminados} de ${c.total}`}
             >
               <div className="man-progress__fill" style={{ width: `${porcentaje}%` }} />
             </div>
             <p className="man-progress__label">
-              {terminados} de {docs.length}
-              {errores > 0 && <span className="man-progress__label-errors"> · {errores} con error</span>}
-              {lote.cancelado && " · cancelando…"}
+              {terminados.toLocaleString("es-CO")} de {c.total.toLocaleString("es-CO")} ·{" "}
+              {porcentaje.toFixed(porcentaje < 10 ? 1 : 0).replace(".", ",")} %
+              {c.errores > 0 && (
+                <span className="man-progress__label-errors"> · {c.errores.toLocaleString("es-CO")} con error</span>
+              )}
+              {lote.pausando && " · pausando tras el documento en curso…"}
             </p>
           </div>
         </div>
 
-        <ul className="man-file-list anz-lista-progreso" aria-label="Documentos del lote" aria-live="polite">
-          {docs.map((d) => (
-            <li
-              key={d.codigo}
-              ref={d.estado === "procesando" ? filaActual : undefined}
-              className={`man-file-row man-file-row--${CLASE[d.estado]}`}
-              aria-label={`${d.archivoOriginal}: ${ETIQUETA[d.estado]}`}
-            >
-              <span
-                className={
-                  "material-symbols-outlined man-file-row__icon" +
-                  (d.estado === "procesando" ? " man-file-row__icon--spin" : "")
-                }
-                aria-hidden="true"
-              >
-                {getIconGlyph(ICONO[d.estado])}
-              </span>
-              <span className="man-file-row__name">{d.archivoOriginal}</span>
-              {d.estado === "completado" && <span className="anz-codigo">{d.codigo}</span>}
-            </li>
+        <dl className="anz-metricas">
+          <div>
+            <dt>Velocidad</dt>
+            <dd>{lote.porMinuto ? `${lote.porMinuto.toLocaleString("es-CO")} docs/min` : "calculando…"}</dd>
+          </div>
+          <div>
+            <dt>Tiempo restante</dt>
+            <dd>{lote.segundosRestantes != null ? formatearDuracion(lote.segundosRestantes) : "calculando…"}</dd>
+          </div>
+          {m && (
+            <div>
+              <dt>Memoria libre</dt>
+              <dd>
+                {formatearMb(m.disponibleMb)} de {formatearMb(m.totalMb)}
+                {m.esperando && (
+                  <Badge tone="warning" size="sm">
+                    esperando memoria
+                  </Badge>
+                )}
+              </dd>
+            </div>
+          )}
+          {m && (
+            <div>
+              <dt>Análisis por fragmentos de</dt>
+              <dd>{m.fragmento.toLocaleString("es-CO")} caracteres</dd>
+            </div>
+          )}
+        </dl>
+
+        <ul className="man-file-list" aria-label="Documentos recientes" aria-live="polite">
+          {lote.actual && <Fila evento={lote.actual} />}
+          {lote.recientes.map((e) => (
+            <Fila key={e.codigo} evento={e} />
           ))}
         </ul>
       </section>
 
       <div className="anz-acciones">
-        <Button variant="outlined" tone="danger" disabled={lote.cancelado} onClick={onCancelar}>
-          Cancelar lote
+        <Button
+          variant="outlined"
+          disabled={lote.pausando}
+          iconLeft={
+            <span className="material-symbols-outlined" aria-hidden="true">
+              {getIconGlyph("pause")}
+            </span>
+          }
+          onClick={onPausar}
+        >
+          Pausar
         </Button>
       </div>
     </div>

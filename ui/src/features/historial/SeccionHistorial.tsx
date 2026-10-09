@@ -1,7 +1,8 @@
 /**
- * Lotes procesados en este equipo. El historial solo guarda totales y la
- * carpeta del lote (nunca nombres de archivo ni datos de pacientes), así que
- * para ver la relación de códigos se abre la carpeta.
+ * Lotes creados en este equipo. El registro solo guarda la carpeta y la fecha
+ * (nunca nombres de archivo ni datos de pacientes); los totales se leen del
+ * lote.sqlite de cada lote. Desde aquí se reanuda un lote en pausa (también
+ * tras cerrar la app) o se abre en Revisión.
  */
 import { useEffect, useState } from "react";
 import { obtenerApi, type EntradaHistorial } from "../../api/escritorio";
@@ -13,7 +14,12 @@ import { plural } from "../anonimizar/formato";
 
 const FECHA = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short" });
 
-export function SeccionHistorial() {
+export interface SeccionHistorialProps {
+  onReanudar: (carpeta: string) => void;
+  onRevisar: (carpeta: string) => void;
+}
+
+export function SeccionHistorial({ onReanudar, onRevisar }: SeccionHistorialProps) {
   const [lotes, setLotes] = useState<EntradaHistorial[] | null>(null);
 
   useEffect(() => {
@@ -46,45 +52,67 @@ export function SeccionHistorial() {
   return (
     <div className="anz-seccion">
       <ul className="anz-lotes" aria-label="Lotes procesados">
-        {lotes.map((l) => (
-          <li key={l.carpeta} className="anz-lote">
-            <span className="material-symbols-outlined anz-lote__icono" aria-hidden="true">
-              {getIconGlyph("folder")}
-            </span>
-            <div className="anz-lote__cuerpo">
-              <span className="anz-lote__titulo">{FECHA.format(new Date(l.fecha))}</span>
-              <span className="anz-lote__ruta" title={l.carpeta}>
-                {l.carpeta}
+        {lotes.map((l) => {
+          const c = l.contadores;
+          return (
+            <li key={l.carpeta} className="anz-lote">
+              <span className="material-symbols-outlined anz-lote__icono" aria-hidden="true">
+                {getIconGlyph("folder")}
               </span>
-              <span className="anz-lote__badges">
-                <Badge tone="success" size="sm">
-                  {plural(l.completados, "anonimizado", "anonimizados")}
-                </Badge>
-                {l.errores > 0 && (
-                  <Badge tone="error" size="sm">
-                    {plural(l.errores, "con error", "con error")}
-                  </Badge>
+              <div className="anz-lote__cuerpo">
+                <span className="anz-lote__titulo">{l.creado ? FECHA.format(new Date(l.creado)) : "—"}</span>
+                <span className="anz-lote__ruta" title={l.carpeta}>
+                  {l.carpeta}
+                </span>
+                {c && (
+                  <span className="anz-lote__badges">
+                    <Badge tone="success" size="sm">
+                      {plural(c.completados, "anonimizado", "anonimizados")}
+                    </Badge>
+                    {c.revisados > 0 && (
+                      <Badge tone="info" size="sm">
+                        {plural(c.revisados, "revisado", "revisados")}
+                      </Badge>
+                    )}
+                    {c.errores > 0 && (
+                      <Badge tone="error" size="sm">
+                        {plural(c.errores, "con error", "con error")}
+                      </Badge>
+                    )}
+                    {c.pendientes > 0 && (
+                      <Badge tone={l.procesando ? "info" : "warning"} size="sm">
+                        {l.procesando ? "procesando" : plural(c.pendientes, "pendiente", "pendientes")}
+                      </Badge>
+                    )}
+                  </span>
                 )}
-                {l.cancelados > 0 && (
-                  <Badge tone="neutral" size="sm">
-                    {plural(l.cancelados, "cancelado", "cancelados")}
-                  </Badge>
-                )}
-              </span>
-            </div>
-            {l.existe ? (
-              <Button
-                variant="outlined"
-                size="sm"
-                onClick={async () => void (await obtenerApi()).abrir_ruta(l.carpeta)}
-              >
-                Abrir carpeta
-              </Button>
-            ) : (
-              <span className="anz-nota">Carpeta movida o eliminada</span>
-            )}
-          </li>
-        ))}
+              </div>
+              {!l.existe ? (
+                <span className="anz-nota">Carpeta movida o eliminada</span>
+              ) : (
+                <span className="anz-lote__acciones">
+                  {c && c.pendientes > 0 && !l.procesando && (
+                    <Button size="sm" onClick={() => onReanudar(l.carpeta)}>
+                      Reanudar
+                    </Button>
+                  )}
+                  {c && c.completados > 0 && (
+                    <Button variant="outlined" size="sm" onClick={() => onRevisar(l.carpeta)}>
+                      Revisar
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => void (await obtenerApi()).abrir_ruta(l.carpeta)}
+                  >
+                    Abrir carpeta
+                  </Button>
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

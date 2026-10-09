@@ -1,28 +1,30 @@
 /**
  * Flujo de anonimización en tres etapas, en la misma sección:
- *   preparar   -- cargar PDFs (arrastrar o seleccionar) y elegir carpeta destino
- *   procesando -- progreso del lote (mismo patrón visual que ModalAnonimizacion)
- *   resultado  -- relación archivo original ↔ código, y accesos a las carpetas
+ *   preparar   -- cargar PDFs (archivos o carpetas) y elegir carpeta destino
+ *   procesando -- progreso del lote, con pausa
+ *   resultado  -- totales, errores, accesos a la revisión y a las carpetas
  *
- * El estado del lote vive en Python; aquí solo se consulta (`estado_lote`)
- * cada INTERVALO_MS mientras está activo.
+ * El estado del lote vive en Python (y en lote.sqlite); aquí solo se consulta
+ * un resumen (`estado_lote`) cada INTERVALO_MS mientras está activo.
  */
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  obtenerApi,
-  type ArchivoPdf,
-  type EstadoLote,
-} from "../../api/escritorio";
+import { useEffect, useRef, useState } from "react";
+import { obtenerApi, type EstadoLote } from "../../api/escritorio";
 import { useToast } from "../../components/Toast/useToast";
 import { PasoPreparar } from "./PasoPreparar";
 import { PasoProcesando } from "./PasoProcesando";
 import { PasoResultado } from "./PasoResultado";
 
-const INTERVALO_MS = 400;
+const INTERVALO_MS = 500;
 
-export function SeccionAnonimizar() {
+export interface SeccionAnonimizarProps {
+  onRevisar: (carpeta: string) => void;
+  /** Carpeta de un lote a reanudar (desde el Historial). */
+  reanudar: string | null;
+  onReanudado: () => void;
+}
+
+export function SeccionAnonimizar({ onRevisar, reanudar, onReanudado }: SeccionAnonimizarProps) {
   const toast = useToast();
-  const [archivos, setArchivos] = useState<ArchivoPdf[]>([]);
   const [destino, setDestino] = useState("");
   const [motorListo, setMotorListo] = useState(false);
   const [errorMotor, setErrorMotor] = useState<string | null>(null);
@@ -30,13 +32,43 @@ export function SeccionAnonimizar() {
   const [iniciando, setIniciando] = useState(false);
   const sondeo = useRef<number | null>(null);
 
-  // Carpeta destino por defecto + espera a que Python termine de cargar spaCy.
+  const detenerSondeo = () => {
+    if (sondeo.current !== null) window.clearInterval(sondeo.current);
+    sondeo.current = null;
+  };
+
+  async function seguir() {
+    const api = await obtenerApi();
+    setLote(await api.estado_lote());
+    detenerSondeo();
+    sondeo.current = window.setInterval(async () => {
+      const estado = await api.estado_lote();
+      setLote(estado);
+      if (estado && !estado.activo) {
+        detenerSondeo();
+        const { errores, pendientes } = estado.contadores;
+        toast.show({
+          tone: pendientes > 0 ? "info" : errores > 0 ? "warning" : "success",
+          message: pendientes > 0 ? "Lote en pausa" : "Lote terminado",
+          description:
+            errores > 0
+              ? `${errores.toLocaleString("es-CO")} ${errores === 1 ? "documento no se pudo" : "documentos no se pudieron"} anonimizar.`
+              : undefined,
+        });
+      }
+    }, INTERVALO_MS);
+  }
+
+  // Carpeta destino por defecto, lote en curso (si la interfaz se recargó) y
+  // espera a que Python termine de cargar spaCy.
   useEffect(() => {
     let vivo = true;
     void (async () => {
       const api = await obtenerApi();
       const carpeta = await api.carpeta_predeterminada();
       if (vivo) setDestino((actual) => actual || carpeta);
+      const enCurso = await api.estado_lote();
+      if (vivo && enCurso?.activo) void seguir();
       while (vivo) {
         const estado = await api.estado_motor();
         if (estado.listo || estado.error) {
@@ -49,94 +81,51 @@ export function SeccionAnonimizar() {
     })();
     return () => {
       vivo = false;
+      detenerSondeo();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al montar
   }, []);
 
-  const detenerSondeo = () => {
-    if (sondeo.current !== null) window.clearInterval(sondeo.current);
-    sondeo.current = null;
-  };
-  useEffect(() => detenerSondeo, []);
-
-  const agregar = useCallback(
-    (nuevos: ArchivoPdf[]) => {
-      if (nuevos.length === 0) {
-        toast.show({ tone: "warning", message: "No se encontraron archivos PDF." });
-        return;
-      }
-      const rutas = new Set(archivos.map((a) => a.ruta));
-      const sinRepetir = nuevos.filter((a) => !rutas.has(a.ruta));
-      const repetidos = nuevos.length - sinRepetir.length;
-      if (repetidos > 0) {
-        toast.show({
-          tone: "info",
-          message: `${repetidos} ${repetidos === 1 ? "archivo ya estaba" : "archivos ya estaban"} en la lista.`,
-        });
-      }
-      setArchivos([...archivos, ...sinRepetir]);
-    },
-    [archivos, toast],
-  );
-
-  async function iniciar() {
+  async function arrancar(accion: () => Promise<{ ok: boolean; error?: string }>) {
     setIniciando(true);
-    const api = await obtenerApi();
-    const r = await api.iniciar_lote(
-      archivos.map((a) => a.ruta),
-      destino,
-    );
+    const r = await accion();
     setIniciando(false);
     if (!r.ok) {
       toast.show({ tone: "error", message: "No se pudo iniciar el lote", description: r.error });
       return;
     }
-    setLote(await api.estado_lote());
-    detenerSondeo();
-    sondeo.current = window.setInterval(async () => {
-      const estado = await api.estado_lote();
-      setLote(estado);
-      if (estado && !estado.activo) {
-        detenerSondeo();
-        const errores = estado.documentos.filter((d) => d.estado === "error").length;
-        toast.show({
-          tone: errores > 0 ? "warning" : "success",
-          message: estado.cancelado ? "Lote cancelado" : "Lote terminado",
-          description:
-            errores > 0
-              ? `${errores} ${errores === 1 ? "documento no se pudo" : "documentos no se pudieron"} anonimizar.`
-              : undefined,
-        });
-      }
-    }, INTERVALO_MS);
+    await seguir();
   }
 
-  async function cancelar() {
-    await (await obtenerApi()).cancelar_lote();
-  }
-
-  function nuevoLote() {
-    setLote(null);
-    setArchivos([]);
-  }
+  // Reanudar pedido desde el Historial.
+  useEffect(() => {
+    if (!reanudar || !motorListo) return;
+    onReanudado();
+    void arrancar(async () => (await obtenerApi()).reanudar_lote(reanudar));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reanudar, motorListo]);
 
   if (lote?.activo) {
-    return <PasoProcesando lote={lote} onCancelar={cancelar} />;
+    return <PasoProcesando lote={lote} onPausar={async () => (await obtenerApi()).pausar_lote()} />;
   }
   if (lote) {
-    return <PasoResultado lote={lote} onNuevoLote={nuevoLote} />;
+    return (
+      <PasoResultado
+        lote={lote}
+        onNuevoLote={() => setLote(null)}
+        onReanudar={() => void arrancar(async () => (await obtenerApi()).reanudar_lote(lote.carpeta))}
+        onRevisar={onRevisar}
+      />
+    );
   }
   return (
     <PasoPreparar
-      archivos={archivos}
       destino={destino}
       motorListo={motorListo}
       errorMotor={errorMotor}
       iniciando={iniciando}
-      onAgregar={agregar}
-      onQuitar={(ruta) => setArchivos((a) => a.filter((x) => x.ruta !== ruta))}
-      onLimpiar={() => setArchivos([])}
       onCambiarDestino={setDestino}
-      onIniciar={iniciar}
+      onIniciar={() => void arrancar(async () => (await obtenerApi()).iniciar_lote(destino))}
     />
   );
 }

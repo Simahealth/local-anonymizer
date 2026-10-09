@@ -301,12 +301,8 @@
 
 /* ---------- Progreso (complementa modalAnonimizacion.css) ---------- */
 
-.anz-lista-progreso {
-  max-height: 360px;
-  overflow-y: auto;
-}
-
-.anz-lista-progreso .man-file-row__name {
+/* Nombre a la izquierda, código/estado alineados a la derecha. */
+.anz-seccion .man-file-row__name {
   flex: 1;
   min-width: 0;
 }
@@ -468,4 +464,85 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-6);
+}
+
+/* ---------- Revisión: el canvas no scrollea, lo hacen sus columnas ---------- */
+
+.anz-canvas-fijo {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.anz-canvas-fijo > .anz-header .anz-header__titulo {
+  margin-bottom: var(--space-12);
+}
+
+.anz-canvas-fijo > .anz-seccion {
+  overflow-y: auto;
+}
+
+/* ---------- Lotes grandes ---------- */
+
+.anz-mas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.anz-metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-12);
+  margin: 0;
+}
+
+.anz-metricas > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.anz-metricas dt {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.anz-metricas dd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.anz-fila-error {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--text-error);
+}
+
+.anz-aviso--info {
+  background: var(--surface-info);
+  border: 1px solid var(--sima-blue);
+  color: var(--text-primary);
+}
+
+.anz-tabla__error-celda {
+  font-size: var(--text-xs);
+  color: var(--text-error);
+}
+
+.anz-lote__acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
 }
