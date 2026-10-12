@@ -9,6 +9,9 @@ fines de investigación, auditoría o analítica. Procesa desde un documento has
 **decenas de miles** en un mismo lote, y entrega una tabla que relaciona cada
 archivo original con su nuevo código.
 
+Es **gratuita y de código abierto**: SimaHealth la ofrece al público para que
+cualquier institución pueda usarla, revisarla y mejorarla.
+
 ![Revisión de un documento anonimizado](docs/capturas/4-revision.png)
 
 ## Descargar
@@ -139,6 +142,20 @@ primeros de cada tipo de formato.
 - Está diseñada para historias clínicas **en español de Colombia**. Otros
   formatos (p. ej. teléfonos o direcciones de otros países) pueden detectarse
   peor.
+
+## Código abierto
+
+SIMA Anonimizador se publica bajo la licencia
+[GNU AGPL-3.0](LICENSE): puedes usarla, estudiar su código, modificarla y
+redistribuirla, siempre que las versiones modificadas que distribuyas (o
+ofrezcas como servicio) también se publiquen con su código bajo la misma
+licencia.
+
+¿Encontraste un dato que no se ocultó o un error? Abre un
+[issue](https://github.com/Simahealth/local-anonymizer/issues) **sin adjuntar
+documentos ni datos reales de pacientes**: describe el formato con un ejemplo
+inventado. Las contribuciones de código son bienvenidas mediante *pull
+requests*.
 
 ## Para desarrolladores
 

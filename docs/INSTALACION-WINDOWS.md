@@ -28,16 +28,14 @@ Si la ventana abre en blanco, ver [Solución de problemas](#solución-de-problem
 
 Descarga el archivo desde la página de
 **[Releases](https://github.com/Simahealth/local-anonymizer/releases/latest)**
-del repositorio, en la sección *Assets*. Hay dos versiones; usa el instalador
-salvo que no puedas instalar programas en el equipo.
+del repositorio, en la sección *Assets*. La descarga es gratuita y no necesita
+cuenta de GitHub. Hay dos versiones; usa el instalador salvo que no puedas
+instalar programas en el equipo.
 
 | Archivo | Para qué sirve |
 | --- | --- |
 | `SIMA-Anonimizador-X.Y.Z-Windows-instalador.exe` | Instala la aplicación con accesos directos en el menú Inicio. **Recomendado.** |
 | `SIMA-Anonimizador-Windows-portable.zip` | Se descomprime en una carpeta y se ejecuta sin instalar. Útil en equipos con restricciones. |
-
-El repositorio es privado: necesitas una cuenta de GitHub con acceso. Si no la
-tienes, pide el archivo al equipo de SimaHealth.
 
 ## Instalar paso a paso
 

@@ -12,9 +12,8 @@ equipo: la aplicación no necesita internet y ningún documento sale de él.
 
 Descarga el archivo desde la página de
 **[Releases](https://github.com/Simahealth/local-anonymizer/releases/latest)**
-del repositorio, en la sección *Assets*. El repositorio es privado: necesitas
-una cuenta de GitHub con acceso. Si no la tienes, pide el archivo al equipo de
-SimaHealth.
+del repositorio, en la sección *Assets*. La descarga es gratuita y no necesita
+cuenta de GitHub.
 
 Hay un instalador para cada tipo de procesador. Para saber cuál tiene tu Mac,
 haz clic en la **manzana** de la esquina superior izquierda → **Acerca de esta
