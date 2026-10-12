@@ -72,6 +72,10 @@ class Anonimizador:
         self._detector = DetectorPII()
         self._reemplazador = Reemplazador()
 
+    @property
+    def modelo_nombres_disponible(self) -> bool:
+        return self._detector.modelo_nombres_disponible
+
     def recargar(self) -> None:
         """Descarta el modelo y lo vuelve a cargar (libera el vocabulario que
         spaCy acumula en lotes largos; ver memoria.py)."""

@@ -25,6 +25,8 @@ export interface PasoPrepararProps {
   destino: string;
   motorListo: boolean;
   errorMotor: string | null;
+  /** El modelo de nombres no se cargó: solo reglas + gazetteer (menos recall). */
+  sinModeloNombres?: boolean;
   iniciando: boolean;
   onCambiarDestino: (carpeta: string) => void;
   onIniciar: () => void;
@@ -40,6 +42,7 @@ export function PasoPreparar({
   destino,
   motorListo,
   errorMotor,
+  sinModeloNombres = false,
   iniciando,
   onCambiarDestino,
   onIniciar,
@@ -244,6 +247,16 @@ export function PasoPreparar({
         <p role="alert" className="anz-aviso anz-aviso--error">
           {icono("error")}
           No se pudo iniciar el motor de anonimización: {errorMotor}
+        </p>
+      )}
+
+      {sinModeloNombres && (
+        <p role="alert" className="anz-aviso anz-aviso--advertencia">
+          {icono("warning")}
+          <span>
+            <strong>No se encontró el modelo de nombres.</strong> La app detectará solo los nombres de su lista
+            interna y puede dejar nombres sin ocultar. Reinstala la aplicación o revisa cada documento en Revisión.
+          </span>
         </p>
       )}
 

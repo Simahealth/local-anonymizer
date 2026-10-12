@@ -30,7 +30,7 @@ from anonimizador.lote import Anonimizador, EventoDocumento, Lote, desde_utf16
 from anonimizador.memoria import GestorMemoria
 
 NOMBRE_APP = "SIMA Anonimizador"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 LIMITE_PAGINA = 200
 
 
@@ -104,7 +104,12 @@ class ApiEscritorio:
             self._error_motor = f"{e.__class__.__name__}: {e}"
 
     def estado_motor(self) -> dict:
-        return {"listo": self._anonimizador is not None, "error": self._error_motor}
+        return {
+            "listo": self._anonimizador is not None,
+            "error": self._error_motor,
+            # Sin el modelo, los nombres que no estén en el gazetteer se escapan.
+            "modeloNombres": bool(self._anonimizador and self._anonimizador.modelo_nombres_disponible),
+        }
 
     def info(self) -> dict:
         return {"version": VERSION, "plataforma": platform.system()}

@@ -120,7 +120,7 @@ export interface InfoLote {
 }
 
 export interface ApiEscritorio {
-  estado_motor(): Promise<{ listo: boolean; error: string | null }>;
+  estado_motor(): Promise<{ listo: boolean; error: string | null; modeloNombres?: boolean }>;
   info(): Promise<{ version: string; plataforma: string }>;
 
   agregar_rutas(rutas: string[]): Promise<ResumenSeleccion>;

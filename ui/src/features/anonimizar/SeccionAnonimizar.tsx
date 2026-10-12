@@ -28,6 +28,7 @@ export function SeccionAnonimizar({ onRevisar, reanudar, onReanudado }: SeccionA
   const [destino, setDestino] = useState("");
   const [motorListo, setMotorListo] = useState(false);
   const [errorMotor, setErrorMotor] = useState<string | null>(null);
+  const [sinModeloNombres, setSinModeloNombres] = useState(false);
   const [lote, setLote] = useState<EstadoLote | null>(null);
   const [iniciando, setIniciando] = useState(false);
   const sondeo = useRef<number | null>(null);
@@ -74,6 +75,7 @@ export function SeccionAnonimizar({ onRevisar, reanudar, onReanudado }: SeccionA
         if (estado.listo || estado.error) {
           setMotorListo(estado.listo);
           setErrorMotor(estado.error);
+          setSinModeloNombres(estado.listo && estado.modeloNombres === false);
           return;
         }
         await new Promise((r) => setTimeout(r, 500));
@@ -123,6 +125,7 @@ export function SeccionAnonimizar({ onRevisar, reanudar, onReanudado }: SeccionA
       destino={destino}
       motorListo={motorListo}
       errorMotor={errorMotor}
+      sinModeloNombres={sinModeloNombres}
       iniciando={iniciando}
       onCambiarDestino={setDestino}
       onIniciar={() => void arrancar(async () => (await obtenerApi()).iniciar_lote(destino))}

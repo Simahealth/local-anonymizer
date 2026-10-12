@@ -1,3 +1,4 @@
+import os
 import re
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from .reconocedores.fecha import ReconocedorFecha
 from .reconocedores.nombre import ReconocedorNombreMayusculas
 from .reconocedores.email_espaciado import ReconocedorEmailEspaciado
 from .reconocedores.nombre_gazetteer import ReconocedorNombreGazetteer, _normalizar, cargar_nombres
+from .reconocedores.nombre_modelo import ReconocedorNombreModelo
 from .reconocedores.registro_medico import ReconocedorRegistroMedico
 from .reconocedores.telefono import ReconocedorTelefonoColombia
 
@@ -52,6 +54,7 @@ MAPA_ENTIDADES: dict[str, str] = {
     "NOMBRE_MAYUS":  "nombres",
     "NOMBRE_GAZETTEER": "nombres",
     "EMAIL_ESPACIADO": "emails",
+    "NOMBRE_MODELO": "nombres",
 }
 
 # Palabras que spaCy clasifica erróneamente como entidades en texto clínico.
@@ -114,6 +117,12 @@ class DetectorPII:
     def __init__(self):
         self._analizador = self._construir_analizador()
 
+    @property
+    def modelo_nombres_disponible(self) -> bool:
+        """True si el modelo NER de nombres está cargado (ver nombre_modelo.py)."""
+        return any(isinstance(r, ReconocedorNombreModelo) and r.disponible
+                   for r in self._analizador.registry.recognizers)
+
     def detectar(self, texto: str) -> dict[str, set[str]]:
         """Retorna {categoria: conjunto de valores detectados en el texto}."""
         return self._detectar_con_presidio(texto)
@@ -138,6 +147,8 @@ class DetectorPII:
         analizador.registry.add_recognizer(ReconocedorNombreMayusculas())
         analizador.registry.add_recognizer(ReconocedorNombreGazetteer())
         analizador.registry.add_recognizer(ReconocedorEmailEspaciado())
+        if not os.environ.get("SIMA_SIN_MODELO_NOMBRES"):
+            analizador.registry.add_recognizer(ReconocedorNombreModelo())
         return analizador
 
     def _detectar_con_presidio(self, texto: str) -> dict[str, set[str]]:

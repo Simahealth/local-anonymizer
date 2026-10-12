@@ -120,6 +120,28 @@ Los builds no están firmados con un certificado de la organización:
   información → Ejecutar de todas formas). Se evita firmando con un certificado
   de firma de código.
 
+## Modelo de nombres (NER entrenado, local)
+
+En exports todo en minúscula y sin tildes ni el NER general de spaCy ni una
+lista de nombres sirven: con nombres que no están en la lista la detección cae
+a ~3 %. `anonimizador/modelos/nombres` es un NER de spaCy (CNN, CPU, 16 MB)
+entrenado para este formato: reconoce nombres por su contexto ("madre ___ cc",
+"dra ___ de neumologia", "firmado por ___ residente") y por su forma.
+
+- Se empaqueta dentro de la app (no requiere instalación aparte ni internet).
+  Si faltara, la app lo avisa y la autoprueba de CI falla.
+- Entrenamiento: `tests/evaluacion/entrenar_modelo_nombres.py`, con aumento de
+  datos (copias de cada historia con nombres inventados, para que aprenda el
+  contexto y no memorice nombres). Toma ~30 min en un núcleo de CPU.
+- Evaluación sin trampa: los nombres del dataset se reemplazaron (con agentes,
+  `variar_nombres_dataset.py`) en tres variantes disjuntas: **A** para
+  entrenar, **C** para elegir el mejor punto del entrenamiento y **B** solo
+  para medir. En B (nombres nunca vistos): 87,9 % de nombres detectados con
+  87,2 % de precisión, y 90,2 % de redacción efectiva total (sin el modelo:
+  59,1 %). Se compararon modelos públicos en español (PlanTL capitel-ner-plus,
+  BSC MEDDOCAN): ninguno superó a este en este formato, y son 10–80 veces más
+  grandes.
+
 ## Calidad de la anonimización
 
 `make fugas` mide lo que importa para la privacidad: corre el pipeline completo

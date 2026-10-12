@@ -50,13 +50,17 @@ def al_soltar(ventana: webview.Window, api: ApiEscritorio, evento: dict) -> None
 def autoprueba(origen: str, salida: str) -> int:
     from anonimizador.lote import Anonimizador, Lote
 
+    anonimizador = Anonimizador()
     lote = Lote.crear([a["ruta"] for a in pdfs_en([origen])], salida)
-    lote.procesar(Anonimizador())
+    lote.procesar(anonimizador)
     c = lote.almacen.contadores()
     _, errores = lote.almacen.listar(0, 50, "errores")
-    resumen = {**c, "mensajesError": [f["error"] for f in errores], "carpeta": str(lote.carpeta)}
+    resumen = {**c, "mensajesError": [f["error"] for f in errores], "carpeta": str(lote.carpeta),
+               "modeloNombres": anonimizador.modelo_nombres_disponible}
     Path(salida, "autoprueba.json").write_text(json.dumps(resumen, ensure_ascii=False, indent=2))
-    return 0 if c["total"] and c["completados"] == c["total"] else 1
+    # Un build sin el modelo de nombres no debe publicarse: falla la autoprueba.
+    ok = c["total"] and c["completados"] == c["total"] and resumen["modeloNombres"]
+    return 0 if ok else 1
 
 
 def main() -> None:

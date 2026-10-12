@@ -183,7 +183,7 @@ export function crearSimulador(): ApiEscritorio {
 
   return {
     async estado_motor() {
-      return { listo: true, error: null };
+      return { listo: true, error: null, modeloNombres: true };
     },
     async info() {
       return { version: "1.1.0", plataforma: "Navegador (simulado)" };
