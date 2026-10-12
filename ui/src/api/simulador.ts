@@ -20,6 +20,7 @@ import type {
   FiltroDocumentos,
   TramoRevision,
 } from "./escritorio";
+import paquete from "../../package.json";
 
 const MS_POR_DOCUMENTO = 120;
 
@@ -186,7 +187,7 @@ export function crearSimulador(): ApiEscritorio {
       return { listo: true, error: null, modeloNombres: true };
     },
     async info() {
-      return { version: "1.1.0", plataforma: "Navegador (simulado)" };
+      return { version: paquete.version, plataforma: "Navegador (simulado)" };
     },
 
     async agregar_rutas(rutas) {
