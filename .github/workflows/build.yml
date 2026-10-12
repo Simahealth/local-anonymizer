@@ -108,3 +108,27 @@ jobs:
             dist/*.exe
             dist/*.zip
           if-no-files-found: error
+
+  # Al subir una etiqueta vX.Y.Z se publica un Release con los instaladores
+  # de las tres plataformas (pestaña "Releases" del repositorio).
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: instaladores
+          merge-multiple: true
+      - name: Publicar release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: SIMA Anonimizador ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            instaladores/*.dmg
+            instaladores/*.exe
+            instaladores/*.zip
+          fail_on_unmatched_files: true
