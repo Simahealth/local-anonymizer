@@ -22,19 +22,22 @@ archivo original con su nuevo código.
 | Mac con chip Apple (M1, M2, M3…) | `SIMA-Anonimizador-macOS-AppleSilicon.dmg` |
 | Mac con procesador Intel | `SIMA-Anonimizador-macOS-Intel.dmg` |
 
-¿No sabes qué Mac tienes? Menú  → *Acerca de esta Mac*: si dice **Chip
+¿No sabes qué Mac tienes? Manzana de la esquina superior izquierda → *Acerca de esta Mac*: si dice **Chip
 Apple**, usa *AppleSilicon*; si dice **Procesador Intel**, usa *Intel*.
 
 > **Primera vez que la abres:** la aplicación aún no está firmada con un
-> certificado, así que el sistema muestra un aviso.
+> certificado, así que el sistema muestra un aviso que se autoriza una sola vez.
 > - **Windows:** en "Windows protegió su PC", haz clic en *Más información* →
 >   *Ejecutar de todas formas*.
-> - **macOS:** haz clic derecho sobre la app → *Abrir* → *Abrir*.
->
-> Solo ocurre la primera vez.
+> - **macOS:** sigue los pasos de *Primera apertura* del manual (cambian según
+>   la versión de macOS).
 
-**Requisitos:** 64 bits, 4 GB de RAM (8 GB recomendado) y unos 600 MB libres.
-No necesita internet ni instalar nada más: todo viene incluido.
+**Manuales de instalación paso a paso:**
+[Windows](docs/INSTALACION-WINDOWS.md) · [macOS](docs/INSTALACION-MACOS.md)
+
+**Requisitos:** Windows 10/11 de 64 bits o macOS 11 o posterior, 4 GB de RAM
+(8 GB recomendado) y unos 500 MB libres. No necesita internet ni instalar nada
+más: todo viene incluido.
 
 ## Cómo se usa
 
