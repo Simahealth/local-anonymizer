@@ -1,0 +1,13 @@
+# Servicio HTTP (servicio/app.py): solo el motor + FastAPI. Sin pywebview,
+# openpyxl ni pyinstaller (son de la app de escritorio).
+presidio-analyzer==2.2.364
+spacy==3.8.16
+es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl
+tldextract==5.4.0
+pymupdf==1.28.2
+reportlab==5.0.1
+psutil==7.2.2
+
+fastapi==0.115.12
+uvicorn==0.34.2
+python-multipart==0.0.20
